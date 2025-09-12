@@ -111,7 +111,7 @@ const BivariateMap = () => {
         return () => {
             clickListener.remove();
         }
-    }, [map, isDefiningArea, handleMapClick]);
+    }, [map, isDefiningArea]);
 
     // Effect to draw the main field polygon
     useEffect(() => {
@@ -138,6 +138,10 @@ const BivariateMap = () => {
         }
     }, [map, fieldPath]);
 
+
+    const onCellHover = useCallback((data: CellData | null) => {
+        setHoverData(data);
+    }, []);
 
     // Effect to generate and display the grid
     useEffect(() => {
@@ -197,7 +201,7 @@ const BivariateMap = () => {
                 p.setMap(null)
             });
         };
-    }, [map, fieldPath, onCellHover]);
+    }, [map, fieldPath, onCellHover, gridPolygons]);
 
     return (
         <>
