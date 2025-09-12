@@ -21,19 +21,36 @@ export function RegisterForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (fieldCoordinates.length < 3) {
-      toast({
-        title: "Incomplete Boundary",
-        description: "Please mark at least 3 points on the map to define your field.",
-        variant: "destructive",
-      })
-      return;
+    try {
+      // Only check for a valid polygon if the user has started marking one.
+      const coords = JSON.parse(fieldCoordinates || '[]');
+      if (coords.length > 0 && coords.length < 3) {
+        toast({
+          title: "Incomplete Boundary",
+          description: "Please mark at least 3 points on the map, or clear the boundary to register without one.",
+          variant: "destructive",
+        })
+        return;
+      }
+      
+      // In a real app, you would save the form data and coordinates to your backend.
+      // For this demo, we'll save it to localStorage.
+      if (coords.length >= 3) {
+        localStorage.setItem('bhumicare_field_coordinates', fieldCoordinates);
+        console.log('Registered with field coordinates:', fieldCoordinates);
+      } else {
+        // If no valid boundary is set, clear any old one from storage.
+        localStorage.removeItem('bhumicare_field_coordinates');
+        console.log('Registered without field coordinates.');
+      }
+      router.push('/dashboard');
+    } catch (error) {
+       toast({
+          title: "Invalid Boundary Data",
+          description: "There was an issue processing the field boundary data. Please try again.",
+          variant: "destructive",
+        })
     }
-    // In a real app, you would save the form data and coordinates to your backend.
-    // For this demo, we'll save it to localStorage.
-    localStorage.setItem('bhumicare_field_coordinates', fieldCoordinates);
-    console.log('Registered with field coordinates:', fieldCoordinates);
-    router.push('/dashboard');
   };
 
   return (

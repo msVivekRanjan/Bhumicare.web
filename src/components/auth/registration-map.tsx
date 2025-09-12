@@ -131,7 +131,7 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
         defaultCenter={{ lat: 20.5937, lng: 78.9629 }}
         defaultZoom={5}
         gestureHandling={isMarking ? 'none' : 'cooperative'}
-        disableDefaultUI={isMarking}
+        disableDefaultUI={false}
         mapId="bhumicare_reg_map"
         onClick={handleMapClick}
         style={{ cursor: isMarking ? 'crosshair' : 'default' }}
@@ -143,23 +143,23 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
       </Map>
       <div className="absolute top-2 left-2 right-2 flex justify-between items-start gap-2">
          <div className="flex flex-col gap-2">
-            <Button onClick={() => setIsMarking(!isMarking)} variant={isMarking ? "secondary" : "default"} size="sm">
+            <Button type="button" onClick={() => setIsMarking(!isMarking)} variant={isMarking ? "secondary" : "default"} size="sm">
                 {isMarking ? <Move className="mr-2 h-4 w-4" /> : <MapPin className="mr-2 h-4 w-4" />}
                 {isMarking ? 'Stop Marking' : 'Start Marking'}
             </Button>
-            <Button onClick={handleLocateMe} variant="outline" size="sm" disabled={isLocating || isMarking}>
+            <Button type="button" onClick={handleLocateMe} variant="outline" size="sm" disabled={isLocating || isMarking}>
                 {isLocating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LocateFixed className="mr-2 h-4 w-4" />}
                 Use My Location
             </Button>
          </div>
          <div className="flex flex-col gap-2">
             {isMarking && (
-                <Button variant="outline" size="sm" onClick={undoLastPoint} disabled={points.length === 0}>
+                <Button type="button" variant="outline" size="sm" onClick={undoLastPoint} disabled={points.length === 0}>
                     <Undo2 className="mr-2 h-4 w-4" />
                     Undo
                 </Button>
             )}
-            <Button variant="destructive" size="sm" onClick={clearBoundary} disabled={points.length === 0}>
+            <Button type="button" variant="destructive" size="sm" onClick={clearBoundary} disabled={points.length === 0}>
               Clear
             </Button>
          </div>

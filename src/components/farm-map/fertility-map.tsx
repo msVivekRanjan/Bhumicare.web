@@ -5,10 +5,11 @@ import { Map, useMap, InfoWindow, useApiIsLoaded } from '@vis.gl/react-google-ma
 import { generateSoilFertilityMap, SoilFertilityMapInput, SoilFertilityMapOutput } from '@/ai/flows/soil-fertility-map';
 import type { SubRegionData } from '@/types';
 import { Button } from '../ui/button';
-import { Wand2, Loader2, AlertTriangle } from 'lucide-react';
+import { Wand2, Loader2, AlertTriangle, LocateFixed } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { useTranslation } from '@/hooks/use-translation';
 import { Skeleton } from '../ui/skeleton';
+import { useToast } from '@/hooks/use-toast';
 
 function FertilityPolygon({ subRegion, onClick }: { subRegion: SubRegionData, onClick: (subRegion: SubRegionData) => void }) {
     const map = useMap();
@@ -51,48 +52,94 @@ export function FertilityMap() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<SubRegionData | null>(null);
-  const [fieldCoordinates, setFieldCoordinates] = useState<google.maps.LatLngLiteral[]>([]);
+  const [fieldCoordinates, setFieldCoordinates] = useState<google.maps.LatLngLiteral[] | null>(null);
+  const [center, setCenter] = useState<google.maps.LatLngLiteral>({ lat: 20.5937, lng: 78.9629 });
+  const [isLocating, setIsLocating] = useState(false);
+
   const { t } = useTranslation();
+  const { toast } = useToast();
   const isApiLoaded = useApiIsLoaded();
   const map = useMap();
   
+  // Default coordinates for Delhi, used as a fallback.
   const defaultFieldCoordinates = [
-      { lat: 28.6139, lng: 77.2090 }, // India Gate, New Delhi
+      { lat: 28.6139, lng: 77.2090 },
       { lat: 28.6130, lng: 77.2100 },
       { lat: 28.6120, lng: 77.2085 },
       { lat: 28.6129, lng: 77.2075 }
   ];
 
-  useEffect(() => {
-    const savedCoords = localStorage.getItem('bhumicare_field_coordinates');
-    let coordsToUse = defaultFieldCoordinates;
-    if (savedCoords) {
-      try {
-        const parsedCoords = JSON.parse(savedCoords);
-        if (Array.isArray(parsedCoords) && parsedCoords.length > 2) {
-          coordsToUse = parsedCoords;
-        }
-      } catch (e) {
-        console.error("Failed to parse coordinates from localStorage, using default.", e);
-      }
-    }
-    setFieldCoordinates(coordsToUse);
-  }, []);
-
-  const getCenter = (coords: google.maps.LatLngLiteral[]) => {
+  const getCenterFromCoords = (coords: google.maps.LatLngLiteral[]) => {
       if (!isApiLoaded || !coords || coords.length === 0) return { lat: 20.5937, lng: 78.9629 };
       const bounds = new window.google.maps.LatLngBounds();
       coords.forEach(point => bounds.extend(point));
       return bounds.getCenter().toJSON();
   }
 
-  useEffect(() => {
-    if (map && isApiLoaded && fieldCoordinates.length > 0) {
-        const bounds = new window.google.maps.LatLngBounds();
-        fieldCoordinates.forEach(point => bounds.extend(point));
-        map.fitBounds(bounds);
+  const locateUser = () => {
+    setIsLocating(true);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const userLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          setCenter(userLocation);
+          map?.moveCamera({ center: userLocation, zoom: 16 });
+          setIsLocating(false);
+        },
+        () => {
+          toast({
+            title: "Location Access Denied",
+            description: "Please enable location permissions in your browser to use this feature.",
+            variant: "destructive"
+          });
+          setIsLocating(false);
+        }
+      );
+    } else {
+      toast({
+        title: "Geolocation Not Supported",
+        description: "Your browser does not support geolocation.",
+        variant: "destructive"
+      });
+      setIsLocating(false);
     }
-  }, [fieldCoordinates, map, isApiLoaded]);
+  }
+
+  useEffect(() => {
+    const savedCoordsStr = localStorage.getItem('bhumicare_field_coordinates');
+    if (savedCoordsStr) {
+      try {
+        const parsedCoords = JSON.parse(savedCoordsStr);
+        if (Array.isArray(parsedCoords) && parsedCoords.length > 2) {
+          setFieldCoordinates(parsedCoords);
+          const newCenter = getCenterFromCoords(parsedCoords);
+          setCenter(newCenter);
+          return;
+        }
+      } catch (e) {
+        console.error("Failed to parse coordinates from localStorage.", e);
+      }
+    }
+    setFieldCoordinates(null); // Explicitly set to null if no valid coords
+    locateUser(); // Ask for location if no saved boundary
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isApiLoaded]);
+
+
+  useEffect(() => {
+    if (map && isApiLoaded && center) {
+        const zoom = fieldCoordinates ? 18 : 16;
+        map.moveCamera({center, zoom});
+        if(fieldCoordinates) {
+            const bounds = new window.google.maps.LatLngBounds();
+            fieldCoordinates.forEach(point => bounds.extend(point));
+            map.fitBounds(bounds);
+        }
+    }
+  }, [center, fieldCoordinates, map, isApiLoaded]);
 
 
   const mockSensorData: Omit<SoilFertilityMapInput, 'fieldCoordinates'> = {
@@ -108,10 +155,8 @@ export function FertilityMap() {
 
 
   const fetchFertilityMap = async () => {
-    if (fieldCoordinates.length === 0) {
-      setError("No field boundary defined. Please register and define your field.");
-      return;
-    }
+    const coordsToUse = fieldCoordinates || defaultFieldCoordinates;
+    
     setLoading(true);
     setError(null);
     setMapData(null);
@@ -119,7 +164,7 @@ export function FertilityMap() {
     try {
       const input = {
         ...mockSensorData,
-        fieldCoordinates: JSON.stringify(fieldCoordinates),
+        fieldCoordinates: JSON.stringify(coordsToUse),
       };
       
       const result = await generateSoilFertilityMap(input);
@@ -148,8 +193,8 @@ export function FertilityMap() {
       <div className="flex-1 h-1/2 lg:h-full rounded-lg overflow-hidden relative border">
         {isApiLoaded ? (
             <Map
-                center={getCenter(fieldCoordinates)}
-                zoom={18}
+                center={center}
+                zoom={16}
                 gestureHandling={'cooperative'}
                 disableDefaultUI={false}
                 fullscreenControl={true}
@@ -210,10 +255,15 @@ export function FertilityMap() {
                   <h4 className="font-semibold mb-2">Overall Recommendation:</h4>
                   <p className="text-sm text-muted-foreground leading-relaxed">{mapData.overallRecommendation}</p>
                 </div>
+            ) : fieldCoordinates === null ? (
+              <div className="text-center space-y-2 text-sm text-muted-foreground">
+                <p>No field boundary has been set for your account.</p>
+                <p>You can generate a map for a default area, or register a new field boundary.</p>
+              </div>
             ) : (
                 <p className="text-sm text-muted-foreground">Click 'Generate Map' to get an AI-powered analysis of your field.</p>
             )}
-            <Button onClick={fetchFertilityMap} disabled={loading || fieldCoordinates.length === 0} className="w-full">
+            <Button onClick={fetchFertilityMap} disabled={loading} className="w-full">
               {loading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
@@ -221,6 +271,12 @@ export function FertilityMap() {
               )}
               {t('generate_map')}
             </Button>
+            {!fieldCoordinates && (
+              <Button onClick={locateUser} variant="outline" className="w-full">
+                {isLocating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LocateFixed className="mr-2 h-4 w-4" />}
+                Center on My Location
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
