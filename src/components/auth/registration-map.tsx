@@ -20,6 +20,7 @@ function DrawnPolygon({ paths }: { paths: google.maps.LatLngLiteral[] }) {
     useEffect(() => {
         if (!map) return;
 
+        // If a polygon doesn't exist, create it and add it to the map.
         if (!polygonRef.current) {
             polygonRef.current = new google.maps.Polygon({
                 paths: paths,
@@ -28,25 +29,23 @@ function DrawnPolygon({ paths }: { paths: google.maps.LatLngLiteral[] }) {
                 strokeWeight: 2,
                 fillColor: "#3498DB",
                 fillOpacity: 0.35,
+                clickable: false, // Ensure the polygon itself isn't clickable
             });
             polygonRef.current.setMap(map);
         } else {
+            // If it exists, just update its path
             polygonRef.current.setPaths(paths);
         }
+    }, [map, paths]);
 
-        return () => {
-            if (polygonRef.current) {
-                polygonRef.current.setMap(null);
-                polygonRef.current = null;
-            }
-        };
-    }, [map]);
-    
+    // Cleanup effect to remove the polygon when the component unmounts
     useEffect(() => {
-        if(polygonRef.current) {
-            polygonRef.current.setPaths(paths);
+      return () => {
+        if (polygonRef.current) {
+            polygonRef.current.setMap(null);
         }
-    }, [paths]);
+      }
+    }, [])
 
     return null;
 }
@@ -56,6 +55,9 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
   const { t } = useTranslation();
 
   const handleMapClick = (e: google.maps.MapMouseEvent) => {
+    // Prevent clicks on markers from adding new points
+    if (e.detail.isAdvancedMarker) return;
+    
     if (e.latLng) {
       setPoints([...points, e.latLng.toJSON()]);
     }

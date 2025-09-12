@@ -53,7 +53,7 @@ const soilFertilityMapPrompt = ai.definePrompt({
   prompt: `You are an expert agronomist and soil scientist. Your task is to analyze sensor data for a given farm field and provide a detailed breakdown for a choropleth map.
 
 Based on the overall sensor data and the field's boundary coordinates, you must:
-1.  Divide the field into 4 logical, equal-area quadrilateral sub-regions (e.g., North-West, North-East, South-West, South-East).
+1.  Divide the field into 8 logical, equal-area quadrilateral sub-regions in a 4x2 grid.
 2.  For each sub-region, estimate the specific soil conditions (N, P, K, moisture) by introducing slight, logical variations from the overall sensor data. For example, one area might be slightly drier, another might have lower nitrogen.
 3.  Calculate a single 'fertilityIndex' (a normalized value from 0.0 for very poor to 1.0 for excellent) for each sub-region based on its specific conditions.
 4.  Provide a concise, one-sentence farming recommendation for each specific sub-region.

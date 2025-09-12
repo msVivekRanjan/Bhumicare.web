@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Map, useMap, InfoWindow, AdvancedMarker } from '@vis.gl/react-google-maps';
+import { Map, useMap, InfoWindow } from '@vis.gl/react-google-maps';
 import { generateSoilFertilityMap, SoilFertilityMapInput, SoilFertilityMapOutput, SubRegionData } from '@/ai/flows/soil-fertility-map';
 import { Button } from '../ui/button';
 import { Wand2, Loader2, AlertTriangle } from 'lucide-react';
@@ -65,8 +65,8 @@ export function FertilityMap() {
 
   const fieldBounds = {
     north: 28.615,
-    south: 28.610,
-    east: 77.232,
+    south: 28.612,
+    east: 77.230,
     west: 77.225,
   };
   const fieldCoordinates = [
@@ -113,7 +113,7 @@ export function FertilityMap() {
       <div className="flex-1 h-1/2 lg:h-full rounded-lg overflow-hidden relative border">
         <Map
             defaultCenter={center}
-            defaultZoom={15}
+            defaultZoom={17}
             gestureHandling={'greedy'}
             disableDefaultUI={true}
             mapId="bhumicare_fertility_map"
@@ -127,7 +127,7 @@ export function FertilityMap() {
                 position={getInfoWindowPosition(selectedRegion.polygon)}
                 onCloseClick={() => setSelectedRegion(null)}
              >
-                <div className="p-2">
+                <div className="p-2 text-black">
                     <h4 className="font-bold text-base mb-2">Region: {selectedRegion.id}</h4>
                     <p><b>Fertility Index:</b> {(selectedRegion.fertilityIndex * 100).toFixed(0)}%</p>
                     <p><b>N:</b> {selectedRegion.nitrogen} mg/kg, <b>P:</b> {selectedRegion.phosphorus} mg/kg, <b>K:</b> {selectedRegion.potassium} mg/kg</p>
