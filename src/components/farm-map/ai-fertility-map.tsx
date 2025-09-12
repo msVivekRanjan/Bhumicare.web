@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { APIProvider, Map, useMap, InfoWindow, AdvancedMarker, Polygon } from '@vis.gl/react-google-maps';
+import { APIProvider, Map, useMap, InfoWindow, AdvancedMarker } from '@vis.gl/react-google-maps';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
 import { MapLegend } from './map-legend';
 import { Button } from '../ui/button';
@@ -37,23 +37,124 @@ const mockGeminiService = {
 
 type CellData = ReturnType<typeof mockGeminiService.getSoilAnalysis>;
 
-const FertilityGrid = ({ bounds, onCellHover }: { bounds: google.maps.LatLngBounds, onCellHover: (data: CellData | null) => void }) => {
+const BivariateMap = () => {
     const map = useMap();
+    const [hoverData, setHoverData] = useState<CellData | null>(null);
+    const [fieldPath, setFieldPath] = useState<google.maps.LatLngLiteral[]>([]);
+    const [isDefiningArea, setIsDefiningArea] = useState(false);
+    const [markers, setMarkers] = useState<google.maps.LatLngLiteral[]>([]);
     const [gridPolygons, setGridPolygons] = useState<google.maps.Polygon[]>([]);
+    const [fieldPolygon, setFieldPolygon] = useState<google.maps.Polygon | null>(null);
 
+    // Load user's location and saved polygon on init
     useEffect(() => {
-        if (!map || !bounds) return;
+        if (!map) return;
+
+        const storedLocation = localStorage.getItem('bhumicare_user_location');
+        let initialCenter = INDIA_CENTER;
+        if (storedLocation) {
+            try {
+                initialCenter = JSON.parse(storedLocation);
+            } catch (e) { console.error("Failed to parse user location"); }
+        }
+        map.setCenter(initialCenter);
+        map.setZoom(storedLocation ? 15 : 5);
+
+        const storedPolygon = localStorage.getItem('bhumicare_field_coordinates');
+        if (storedPolygon) {
+            try {
+                const path = JSON.parse(storedPolygon);
+                if (path && path.length > 2) {
+                    setFieldPath(path);
+                }
+            } catch (e) { console.error("Failed to parse stored polygon"); }
+        }
+    }, [map]);
+
+    const handleMapClick = (e: google.maps.MapMouseEvent) => {
+        if (!isDefiningArea || !e.latLng) return;
+        const newMarker = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+        setMarkers(prev => [...prev, newMarker]);
+    };
+
+    const startDefiningArea = () => {
+        // Clear existing grid and field polygons from the map
+        gridPolygons.forEach(p => p.setMap(null));
+        setGridPolygons([]);
+        fieldPolygon?.setMap(null);
+        setFieldPolygon(null);
+        
+        setFieldPath([]);
+        setMarkers([]);
+        setIsDefiningArea(true);
+        setHoverData(null);
+    };
+    
+    const finishDefiningArea = useCallback(() => {
+        if (markers.length < 3) {
+            alert("Please mark at least 3 points to form a field area.");
+            return;
+        }
+        setFieldPath(markers);
+        localStorage.setItem('bhumicare_field_coordinates', JSON.stringify(markers));
+        setIsDefiningArea(false);
+        setMarkers([]); // Clear temporary markers
+    }, [markers]);
+
+    const undoLastMarker = () => {
+        setMarkers(prev => prev.slice(0, -1));
+    };
+    
+    useEffect(() => {
+        if (!map) return;
+        const clickListener = map.addListener('click', handleMapClick);
+        return () => {
+            clickListener.remove();
+        }
+    }, [map, isDefiningArea, handleMapClick]);
+
+    // Effect to draw the main field polygon
+    useEffect(() => {
+        if (!map || fieldPath.length < 3) return;
+
+        fieldPolygon?.setMap(null); // Clear previous polygon
+
+        const newFieldPolygon = new google.maps.Polygon({
+            paths: fieldPath,
+            fillColor: "#00FF00",
+            fillOpacity: 0.1,
+            strokeColor: "#00FF00",
+            strokeWeight: 2,
+            map: map,
+        });
+
+        const bounds = new google.maps.LatLngBounds();
+        fieldPath.forEach(coord => bounds.extend(coord));
+        map.fitBounds(bounds);
+        setFieldPolygon(newFieldPolygon);
+
+        return () => {
+            newFieldPolygon.setMap(null);
+        }
+    }, [map, fieldPath]);
+
+
+    // Effect to generate and display the grid
+    useEffect(() => {
+        if (!map || fieldPath.length < 3) return;
 
         // Clean up old polygons
         gridPolygons.forEach(p => p.setMap(null));
 
+        const bounds = new google.maps.LatLngBounds();
+        fieldPath.forEach(p => bounds.extend(p));
         const sw = bounds.getSouthWest();
         const ne = bounds.getNorthEast();
 
         const latStep = (ne.lat() - sw.lat()) / 5;
         const lngStep = (ne.lng() - sw.lng()) / 5;
 
-        const newPolygons: google.maps.Polygon[] = [];
+        const newGridPolygons: google.maps.Polygon[] = [];
 
         for (let i = 0; i < 5; i++) {
             for (let j = 0; j < 5; j++) {
@@ -85,99 +186,23 @@ const FertilityGrid = ({ bounds, onCellHover }: { bounds: google.maps.LatLngBoun
                 polygon.addListener('mouseover', () => onCellHover((polygon as any).analysisData));
                 polygon.addListener('mouseout', () => onCellHover(null));
 
-                newPolygons.push(polygon);
+                newGridPolygons.push(polygon);
             }
         }
-        setGridPolygons(newPolygons);
+        setGridPolygons(newGridPolygons);
 
         return () => {
-            newPolygons.forEach(p => {
+            newGridPolygons.forEach(p => {
                 google.maps.event.clearInstanceListeners(p);
                 p.setMap(null)
             });
         };
-    }, [map, bounds, onCellHover]);
-
-    return null;
-}
-
-
-const BivariateMap = () => {
-    const map = useMap();
-    const [hoverData, setHoverData] = useState<CellData | null>(null);
-    const [fieldPath, setFieldPath] = useState<google.maps.LatLngLiteral[]>([]);
-    const [fieldBounds, setFieldBounds] = useState<google.maps.LatLngBounds | null>(null);
-    const [isDefiningArea, setIsDefiningArea] = useState(false);
-    const [markers, setMarkers] = useState<google.maps.LatLngLiteral[]>([]);
-
-    // Load user's location on init
-    useEffect(() => {
-        const storedLocation = localStorage.getItem('bhumicare_user_location');
-        let initialCenter = INDIA_CENTER;
-        if (storedLocation) {
-            try {
-                initialCenter = JSON.parse(storedLocation);
-            } catch (e) { console.error("Failed to parse user location"); }
-        }
-        if (map) {
-            map.setCenter(initialCenter);
-            map.setZoom(storedLocation ? 15 : 5);
-        }
-    }, [map]);
-
-    const handleMapClick = (e: google.maps.MapMouseEvent) => {
-        if (!isDefiningArea || !e.latLng) return;
-        const newMarker = { lat: e.latLng.lat(), lng: e.latLng.lng() };
-        setMarkers(prev => [...prev, newMarker]);
-    };
-
-    const startDefiningArea = () => {
-        setFieldPath([]);
-        setMarkers([]);
-        setFieldBounds(null);
-        setIsDefiningArea(true);
-    };
-    
-    const finishDefiningArea = useCallback(() => {
-        if (markers.length < 3) {
-            alert("Please mark at least 3 points to form a field area.");
-            return;
-        }
-        setFieldPath(markers);
-        localStorage.setItem('bhumicare_field_coordinates', JSON.stringify(markers));
-
-
-        const bounds = new google.maps.LatLngBounds();
-        markers.forEach(coord => bounds.extend(coord));
-        setFieldBounds(bounds);
-        map?.fitBounds(bounds);
-        
-        setIsDefiningArea(false);
-        setMarkers([]); // Clear temporary markers
-    }, [markers, map]);
-
-    const undoLastMarker = () => {
-        setMarkers(prev => prev.slice(0, -1));
-    };
-    
-    useEffect(() => {
-        if (!map) return;
-        map.addListener('click', handleMapClick);
-        return () => {
-            google.maps.event.clearListeners(map, 'click');
-        }
-    }, [map, isDefiningArea]);
-
+    }, [map, fieldPath, onCellHover]);
 
     return (
         <>
             {markers.map((pos, index) => <AdvancedMarker key={index} position={pos} />)}
-            {fieldPath.length > 2 && fieldBounds && (
-                <>
-                    <Polygon paths={fieldPath} fillColor="#00FF00" fillOpacity={0.1} strokeColor="#00FF00" strokeWeight={2} />
-                    <FertilityGrid bounds={fieldBounds} onCellHover={setHoverData} />
-                </>
-            )}
+
              {hoverData && (
                 <InfoWindow
                     position={hoverData.coords}
