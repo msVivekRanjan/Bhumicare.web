@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Map, useMap, InfoWindow } from '@vis.gl/react-google-maps';
-import { generateSoilFertilityMap, SoilFertilityMapInput, SoilFertilityMapOutput, SubRegionData } from '@/ai/flows/soil-fertility-map';
+import { generateSoilFertilityMap, SoilFertilityMapInput, SoilFertilityMapOutput } from '@/ai/flows/soil-fertility-map';
+import type { SubRegionData } from '@/types';
 import { Button } from '../ui/button';
 import { Wand2, Loader2, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
@@ -50,7 +51,43 @@ export function FertilityMap() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<SubRegionData | null>(null);
+  const [fieldCoordinates, setFieldCoordinates] = useState<google.maps.LatLngLiteral[]>([]);
   const { t } = useTranslation();
+  
+  const defaultFieldBounds = {
+    north: 28.615, south: 28.612, east: 77.230, west: 77.225
+  };
+  const defaultFieldCoordinates = [
+      { lat: defaultFieldBounds.north, lng: defaultFieldBounds.west },
+      { lat: defaultFieldBounds.north, lng: defaultFieldBounds.east },
+      { lat: defaultFieldBounds.south, lng: defaultFieldBounds.east },
+      { lat: defaultFieldBounds.south, lng: defaultFieldBounds.west },
+  ];
+
+  useEffect(() => {
+    const savedCoords = localStorage.getItem('bhumicare_field_coordinates');
+    if (savedCoords) {
+      try {
+        const parsedCoords = JSON.parse(savedCoords);
+        if (Array.isArray(parsedCoords) && parsedCoords.length > 2) {
+          setFieldCoordinates(parsedCoords);
+          return;
+        }
+      } catch (e) {
+        console.error("Failed to parse coordinates from localStorage", e);
+      }
+    }
+    setFieldCoordinates(defaultFieldCoordinates);
+  }, []);
+
+
+  const getCenter = (coords: google.maps.LatLngLiteral[]) => {
+      if (!coords || coords.length === 0) return { lat: 20.5937, lng: 78.9629 };
+      const bounds = new google.maps.LatLngBounds();
+      coords.forEach(point => bounds.extend(point));
+      return bounds.getCenter().toJSON();
+  }
+
 
   const mockSensorData: Omit<SoilFertilityMapInput, 'fieldCoordinates'> = {
     soilMoisture: 45.2,
@@ -63,21 +100,12 @@ export function FertilityMap() {
     potassium: 100,
   };
 
-  const fieldBounds = {
-    north: 28.615,
-    south: 28.612,
-    east: 77.230,
-    west: 77.225,
-  };
-  const fieldCoordinates = [
-      { lat: fieldBounds.north, lng: fieldBounds.west },
-      { lat: fieldBounds.north, lng: fieldBounds.east },
-      { lat: fieldBounds.south, lng: fieldBounds.east },
-      { lat: fieldBounds.south, lng: fieldBounds.west },
-  ];
-  const center = { lat: (fieldBounds.north + fieldBounds.south) / 2, lng: (fieldBounds.east + fieldBounds.west) / 2 };
 
   const fetchFertilityMap = async () => {
+    if (fieldCoordinates.length === 0) {
+      setError("No field boundary defined. Please register and define your field.");
+      return;
+    }
     setLoading(true);
     setError(null);
     setMapData(null);
@@ -111,32 +139,39 @@ export function FertilityMap() {
   return (
     <div className="w-full h-full flex flex-col lg:flex-row gap-4">
       <div className="flex-1 h-1/2 lg:h-full rounded-lg overflow-hidden relative border">
-        <Map
-            defaultCenter={center}
-            defaultZoom={17}
-            gestureHandling={'greedy'}
-            disableDefaultUI={true}
-            mapId="bhumicare_fertility_map"
-            mapTypeId="satellite"
-        >
-          {mapData?.subRegions.map((subRegion) => (
-            <FertilityPolygon key={subRegion.id} subRegion={subRegion} onClick={handlePolygonClick} />
-          ))}
-          {selectedRegion && (
-             <InfoWindow 
-                position={getInfoWindowPosition(selectedRegion.polygon)}
-                onCloseClick={() => setSelectedRegion(null)}
-             >
-                <div className="p-2 text-black">
-                    <h4 className="font-bold text-base mb-2">Region: {selectedRegion.id}</h4>
-                    <p><b>Fertility Index:</b> {(selectedRegion.fertilityIndex * 100).toFixed(0)}%</p>
-                    <p><b>N:</b> {selectedRegion.nitrogen} mg/kg, <b>P:</b> {selectedRegion.phosphorus} mg/kg, <b>K:</b> {selectedRegion.potassium} mg/kg</p>
-                    <p><b>Moisture:</b> {selectedRegion.soilMoisture}%</p>
-                    <p className="mt-2 text-xs italic"><b>Recommendation:</b> {selectedRegion.recommendation}</p>
-                </div>
-             </InfoWindow>
-          )}
-        </Map>
+        {fieldCoordinates.length > 0 ? (
+            <Map
+                center={getCenter(fieldCoordinates)}
+                zoom={17}
+                gestureHandling={'greedy'}
+                disableDefaultUI={true}
+                mapId="bhumicare_fertility_map"
+                mapTypeId="satellite"
+            >
+              {mapData?.subRegions.map((subRegion) => (
+                <FertilityPolygon key={subRegion.id} subRegion={subRegion} onClick={handlePolygonClick} />
+              ))}
+              {selectedRegion && (
+                 <InfoWindow 
+                    position={getInfoWindowPosition(selectedRegion.polygon)}
+                    onCloseClick={() => setSelectedRegion(null)}
+                    options={{ pixelOffset: new google.maps.Size(0, -30) }}
+                 >
+                    <div className="p-2 text-black">
+                        <h4 className="font-bold text-base mb-2">Region: {selectedRegion.id}</h4>
+                        <p><b>Fertility Index:</b> {(selectedRegion.fertilityIndex * 100).toFixed(0)}%</p>
+                        <p><b>N:</b> {selectedRegion.nitrogen} mg/kg, <b>P:</b> {selectedRegion.phosphorus} mg/kg, <b>K:</b> {selectedRegion.potassium} mg/kg</p>
+                        <p><b>Moisture:</b> {selectedRegion.soilMoisture}%</p>
+                        <p className="mt-2 text-xs italic"><b>Recommendation:</b> {selectedRegion.recommendation}</p>
+                    </div>
+                 </InfoWindow>
+              )}
+            </Map>
+        ) : (
+             <div className="w-full h-full flex items-center justify-center bg-muted">
+                <p>Loading map...</p>
+            </div>
+        )}
         {loading && (
           <div className="absolute inset-0 bg-background/50 flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -170,7 +205,7 @@ export function FertilityMap() {
             ) : (
                 <p className="text-sm text-muted-foreground">Click 'Generate Map' to get an AI-powered analysis of your field.</p>
             )}
-            <Button onClick={fetchFertilityMap} disabled={loading} className="w-full">
+            <Button onClick={fetchFertilityMap} disabled={loading || fieldCoordinates.length === 0} className="w-full">
               {loading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (

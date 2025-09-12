@@ -10,15 +10,28 @@ import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
 import { RegistrationMap } from './registration-map';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 export function RegisterForm() {
   const { t } = useTranslation();
   const [fieldCoordinates, setFieldCoordinates] = useState<string>('');
   const router = useRouter();
+  const { toast } = useToast();
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you would save the form data and coordinates
+    if (fieldCoordinates.length < 3) {
+      toast({
+        title: "Incomplete Boundary",
+        description: "Please mark at least 3 points on the map to define your field.",
+        variant: "destructive",
+      })
+      return;
+    }
+    // In a real app, you would save the form data and coordinates to your backend.
+    // For this demo, we'll save it to localStorage.
+    localStorage.setItem('bhumicare_field_coordinates', fieldCoordinates);
     console.log('Registered with field coordinates:', fieldCoordinates);
     router.push('/dashboard');
   };

@@ -20,7 +20,6 @@ function DrawnPolygon({ paths }: { paths: google.maps.LatLngLiteral[] }) {
     useEffect(() => {
         if (!map) return;
 
-        // If a polygon doesn't exist, create it and add it to the map.
         if (!polygonRef.current) {
             polygonRef.current = new google.maps.Polygon({
                 paths: paths,
@@ -29,16 +28,14 @@ function DrawnPolygon({ paths }: { paths: google.maps.LatLngLiteral[] }) {
                 strokeWeight: 2,
                 fillColor: "#3498DB",
                 fillOpacity: 0.35,
-                clickable: false, // Ensure the polygon itself isn't clickable
+                clickable: false,
             });
             polygonRef.current.setMap(map);
         } else {
-            // If it exists, just update its path
             polygonRef.current.setPaths(paths);
         }
     }, [map, paths]);
 
-    // Cleanup effect to remove the polygon when the component unmounts
     useEffect(() => {
       return () => {
         if (polygonRef.current) {
@@ -55,10 +52,7 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
   const { t } = useTranslation();
 
   const handleMapClick = (e: google.maps.MapMouseEvent) => {
-    // Prevent clicks on markers from adding new points
-    if (e.detail.isAdvancedMarker) return;
-    
-    if (e.latLng) {
+    if (e.latLng && points.length < 7) {
       setPoints([...points, e.latLng.toJSON()]);
     }
   };
@@ -72,10 +66,20 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
     onCoordinatesChange(coordsString);
   }, [points, onCoordinatesChange]);
 
+  const getHelperText = () => {
+    if (points.length < 3) {
+      return t('click_to_add_points');
+    }
+    if (points.length >= 7) {
+      return 'Maximum of 7 points reached.';
+    }
+    return `Points added: ${points.length}/7. Click to add more.`;
+  }
+
   return (
     <div className="w-full h-full relative">
       <Map
-        defaultCenter={{ lat: 20.5937, lng: 78.9629 }} // Center of India
+        defaultCenter={{ lat: 20.5937, lng: 78.9629 }}
         defaultZoom={5}
         gestureHandling={'greedy'}
         disableDefaultUI={true}
@@ -88,7 +92,7 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
         {points.length > 2 && <DrawnPolygon paths={points} />}
       </Map>
       <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center bg-background/80 p-2 rounded-md shadow-lg">
-         <p className="text-xs text-muted-foreground">{t('click_to_add_points')}</p>
+         <p className="text-xs text-muted-foreground">{getHelperText()}</p>
          <Button variant="destructive" size="sm" onClick={clearBoundary} disabled={points.length === 0}>
            {t('clear_boundary')}
          </Button>
