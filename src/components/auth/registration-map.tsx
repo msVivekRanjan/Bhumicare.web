@@ -81,7 +81,7 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
       <Map
         defaultCenter={{ lat: 20.5937, lng: 78.9629 }}
         defaultZoom={5}
-        gestureHandling={'greedy'}
+        gestureHandling={'cooperative'}
         disableDefaultUI={true}
         mapId="bhumicare_reg_map"
         onClick={handleMapClick}

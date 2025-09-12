@@ -144,7 +144,7 @@ export function FertilityMap() {
                 center={getCenter(fieldCoordinates)}
                 zoom={17}
                 gestureHandling={'greedy'}
-                disableDefaultUI={true}
+                disableDefaultUI={false}
                 mapId="bhumicare_fertility_map"
                 mapTypeId="satellite"
             >
