@@ -4,6 +4,7 @@ import {
   Map,
   useMap,
   AdvancedMarker,
+  useApiIsLoaded,
 } from '@vis.gl/react-google-maps';
 import { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
@@ -50,6 +51,7 @@ function DrawnPolygon({ paths }: { paths: google.maps.LatLngLiteral[] }) {
 export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
   const [points, setPoints] = useState<google.maps.LatLngLiteral[]>([]);
   const { t } = useTranslation();
+  const isApiLoaded = useApiIsLoaded();
 
   const handleMapClick = (e: google.maps.MapMouseEvent) => {
     if (e.latLng && points.length < 7) {
@@ -76,13 +78,17 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
     return `Points added: ${points.length}/7. Click to add more.`;
   }
 
+  if (!isApiLoaded) {
+    return <div className="w-full h-full flex items-center justify-center bg-muted"><p>Loading map...</p></div>;
+  }
+
   return (
     <div className="w-full h-full relative">
       <Map
         defaultCenter={{ lat: 20.5937, lng: 78.9629 }}
         defaultZoom={5}
         gestureHandling={'cooperative'}
-        disableDefaultUI={true}
+        disableDefaultUI={false}
         mapId="bhumicare_reg_map"
         onClick={handleMapClick}
       >

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Map, useMap, InfoWindow } from '@vis.gl/react-google-maps';
+import { Map, useMap, InfoWindow, useApiIsLoaded } from '@vis.gl/react-google-maps';
 import { generateSoilFertilityMap, SoilFertilityMapInput, SoilFertilityMapOutput } from '@/ai/flows/soil-fertility-map';
 import type { SubRegionData } from '@/types';
 import { Button } from '../ui/button';
@@ -53,6 +53,7 @@ export function FertilityMap() {
   const [selectedRegion, setSelectedRegion] = useState<SubRegionData | null>(null);
   const [fieldCoordinates, setFieldCoordinates] = useState<google.maps.LatLngLiteral[]>([]);
   const { t } = useTranslation();
+  const isApiLoaded = useApiIsLoaded();
   
   const defaultFieldBounds = {
     north: 28.6135, south: 28.6120, east: 77.2285, west: 77.2265
@@ -82,7 +83,7 @@ export function FertilityMap() {
 
 
   const getCenter = (coords: google.maps.LatLngLiteral[]) => {
-      if (!coords || coords.length === 0) return { lat: 20.5937, lng: 78.9629 };
+      if (!coords || coords.length === 0 || !isApiLoaded) return { lat: 20.5937, lng: 78.9629 };
       const bounds = new google.maps.LatLngBounds();
       coords.forEach(point => bounds.extend(point));
       return bounds.getCenter().toJSON();
@@ -139,7 +140,7 @@ export function FertilityMap() {
   return (
     <div className="w-full h-full flex flex-col lg:flex-row gap-4">
       <div className="flex-1 h-1/2 lg:h-full rounded-lg overflow-hidden relative border">
-        {fieldCoordinates.length > 0 ? (
+        {isApiLoaded && fieldCoordinates.length > 0 ? (
             <Map
                 center={getCenter(fieldCoordinates)}
                 zoom={18}
