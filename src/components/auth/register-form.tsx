@@ -15,7 +15,7 @@ import ErrorBoundary from '../error-boundary';
 
 export function RegisterForm() {
   const { t } = useTranslation();
-  const [fieldCoordinates, setFieldCoordinates] = useState<string>('');
+  const [location, setLocation] = useState<string>('');
   const router = useRouter();
   const { toast } = useToast();
 
@@ -23,13 +23,12 @@ export function RegisterForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
       
-      if (fieldCoordinates) {
-        localStorage.setItem('bhumicare_field_coordinates', fieldCoordinates);
-        console.log('Registered with field coordinates:', fieldCoordinates);
-      } else {
+      if (location) {
+        localStorage.setItem('bhumicare_user_location', location);
+        // Clear any old polygon data
         localStorage.removeItem('bhumicare_field_coordinates');
-        console.log('Registered without field coordinates.');
       }
+      
       toast({
         title: "Registration Successful!",
         description: "Your account has been created.",
@@ -58,12 +57,12 @@ export function RegisterForm() {
         <Label>{t('define_field_boundary')}</Label>
         <div className="h-64 w-full rounded-lg overflow-hidden border">
           <ErrorBoundary fallback={<p>Something went wrong with the map.</p>}>
-            <APIProvider apiKey={GOOGLE_MAPS_API_KEY} libraries={['drawing']}>
-                  <RegistrationMap onCoordinatesChange={setFieldCoordinates} />
+            <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
+                  <RegistrationMap onLocationChange={setLocation} />
             </APIProvider>
           </ErrorBoundary>
         </div>
-        <Input id="coordinates" type="hidden" value={fieldCoordinates} />
+        <Input id="coordinates" type="hidden" value={location} />
       </div>
 
       <Button type="submit" className="w-full">
