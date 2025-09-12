@@ -201,7 +201,7 @@ const BivariateMap = () => {
                 p.setMap(null)
             });
         };
-    }, [map, fieldPath, onCellHover, gridPolygons]);
+    }, [map, fieldPath, onCellHover]);
 
     return (
         <>
