@@ -5,24 +5,26 @@ import { APIProvider, Map, useMap, InfoWindow, AdvancedMarker } from '@vis.gl/re
 import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
 import { MapLegend } from './map-legend';
 import { Button } from '../ui/button';
-import { Loader2, LocateFixed, Undo, X, Expand, Shrink, EyeOff } from 'lucide-react';
+import { Loader2, LocateFixed, Undo, Expand, Shrink, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateSoilFertilityMap, SoilFertilityMapOutput } from '@/ai/flows/soil-fertility-map';
+import { getSmartRecommendation } from '@/ai/flows/smart-recommendations';
 import { useTranslation } from '@/hooks/use-translation';
+import { Skeleton } from '../ui/skeleton';
 
 const INDIA_CENTER = { lat: 20.5937, lng: 78.9629 };
+const GRID_RESOLUTION = 7; // Use a 7x7 grid
 
 type CellData = {
     id: string;
-    polygon: { lat: number; lng: number; }[];
+    polygon: google.maps.LatLngLiteral[];
+    center: google.maps.LatLngLiteral;
     nitrogen: number;
     phosphorus: number;
     potassium: number;
     soilMoisture: number;
     fertilityIndex: number;
-    recommendation: string;
 };
-
 
 const BivariateMap = () => {
     const map = useMap();
@@ -39,8 +41,10 @@ const BivariateMap = () => {
     const [tempPolygon, setTempPolygon] = useState<google.maps.Polygon | null>(null);
 
     const [isLoadingMap, setIsLoadingMap] = useState(false);
-    const [mapData, setMapData] = useState<SoilFertilityMapOutput | null>(null);
-
+    const [mapData, setMapData] = useState<CellData[] | null>(null);
+    
+    const [infoWindowRecommendation, setInfoWindowRecommendation] = useState<string | null>(null);
+    const [isRecommendationLoading, setIsRecommendationLoading] = useState(false);
 
     useEffect(() => {
         if (!map) return;
@@ -85,6 +89,7 @@ const BivariateMap = () => {
         return () => {
             google.maps.event.removeListener(clickListener);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [map, isDefiningArea]);
 
     const startDefiningArea = () => {
@@ -117,9 +122,37 @@ const BivariateMap = () => {
         setMarkers(prev => prev.slice(0, -1));
     };
 
+    const fetchRecommendationForCell = useCallback(async (cellData: CellData) => {
+        setIsRecommendationLoading(true);
+        setInfoWindowRecommendation(null);
+        try {
+            const recommendation = await getSmartRecommendation({
+                soilMoisture: cellData.soilMoisture,
+                lightLevel: 98, // Using a typical value
+                gasLevel: 29,   // Using a typical value
+                temperature: 32, // Using a typical value
+                humidity: 74,  // Using a typical value
+                nitrogen: cellData.nitrogen,
+                phosphorus: cellData.phosphorus,
+                potassium: cellData.potassium,
+            });
+            setInfoWindowRecommendation(recommendation.recommendation);
+        } catch (error) {
+            console.error("Failed to get recommendation for cell:", error);
+            setInfoWindowRecommendation("Could not load recommendation.");
+        } finally {
+            setIsRecommendationLoading(false);
+        }
+    }, []);
+
     const onCellHover = useCallback((data: CellData | null) => {
         setHoverData(data);
-    }, []);
+        if(data) {
+            fetchRecommendationForCell(data);
+        } else {
+            setInfoWindowRecommendation(null);
+        }
+    }, [fetchRecommendationForCell]);
 
     const getUserLocation = () => {
         if (navigator.geolocation) {
@@ -188,31 +221,74 @@ const BivariateMap = () => {
         return () => {
             newFieldPolygon.setMap(null);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [map, fieldPath]);
     
+    // Grid Generation and AI call logic
     useEffect(() => {
-        if (fieldPath.length < 3) return;
+        if (fieldPath.length < 3 || !map) return;
+
+        const mainPolygonForCheck = new google.maps.Polygon({ paths: fieldPath });
+        const bounds = new google.maps.LatLngBounds();
+        fieldPath.forEach(p => bounds.extend(p));
+        const sw = bounds.getSouthWest();
+        const ne = bounds.getNorthEast();
+
+        const cellsToAnalyze: {id: string, center: google.maps.LatLngLiteral}[] = [];
+        const cellPolygons: {id: string, polygon: google.maps.LatLngLiteral[], center: google.maps.LatLngLiteral}[] = [];
+
+        const latStep = (ne.lat() - sw.lat()) / GRID_RESOLUTION;
+        const lngStep = (ne.lng() - sw.lng()) / GRID_RESOLUTION;
+
+        for (let i = 0; i < GRID_RESOLUTION; i++) {
+            for (let j = 0; j < GRID_RESOLUTION; j++) {
+                const cellSW = { lat: sw.lat() + i * latStep, lng: sw.lng() + j * lngStep };
+                const cellNE = { lat: sw.lat() + (i + 1) * latStep, lng: sw.lng() + (j + 1) * lngStep };
+                const cellCenter = { lat: cellSW.lat + latStep / 2, lng: cellSW.lng + lngStep / 2 };
+                
+                if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(cellCenter), mainPolygonForCheck)) {
+                    const id = `cell_${i}_${j}`;
+                    cellsToAnalyze.push({ id, center: cellCenter });
+                    cellPolygons.push({
+                        id,
+                        center: cellCenter,
+                        polygon: [
+                            cellSW,
+                            { lat: cellSW.lat, lng: cellNE.lng },
+                            cellNE,
+                            { lat: cellNE.lat, lng: cellSW.lng }
+                        ]
+                    });
+                }
+            }
+        }
 
         const generateMap = async () => {
+            if(cellsToAnalyze.length === 0) {
+                toast({ variant: "destructive", title: "No area to analyze", description: "The defined field area is too small."});
+                return;
+            };
+
             setIsLoadingMap(true);
             setMapData(null);
             gridPolygons.forEach(p => p.setMap(null));
             setGridPolygons([]);
             
             try {
-                const mockSensorData = {
+                const result = await generateSoilFertilityMap({
                     soilMoisture: 45,
-                    lightLevel: 98,
-                    gasLevel: 29,
-                    temperature: 32,
-                    humidity: 74,
                     nitrogen: 150,
                     phosphorus: 50,
                     potassium: 100,
-                    fieldCoordinates: JSON.stringify(fieldPath),
-                };
-                const result = await generateSoilFertilityMap(mockSensorData);
-                setMapData(result);
+                    gridCells: cellsToAnalyze,
+                });
+                
+                const combinedData: CellData[] = result.subRegions.map(region => {
+                    const cellPoly = cellPolygons.find(p => p.id === region.id);
+                    return { ...region, polygon: cellPoly!.polygon, center: cellPoly!.center };
+                });
+
+                setMapData(combinedData);
             } catch (error) {
                 console.error("Failed to generate AI map:", error);
                 toast({
@@ -227,18 +303,17 @@ const BivariateMap = () => {
 
         generateMap();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fieldPath, toast]);
-
+    }, [fieldPath, map, toast]);
+    
+    // Drawing polygons on map
     useEffect(() => {
         if (!map || !mapData) return;
 
         gridPolygons.forEach(p => p.setMap(null));
-
         const newGridPolygons: google.maps.Polygon[] = [];
 
-        mapData.subRegions.forEach(region => {
+        mapData.forEach(region => {
             const fertilityIndex = region.fertilityIndex;
-            
             const hue = (fertilityIndex * 120).toString(10);
             const color = `hsl(${hue}, 100%, 50%)`;
 
@@ -281,18 +356,27 @@ const BivariateMap = () => {
 
              {hoverData && (
                 <InfoWindow
-                    position={hoverData.polygon[0]}
+                    position={hoverData.center}
                     onCloseClick={() => setHoverData(null)}
                     options={{ pixelOffset: new window.google.maps.Size(0, -30) }}
                 >
-                    <div className="p-1 text-black font-body w-56">
-                        <h4 className="font-bold text-base mb-2 font-headline">Cell Analysis (ID: {hoverData.id})</h4>
+                    <div className="p-1 text-black font-body w-64">
+                        <h4 className="font-bold text-base mb-2 font-headline">GPS Sensor: {hoverData.id}</h4>
+                        <p className="text-xs font-mono">Lat: {hoverData.center.lat.toFixed(4)}, Lng: {hoverData.center.lng.toFixed(4)}</p>
+                        <hr className="my-2"/>
                         <p className="text-xs"><b>Fertility Index:</b> {(hoverData.fertilityIndex * 100).toFixed(0)}%</p>
                         <p className="text-xs"><b>Moisture:</b> {hoverData.soilMoisture}%</p>
                         <p className="text-xs"><b>N:</b> {hoverData.nitrogen} | <b>P:</b> {hoverData.phosphorus} | <b>K:</b> {hoverData.potassium}</p>
-                        <p className="mt-2 text-xs italic">
-                           {hoverData.recommendation}
-                        </p>
+                        <div className="mt-2 text-xs italic">
+                           {isRecommendationLoading ? (
+                            <div className="space-y-1">
+                                <Skeleton className="h-3 w-full" />
+                                <Skeleton className="h-3 w-3/4" />
+                            </div>
+                           ) : (
+                            <p>{infoWindowRecommendation}</p>
+                           )}
+                        </div>
                     </div>
                 </InfoWindow>
             )}

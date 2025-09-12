@@ -27,6 +27,7 @@ export type Translations = {
 export type SubRegionData = {
   id: string;
   polygon: { lat: number; lng: number }[];
+  center: { lat: number; lng: number };
   nitrogen: number;
   phosphorus: number;
   potassium: number;
