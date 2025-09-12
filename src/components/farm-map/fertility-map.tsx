@@ -79,6 +79,13 @@ export function FertilityMap() {
     setFieldCoordinates(coordsToUse);
   }, []);
 
+  const getCenter = (coords: google.maps.LatLngLiteral[]) => {
+      if (!isApiLoaded || !coords || coords.length === 0) return { lat: 20.5937, lng: 78.9629 };
+      const bounds = new window.google.maps.LatLngBounds();
+      coords.forEach(point => bounds.extend(point));
+      return bounds.getCenter().toJSON();
+  }
+
   useEffect(() => {
     if (map && isApiLoaded && fieldCoordinates.length > 0) {
         const bounds = new window.google.maps.LatLngBounds();
@@ -86,14 +93,6 @@ export function FertilityMap() {
         map.fitBounds(bounds);
     }
   }, [fieldCoordinates, map, isApiLoaded]);
-
-
-  const getCenter = () => {
-      if (!isApiLoaded || !fieldCoordinates || fieldCoordinates.length === 0) return { lat: 20.5937, lng: 78.9629 };
-      const bounds = new window.google.maps.LatLngBounds();
-      fieldCoordinates.forEach(point => bounds.extend(point));
-      return bounds.getCenter().toJSON();
-  }
 
 
   const mockSensorData: Omit<SoilFertilityMapInput, 'fieldCoordinates'> = {
@@ -147,12 +146,13 @@ export function FertilityMap() {
   return (
     <div className="w-full h-full flex flex-col lg:flex-row gap-4">
       <div className="flex-1 h-1/2 lg:h-full rounded-lg overflow-hidden relative border">
-        {isApiLoaded && fieldCoordinates.length > 0 ? (
+        {isApiLoaded ? (
             <Map
-                center={getCenter()}
+                center={getCenter(fieldCoordinates)}
                 zoom={18}
                 gestureHandling={'cooperative'}
                 disableDefaultUI={false}
+                fullscreenControl={true}
                 mapId="bhumicare_fertility_map"
                 mapTypeId="satellite"
             >
