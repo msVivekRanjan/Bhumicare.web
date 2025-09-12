@@ -266,9 +266,13 @@ export function AIFertilityMap() {
                     defaultCenter={INDIA_CENTER}
                     defaultZoom={5}
                     gestureHandling={'cooperative'}
-                    disableDefaultUI={true}
                     mapId={'bhumicare_ai_fertility_map'}
                     mapTypeId="satellite"
+                    disableDefaultUI={false}
+                    zoomControl={true}
+                    mapTypeControl={true}
+                    streetViewControl={true}
+                    fullscreenControl={true}
                 >
                     <BivariateMap />
                 </Map>
