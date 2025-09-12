@@ -11,6 +11,7 @@ import { RegistrationMap } from './registration-map';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import ErrorBoundary from '../error-boundary';
 
 export function RegisterForm() {
   const { t } = useTranslation();
@@ -22,13 +23,10 @@ export function RegisterForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
       
-      // In a real app, you would save the form data and coordinates to your backend.
-      // For this demo, we'll save it to localStorage.
       if (fieldCoordinates) {
         localStorage.setItem('bhumicare_field_coordinates', fieldCoordinates);
         console.log('Registered with field coordinates:', fieldCoordinates);
       } else {
-        // If no valid boundary is set, clear any old one from storage.
         localStorage.removeItem('bhumicare_field_coordinates');
         console.log('Registered without field coordinates.');
       }
@@ -59,9 +57,11 @@ export function RegisterForm() {
       <div className="grid gap-2">
         <Label>{t('define_field_boundary')}</Label>
         <div className="h-64 w-full rounded-lg overflow-hidden border">
-           <APIProvider apiKey={GOOGLE_MAPS_API_KEY} libraries={['drawing']}>
-                <RegistrationMap onCoordinatesChange={setFieldCoordinates} />
-           </APIProvider>
+          <ErrorBoundary fallback={<p>Something went wrong with the map.</p>}>
+            <APIProvider apiKey={GOOGLE_MAPS_API_KEY} libraries={['drawing']}>
+                  <RegistrationMap onCoordinatesChange={setFieldCoordinates} />
+            </APIProvider>
+          </ErrorBoundary>
         </div>
         <Input id="coordinates" type="hidden" value={fieldCoordinates} />
       </div>
