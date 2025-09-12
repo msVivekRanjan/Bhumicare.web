@@ -42,7 +42,8 @@ function FertilityPolygon({ subRegion, onClick }: { subRegion: SubRegionData, on
                 polygonRef.current.setMap(null);
             }
         };
-    }, [map, subRegion, onClick]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [map, subRegion]);
 
     return null;
 }
@@ -131,12 +132,12 @@ export function FertilityMap() {
 
   useEffect(() => {
     if (map && isApiLoaded && center) {
-        const zoom = fieldCoordinates ? 18 : 16;
-        map.moveCamera({center, zoom});
         if(fieldCoordinates) {
             const bounds = new window.google.maps.LatLngBounds();
             fieldCoordinates.forEach(point => bounds.extend(point));
             map.fitBounds(bounds);
+        } else {
+            map.moveCamera({center, zoom: 16});
         }
     }
   }, [center, fieldCoordinates, map, isApiLoaded]);
