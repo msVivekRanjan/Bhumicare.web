@@ -6,10 +6,11 @@ import {
   AdvancedMarker,
   useApiIsLoaded,
 } from '@vis.gl/react-google-maps';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
-import { MapPin, Move } from 'lucide-react';
+import { MapPin, Move, LocateFixed, Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface RegistrationMapProps {
   onCoordinatesChange: (coordinates: string) => void;
@@ -36,15 +37,13 @@ function DrawnPolygon({ paths }: { paths: google.maps.LatLngLiteral[] }) {
         } else {
             polygonRef.current.setPaths(paths);
         }
-    }, [map, paths]);
 
-    useEffect(() => {
-      return () => {
-        if (polygonRef.current) {
-            polygonRef.current.setMap(null);
+        return () => {
+          if (polygonRef.current) {
+              polygonRef.current.setMap(null);
+          }
         }
-      }
-    }, [])
+    }, [map, paths]);
 
     return null;
 }
@@ -52,8 +51,11 @@ function DrawnPolygon({ paths }: { paths: google.maps.LatLngLiteral[] }) {
 export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
   const [points, setPoints] = useState<google.maps.LatLngLiteral[]>([]);
   const [isMarking, setIsMarking] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
   const { t } = useTranslation();
   const isApiLoaded = useApiIsLoaded();
+  const map = useMap();
+  const { toast } = useToast();
 
   const handleMapClick = (e: google.maps.MapMouseEvent) => {
     if (isMarking && e.latLng && points.length < 7) {
@@ -63,6 +65,37 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
 
   const clearBoundary = () => {
     setPoints([]);
+  };
+
+  const handleLocateMe = () => {
+    setIsLocating(true);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const userLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          map?.moveCamera({ center: userLocation, zoom: 16 });
+          setIsLocating(false);
+        },
+        () => {
+          toast({
+            title: "Location Access Denied",
+            description: "Please enable location permissions in your browser to use this feature.",
+            variant: "destructive"
+          });
+          setIsLocating(false);
+        }
+      );
+    } else {
+      toast({
+        title: "Geolocation Not Supported",
+        description: "Your browser does not support geolocation.",
+        variant: "destructive"
+      });
+      setIsLocating(false);
+    }
   };
 
   useEffect(() => {
@@ -103,11 +136,17 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
         ))}
         {points.length > 2 && <DrawnPolygon paths={points} />}
       </Map>
-      <div className="absolute top-2 left-2 right-2 flex justify-between items-center bg-background/80 p-2 rounded-md shadow-lg">
-        <Button onClick={() => setIsMarking(!isMarking)} variant={isMarking ? "secondary" : "default"}>
-            {isMarking ? <Move className="mr-2 h-4 w-4" /> : <MapPin className="mr-2 h-4 w-4" />}
-            {isMarking ? 'Stop Marking' : 'Start Marking'}
-        </Button>
+      <div className="absolute top-2 left-2 right-2 flex justify-between items-start gap-2">
+         <div className="flex flex-col gap-2">
+            <Button onClick={() => setIsMarking(!isMarking)} variant={isMarking ? "secondary" : "default"} size="sm">
+                {isMarking ? <Move className="mr-2 h-4 w-4" /> : <MapPin className="mr-2 h-4 w-4" />}
+                {isMarking ? 'Stop Marking' : 'Start Marking'}
+            </Button>
+            <Button onClick={handleLocateMe} variant="outline" size="sm" disabled={isLocating}>
+                {isLocating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LocateFixed className="mr-2 h-4 w-4" />}
+                Use My Location
+            </Button>
+         </div>
          <Button variant="destructive" size="sm" onClick={clearBoundary} disabled={points.length === 0}>
            {t('clear_boundary')}
          </Button>

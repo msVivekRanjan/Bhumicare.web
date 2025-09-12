@@ -132,6 +132,7 @@ export function FertilityMap() {
   };
 
   const getInfoWindowPosition = (polygon: {lat: number, lng: number}[]) => {
+    if (!isApiLoaded) return { lat: 0, lng: 0 };
     const bounds = new google.maps.LatLngBounds();
     polygon.forEach(point => bounds.extend(point));
     return bounds.getCenter().toJSON();
@@ -144,7 +145,7 @@ export function FertilityMap() {
             <Map
                 center={getCenter(fieldCoordinates)}
                 zoom={18}
-                gestureHandling={'greedy'}
+                gestureHandling={'cooperative'}
                 disableDefaultUI={false}
                 mapId="bhumicare_fertility_map"
                 mapTypeId="satellite"
