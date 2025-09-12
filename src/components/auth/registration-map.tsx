@@ -47,7 +47,9 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
   // Initialize DrawingManager
   useEffect(() => {
     // Ensure the map and the drawing library are loaded before creating the manager
-    if (!map || !isApiLoaded || !window.google.maps.drawing) return;
+    if (!map || !isApiLoaded || !window.google?.maps?.drawing) {
+        return;
+    }
 
     const manager = new google.maps.drawing.DrawingManager({
       drawingMode: google.maps.drawing.DrawingMode.POLYGON,
