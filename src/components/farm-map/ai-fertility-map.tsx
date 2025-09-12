@@ -5,10 +5,9 @@ import { APIProvider, Map, useMap, InfoWindow, AdvancedMarker } from '@vis.gl/re
 import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
 import { MapLegend } from './map-legend';
 import { Button } from '../ui/button';
-import { Loader2, LocateFixed, Undo, X } from 'lucide-react';
+import { Loader2, LocateFixed, Undo, X, Expand, Shrink, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateSoilFertilityMap, SoilFertilityMapOutput } from '@/ai/flows/soil-fertility-map';
-import { Skeleton } from '../ui/skeleton';
 import { useTranslation } from '@/hooks/use-translation';
 
 const INDIA_CENTER = { lat: 20.5937, lng: 78.9629 };
@@ -30,22 +29,20 @@ const BivariateMap = () => {
     const { t } = useTranslation();
     const { toast } = useToast();
 
-    // Component State
     const [hoverData, setHoverData] = useState<CellData | null>(null);
     const [fieldPath, setFieldPath] = useState<google.maps.LatLngLiteral[]>([]);
     const [isDefiningArea, setIsDefiningArea] = useState(false);
     const [markers, setMarkers] = useState<google.maps.LatLngLiteral[]>([]);
     
-    // Map Objects State
     const [gridPolygons, setGridPolygons] = useState<google.maps.Polygon[]>([]);
     const [fieldPolygon, setFieldPolygon] = useState<google.maps.Polygon | null>(null);
     const [tempPolygon, setTempPolygon] = useState<google.maps.Polygon | null>(null);
 
-    // AI Data State
     const [isLoadingMap, setIsLoadingMap] = useState(false);
     const [mapData, setMapData] = useState<SoilFertilityMapOutput | null>(null);
+    const [isRecommendationVisible, setIsRecommendationVisible] = useState(true);
 
-    // Load user's location and saved polygon on init
+
     useEffect(() => {
         if (!map) return;
 
@@ -66,7 +63,6 @@ const BivariateMap = () => {
                 if (path && path.length > 2) {
                     setFieldPath(path);
                 } else {
-                    // If no valid polygon, prompt user to define one
                     toast({ title: "Define your farm", description: "Click 'Define Field Area' to get started."});
                 }
             } catch (e) { 
@@ -77,8 +73,6 @@ const BivariateMap = () => {
             toast({ title: "Define your farm", description: "Click 'Define Field Area' to get started."});
         }
     }, [map, toast]);
-    
-    // --- Map Interaction Handlers ---
     
     const handleMapClick = (e: google.maps.MapMouseEvent) => {
         if (!isDefiningArea || !e.latLng) return;
@@ -95,7 +89,6 @@ const BivariateMap = () => {
     }, [map, isDefiningArea]);
 
     const startDefiningArea = () => {
-        // Clear everything
         gridPolygons.forEach(p => p.setMap(null));
         setGridPolygons([]);
         fieldPolygon?.setMap(null);
@@ -108,6 +101,7 @@ const BivariateMap = () => {
         setMarkers([]);
         setIsDefiningArea(true);
         setHoverData(null);
+        setIsRecommendationVisible(true);
     };
     
     const finishDefiningArea = useCallback(() => {
@@ -150,9 +144,6 @@ const BivariateMap = () => {
         }
     }
     
-    // --- Drawing Effects ---
-    
-    // Effect for the temporary polygon while marking
     useEffect(() => {
         if (!map || !isDefiningArea) return;
 
@@ -177,7 +168,6 @@ const BivariateMap = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [map, markers, isDefiningArea]);
 
-    // Effect to draw the final field polygon
     useEffect(() => {
         if (!map || fieldPath.length < 3) return;
 
@@ -202,8 +192,6 @@ const BivariateMap = () => {
         }
     }, [map, fieldPath]);
     
-    // --- AI Data Fetching and Grid Generation ---
-    
     useEffect(() => {
         if (fieldPath.length < 3) return;
 
@@ -214,7 +202,6 @@ const BivariateMap = () => {
             setGridPolygons([]);
             
             try {
-                 // Mock data for now, replace with actual sensor data
                 const mockSensorData = {
                     soilMoisture: 45,
                     lightLevel: 98,
@@ -241,10 +228,9 @@ const BivariateMap = () => {
         };
 
         generateMap();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fieldPath, toast]);
 
-
-    // Effect to generate and display the grid from AI data
     useEffect(() => {
         if (!map || !mapData) return;
 
@@ -255,7 +241,6 @@ const BivariateMap = () => {
         mapData.subRegions.forEach(region => {
             const fertilityIndex = region.fertilityIndex;
             
-            // Create color from fertility index (0=red, 0.5=yellow, 1=green)
             const hue = (fertilityIndex * 120).toString(10);
             const color = `hsl(${hue}, 100%, 50%)`;
 
@@ -270,7 +255,6 @@ const BivariateMap = () => {
                 zIndex: 3,
             });
             
-            // Attach data to the polygon object for hover effect
             (polygon as any).analysisData = region;
 
             const mouseoverListener = () => onCellHover((polygon as any).analysisData);
@@ -291,17 +275,15 @@ const BivariateMap = () => {
             });
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [map, mapData]);
+    }, [map, mapData, onCellHover]);
 
     return (
         <>
-            {/* Markers while defining area */}
             {isDefiningArea && markers.map((pos, index) => <AdvancedMarker key={index} position={pos} />)}
 
-            {/* InfoWindow for hover */}
              {hoverData && (
                 <InfoWindow
-                    position={hoverData.polygon[0]} // Position at first point of the cell
+                    position={hoverData.polygon[0]}
                     onCloseClick={() => setHoverData(null)}
                     options={{ pixelOffset: new window.google.maps.Size(0, -30) }}
                 >
@@ -317,7 +299,6 @@ const BivariateMap = () => {
                 </InfoWindow>
             )}
 
-             {/* UI Controls */}
              <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
                 {!isDefiningArea ? (
                     <Button onClick={startDefiningArea}>Define New Field Area</Button>
@@ -349,21 +330,51 @@ const BivariateMap = () => {
                 </div>
              )}
              
-             {mapData && !isLoadingMap && (
-                 <div className="absolute bottom-16 md:bottom-4 left-1/2 -translate-x-1/2 bg-background/80 p-3 rounded-lg shadow-lg text-center z-10 max-w-lg">
-                    <h4 className="font-bold font-headline text-primary">{t('ai_map_recommendation')}</h4>
-                    <p className="text-sm text-muted-foreground">{mapData.overallRecommendation}</p>
+             {mapData && !isLoadingMap && isRecommendationVisible && (
+                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/80 p-3 rounded-lg shadow-lg text-center z-20 max-w-lg">
+                    <div className="flex justify-between items-start gap-4">
+                        <div>
+                            <h4 className="font-bold font-headline text-primary">{t('ai_map_recommendation')}</h4>
+                            <p className="text-sm text-muted-foreground">{mapData.overallRecommendation}</p>
+                        </div>
+                         <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={() => setIsRecommendationVisible(false)}>
+                            <EyeOff className="h-4 w-4" />
+                         </Button>
+                    </div>
                 </div>
              )}
+            <div className="absolute bottom-4 right-4 z-10">
+                <MapLegend />
+            </div>
         </>
     );
 };
 
 export function AIFertilityMap() {
     const [isMounted, setIsMounted] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const mapContainerRef = useRef<HTMLDivElement>(null);
+    
     useEffect(() => {
-        setIsMounted(true)
+        setIsMounted(true);
+        const onFullscreenChange = () => {
+          setIsFullscreen(!!document.fullscreenElement);
+        };
+        document.addEventListener('fullscreenchange', onFullscreenChange);
+        return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
     }, [])
+
+    const handleFullscreen = () => {
+        if (!mapContainerRef.current) return;
+        if (!document.fullscreenElement) {
+          mapContainerRef.current.requestFullscreen().catch(err => {
+            alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+          });
+        } else {
+          document.exitFullscreen();
+        }
+    };
+
 
     if(!isMounted) {
         return (
@@ -375,7 +386,7 @@ export function AIFertilityMap() {
     
     return (
         <APIProvider apiKey={GOOGLE_MAPS_API_KEY} libraries={['geometry']}>
-            <div className="w-full h-full relative">
+            <div ref={mapContainerRef} className="w-full h-full relative bg-muted">
                 <Map
                     defaultCenter={INDIA_CENTER}
                     defaultZoom={5}
@@ -386,12 +397,14 @@ export function AIFertilityMap() {
                     zoomControl={true}
                     mapTypeControl={true}
                     streetViewControl={true}
-                    fullscreenControl={true}
+                    fullscreenControl={false}
                 >
                     <BivariateMap />
                 </Map>
-                <div className="absolute bottom-4 right-4 z-10">
-                    <MapLegend />
+                 <div className="absolute top-4 right-4 z-10">
+                    <Button type="button" size="icon" variant="secondary" onClick={handleFullscreen} title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}>
+                        {isFullscreen ? <Shrink className="h-5 w-5" /> : <Expand className="h-5 w-5" />}
+                    </Button>
                 </div>
             </div>
         </APIProvider>
@@ -399,7 +412,6 @@ export function AIFertilityMap() {
 }
 
 export const getColorFromIndex = (fertilityIndex: number) => {
-    // fertilityIndex is 0-1. We want to map this to a hue from 0 (red) to 120 (green).
     const hue = (fertilityIndex * 120).toString(10);
     return `hsl(${hue}, 100%, 45%)`;
 };

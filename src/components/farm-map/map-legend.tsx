@@ -6,7 +6,7 @@ const levels = [1, 0.8, 0.6, 0.4, 0.2, 0];
 
 export function MapLegend() {
     return (
-        <div className="bg-background/80 backdrop-blur-sm p-3 rounded-lg border border-border shadow-lg">
+        <div className="bg-background/90 p-3 rounded-lg border border-border shadow-lg">
             <h3 className="font-headline text-sm font-semibold mb-2 text-center">Fertility Index</h3>
             <div className="flex items-center gap-2">
                 <div className="flex flex-col gap-1">
