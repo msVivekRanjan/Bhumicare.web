@@ -17,18 +17,14 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       <WelcomeBanner name="Farmer" />
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-           <RealTimeMetrics />
-        </div>
-        <div className="space-y-6">
-          <WeatherWidget />
-          <RecommendationCard />
-        </div>
-      </div>
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        {/* Column 1: Real-time data and Trends */}
         <div className="lg:col-span-2 space-y-6">
-          <Card>
+           <RealTimeMetrics />
+           <Card>
             <CardHeader>
               <CardTitle className="text-base font-medium font-headline">{t('soil_data_trends')}</CardTitle>
               <CardDescription>24-hour performance data</CardDescription>
@@ -37,14 +33,20 @@ export default function DashboardPage() {
               <DataChart />
             </CardContent>
           </Card>
-          <MarketPrices />
         </div>
+        
+        {/* Column 2: Weather, AI, and Pests */}
         <div className="space-y-6">
-            <PestAlerts />
+          <WeatherWidget />
+          <RecommendationCard />
+          <PestAlerts />
         </div>
-      </div>
-      <div className="grid grid-cols-1 gap-6">
-        <CropCalendar />
+
+        {/* Full-width bottom row */}
+        <div className="md:col-span-2 lg:col-span-3 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <MarketPrices />
+            <CropCalendar />
+        </div>
       </div>
     </div>
   );
