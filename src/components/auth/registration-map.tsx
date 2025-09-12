@@ -6,9 +6,9 @@ import {
   useApiIsLoaded,
   AdvancedMarker,
 } from '@vis.gl/react-google-maps';
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Redo, Undo, X, LocateFixed } from 'lucide-react';
+import { Loader2, Redo, Undo, X, LocateFixed, Expand, Shrink } from 'lucide-react';
 import { Button } from '../ui/button';
 
 interface RegistrationMapProps {
@@ -22,11 +22,32 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
   const [isMarking, setIsMarking] = useState(false);
   const [vertices, setVertices] = useState<google.maps.LatLngLiteral[]>([]);
   const [polygon, setPolygon] = useState<google.maps.Polygon | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const map = useMap();
   const isApiLoaded = useApiIsLoaded();
   const { toast } = useToast();
+
+  const handleFullscreen = () => {
+    if (!mapContainerRef.current) return;
+
+    if (!document.fullscreenElement) {
+      mapContainerRef.current.requestFullscreen().catch(err => {
+        alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
+  
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
+  }, []);
 
   const getUserLocation = () => {
     if (navigator.geolocation) {
@@ -54,7 +75,9 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
 
   // 1. Geolocation on load
   useEffect(() => {
-    getUserLocation();
+    if(map) {
+      getUserLocation();
+    }
   }, [map]);
 
   // Handle map clicks during marking mode
@@ -131,7 +154,7 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
   return (
     <div 
       ref={mapContainerRef} 
-      className="w-full h-full relative" 
+      className="w-full h-full relative bg-muted" 
       style={{ cursor: isMarking ? 'crosshair' : 'default' }}
     >
       <Map
@@ -141,7 +164,7 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
         disableDefaultUI={true}
         mapId="bhumicare_reg_map"
         mapTypeId="satellite"
-        fullscreenControl={true}
+        fullscreenControl={false}
       >
         {vertices.map((v, i) => <AdvancedMarker key={i} position={v} />)}
       </Map>
@@ -159,6 +182,12 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
        </div>
 
       <div className="absolute top-2 right-2 z-10">
+        <Button type="button" size="icon" variant="secondary" onClick={handleFullscreen} title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}>
+             {isFullscreen ? <Shrink className="h-5 w-5" /> : <Expand className="h-5 w-5" />}
+        </Button>
+      </div>
+
+       <div className="absolute bottom-16 right-2 z-10">
         <Button type="button" size="icon" variant="secondary" onClick={getUserLocation} title="Get my current location">
             <LocateFixed className="h-5 w-5" />
         </Button>
