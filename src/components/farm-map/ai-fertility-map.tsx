@@ -5,7 +5,8 @@ import { APIProvider, Map, useMap, InfoWindow, AdvancedMarker } from '@vis.gl/re
 import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
 import { MapLegend } from './map-legend';
 import { Button } from '../ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, LocateFixed } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const INDIA_CENTER = { lat: 20.5937, lng: 78.9629 };
 
@@ -45,6 +46,7 @@ const BivariateMap = () => {
     const [markers, setMarkers] = useState<google.maps.LatLngLiteral[]>([]);
     const [gridPolygons, setGridPolygons] = useState<google.maps.Polygon[]>([]);
     const [fieldPolygon, setFieldPolygon] = useState<google.maps.Polygon | null>(null);
+    const { toast } = useToast();
 
     // Load user's location and saved polygon on init
     useEffect(() => {
@@ -138,7 +140,6 @@ const BivariateMap = () => {
         }
     }, [map, fieldPath]);
 
-
     const onCellHover = useCallback((data: CellData | null) => {
         setHoverData(data);
     }, []);
@@ -203,6 +204,30 @@ const BivariateMap = () => {
         };
     }, [map, fieldPath, onCellHover]);
 
+    const getUserLocation = () => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const userLoc = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
+              map?.panTo(userLoc);
+              map?.setZoom(15);
+               toast({ title: "Location found!", description: "Map centered on your current location." });
+            },
+            () => {
+                toast({ title: "Could not get location.", description: "Defaulting to a central location.", variant: "destructive" });
+                map?.panTo(INDIA_CENTER);
+                map?.setZoom(5);
+            }
+          );
+        } else {
+             toast({ title: "Geolocation not supported.", description: "Your browser does not support geolocation.", variant: "destructive" });
+        }
+    }
+
+
     return (
         <>
             {markers.map((pos, index) => <AdvancedMarker key={index} position={pos} />)}
@@ -241,6 +266,11 @@ const BivariateMap = () => {
                     <p className="text-sm text-muted-foreground">Click on the map to mark the corners of your field.</p>
                 </div>
              )}
+             <div className="absolute bottom-4 left-4 z-10">
+                <Button type="button" size="icon" variant="secondary" onClick={getUserLocation} title="Get my current location">
+                    <LocateFixed className="h-5 w-5" />
+                </Button>
+             </div>
         </>
     );
 };

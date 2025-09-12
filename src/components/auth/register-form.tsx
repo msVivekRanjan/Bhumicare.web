@@ -8,7 +8,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import { APIProvider } from '@vis.gl/react-google-maps';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
 import { RegistrationMap } from './registration-map';
-import { useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import ErrorBoundary from '../error-boundary';
@@ -19,9 +19,22 @@ export function RegisterForm() {
   const router = useRouter();
   const { toast } = useToast();
 
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const emailInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+      
+      const name = nameInputRef.current?.value;
+      const email = emailInputRef.current?.value;
+
+      if(name) {
+        localStorage.setItem('bhumicare_user_name', name);
+      }
+      if(email) {
+        localStorage.setItem('bhumicare_user_email', email);
+      }
       
       // For demonstration, we save to local storage.
       // In a real app, this would be sent to the server.
@@ -56,11 +69,11 @@ export function RegisterForm() {
       <div className="grid grid-cols-2 gap-4">
         <div className="grid gap-2">
           <Label htmlFor="full-name">{t('full_name')}</Label>
-          <Input id="full-name" placeholder="Ram Kumar" required className="bg-background/50" />
+          <Input ref={nameInputRef} id="full-name" placeholder="Ram Kumar" required className="bg-background/50" />
         </div>
          <div className="grid gap-2">
             <Label htmlFor="email">{t('email')}</Label>
-            <Input id="email" type="email" placeholder="ram@example.com" required className="bg-background/50" />
+            <Input ref={emailInputRef} id="email" type="email" placeholder="ram@example.com" required className="bg-background/50" />
          </div>
       </div>
       <div className="grid gap-2">

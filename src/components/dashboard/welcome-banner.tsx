@@ -7,12 +7,17 @@ interface WelcomeBannerProps {
     name: string;
 }
 
-export function WelcomeBanner({ name }: WelcomeBannerProps) {
+export function WelcomeBanner({ name: defaultName }: WelcomeBannerProps) {
     const { t } = useTranslation();
     const [date, setDate] = useState('');
+    const [name, setName] = useState(defaultName);
 
     useEffect(() => {
         setDate(new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+        const storedName = localStorage.getItem('bhumicare_user_name');
+        if (storedName) {
+            setName(storedName);
+        }
     }, []);
 
     return (
