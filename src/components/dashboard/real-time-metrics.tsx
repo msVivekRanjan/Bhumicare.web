@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { MetricCard } from './metric-card';
-import { Thermometer, Wind } from 'lucide-react';
+import { Thermometer, Wind, Droplets, Mountain, Leaf } from 'lucide-react';
 import type { SensorData } from '@/types';
 import { useTranslation } from '@/hooks/use-translation';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 
 const initialData: SensorData = {
   soilMoisture: 45.2,
@@ -21,6 +22,7 @@ const initialData: SensorData = {
 export default function RealTimeMetrics() {
   const [data, setData] = useState<SensorData>(initialData);
   const { t } = useTranslation();
+  const lastUpdated = new Date(data.timestamp).toLocaleTimeString();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -41,19 +43,49 @@ export default function RealTimeMetrics() {
   }, []);
 
   return (
-    <>
-      <MetricCard
-        title={t('temperature')}
-        value={data.temperature}
-        unit="°C"
-        icon={<Thermometer className="h-4 w-4" />}
-      />
-      <MetricCard
-        title={t('humidity')}
-        value={data.humidity}
-        unit="%"
-        icon={<Wind className="h-4 w-4" />}
-      />
-    </>
+    <Card>
+      <CardHeader>
+        <CardTitle className="font-headline">{t('real_time_data')}</CardTitle>
+        <CardDescription>{t('last_updated')} {lastUpdated}</CardDescription>
+      </CardHeader>
+      <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <MetricCard
+          title={t('soil_moisture')}
+          value={data.soilMoisture}
+          unit="%"
+          icon={<Droplets className="h-4 w-4" />}
+        />
+        <MetricCard
+          title={t('temperature')}
+          value={data.temperature}
+          unit="°C"
+          icon={<Thermometer className="h-4 w-4" />}
+        />
+        <MetricCard
+          title={t('humidity')}
+          value={data.humidity}
+          unit="%"
+          icon={<Wind className="h-4 w-4" />}
+        />
+        <MetricCard
+          title={t('nitrogen')}
+          value={data.nitrogen}
+          unit="mg/kg"
+          icon={<Leaf className="h-4 w-4" />}
+        />
+        <MetricCard
+          title={t('phosphorus')}
+          value={data.phosphorus}
+          unit="mg/kg"
+          icon={<Mountain className="h-4 w-4" />}
+        />
+        <MetricCard
+          title={t('potassium')}
+          value={data.potassium}
+          unit="mg/kg"
+          icon={<Mountain className="h-4 w-4" />}
+        />
+      </CardContent>
+    </Card>
   );
 }

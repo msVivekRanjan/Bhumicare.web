@@ -10,8 +10,6 @@ import { MarketPrices } from '@/components/dashboard/market-prices';
 import { CropCalendar } from '@/components/dashboard/crop-calendar';
 import { PestAlerts } from '@/components/dashboard/pest-alerts';
 import { WelcomeBanner } from '@/components/dashboard/welcome-banner';
-import { SoilMoistureGauge } from '@/components/dashboard/soil-moisture-gauge';
-import { NpkChart } from '@/components/dashboard/npk-chart';
 
 export default function DashboardPage() {
   const { t } = useTranslation();
@@ -19,13 +17,13 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       <WelcomeBanner name="Farmer" />
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
-        <div className="lg:col-span-2 grid md:grid-cols-2 gap-6">
-            <SoilMoistureGauge />
-            <NpkChart />
-        </div>
-        <div className="lg:col-span-2 grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
            <RealTimeMetrics />
+        </div>
+        <div className="space-y-6">
+          <WeatherWidget />
+          <RecommendationCard />
         </div>
       </div>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -42,13 +40,11 @@ export default function DashboardPage() {
           <MarketPrices />
         </div>
         <div className="space-y-6">
-          <WeatherWidget />
-          <RecommendationCard />
+            <PestAlerts />
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6">
         <CropCalendar />
-        <PestAlerts />
       </div>
     </div>
   );
