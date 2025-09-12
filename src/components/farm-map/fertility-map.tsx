@@ -17,15 +17,16 @@ function GroundOverlay({ bounds, image }: { bounds: google.maps.LatLngBoundsLite
 
     useEffect(() => {
         if (!map) return;
-        if (!overlayRef.current) {
-            overlayRef.current = new google.maps.GroundOverlay(image, bounds);
-            overlayRef.current.setMap(map);
-        } else {
-            overlayRef.current.setMap(map);
-            overlayRef.current.setUrl(image);
-            overlayRef.current.setBounds(bounds);
+
+        // Clean up previous overlay if it exists
+        if (overlayRef.current) {
+            overlayRef.current.setMap(null);
         }
 
+        // Create a new overlay
+        overlayRef.current = new google.maps.GroundOverlay(image, bounds);
+        overlayRef.current.setMap(map);
+        
         return () => {
             if (overlayRef.current) {
                 overlayRef.current.setMap(null);
