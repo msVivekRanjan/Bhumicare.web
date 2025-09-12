@@ -46,7 +46,11 @@ export async function generateSoilFertilityMap(
 
 const soilFertilityMapPrompt = ai.definePrompt({
   name: 'soilFertilityMapPrompt',
-  input: {schema: SoilFertilityMapInputSchema},
+  input: {schema: z.object({
+      ...SoilFertilityMapInputSchema.shape,
+      gridCellsJson: z.string(), // We'll pass the stringified JSON here
+    })
+  },
   output: {schema: SoilFertilityMapOutputSchema},
   prompt: `You are an expert agronomist. Your task is to analyze a list of grid cells representing a farm field and estimate their soil properties.
 
@@ -63,7 +67,7 @@ Overall Average Sensor Data:
 - Potassium (K): {{potassium}} mg/kg
 
 Grid cells to analyze:
-{{{jsonStringify gridCells}}}
+{{{gridCellsJson}}}
 
 Your response MUST be a valid JSON object matching the specified output schema.
 `,
@@ -76,7 +80,8 @@ const soilFertilityMapFlow = ai.defineFlow(
     outputSchema: SoilFertilityMapOutputSchema,
   },
   async input => {
-    const {output} = await soilFertilityMapPrompt(input);
+    const gridCellsJson = JSON.stringify(input.gridCells, null, 2);
+    const {output} = await soilFertilityMapPrompt({...input, gridCellsJson});
     return output!;
   }
 );
