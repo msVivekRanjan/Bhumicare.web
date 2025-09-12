@@ -8,8 +8,8 @@ import { Loader2 } from 'lucide-react';
 
 // --- Mock Data and Services ---
 
-// 1. Farmer's field coordinates (polygon)
-const FARMER_FIELD_COORDS = [
+// 1. Farmer's field coordinates (polygon) - A default is provided, but we will try to load from localStorage
+const DEFAULT_FARMER_FIELD_COORDS = [
     { lat: 20.2465, lng: 85.8015 },
     { lat: 20.2465, lng: 85.8035 },
     { lat: 20.2450, lng: 85.8035 },
@@ -45,7 +45,7 @@ const mockGeminiService = {
 
 // --- Map Components ---
 
-const DataGridOverlay = ({ onCellHover }: { onCellHover: (data: any) => void }) => {
+const DataGridOverlay = ({ onCellHover, fieldCoords }: { onCellHover: (data: any) => void, fieldCoords: {lat: number, lng: number}[] }) => {
     const map = useMap();
     const [gridPolygons, setGridPolygons] = useState<google.maps.Polygon[]>([]);
 
@@ -53,7 +53,9 @@ const DataGridOverlay = ({ onCellHover }: { onCellHover: (data: any) => void }) 
         if (!map) return;
 
         const bounds = new google.maps.LatLngBounds();
-        FARMER_FIELD_COORDS.forEach(coord => bounds.extend(coord));
+        fieldCoords.forEach(coord => bounds.extend(coord));
+        map.fitBounds(bounds);
+
         const sw = bounds.getSouthWest();
         const ne = bounds.getNorthEast();
 
@@ -88,7 +90,6 @@ const DataGridOverlay = ({ onCellHover }: { onCellHover: (data: any) => void }) 
                     map: map,
                 });
                 
-                // Store analysis data directly on the polygon object
                 (polygon as any).analysisData = analysis;
 
                 polygon.addListener('mouseover', () => {
@@ -111,23 +112,28 @@ const DataGridOverlay = ({ onCellHover }: { onCellHover: (data: any) => void }) 
                 p.setMap(null);
             });
         };
-    }, [map, onCellHover]);
+    }, [map, onCellHover, fieldCoords]);
 
     return null;
 };
 
 const BivariateMap = () => {
-    const map = useMap();
     const [hoverData, setHoverData] = useState<any>(null);
+    const [fieldCoords, setFieldCoords] = useState(DEFAULT_FARMER_FIELD_COORDS);
 
     useEffect(() => {
-        if (!map) return;
-
-        const bounds = new google.maps.LatLngBounds();
-        FARMER_FIELD_COORDS.forEach(coord => bounds.extend(coord));
-        map.fitBounds(bounds);
-
-    }, [map]);
+        const storedCoords = localStorage.getItem('bhumicare_field_coordinates');
+        if (storedCoords) {
+            try {
+                const parsedCoords = JSON.parse(storedCoords);
+                if (Array.isArray(parsedCoords) && parsedCoords.length > 0) {
+                    setFieldCoords(parsedCoords);
+                }
+            } catch (error) {
+                console.error("Failed to parse coordinates from localStorage", error);
+            }
+        }
+    }, []);
 
     const handleCellHover = (data: any) => {
         setHoverData(data);
@@ -135,7 +141,7 @@ const BivariateMap = () => {
 
     return (
         <>
-            <DataGridOverlay onCellHover={handleCellHover} />
+            <DataGridOverlay onCellHover={handleCellHover} fieldCoords={fieldCoords} />
             {hoverData && (
                 <InfoWindow
                     position={hoverData.coords}
