@@ -40,7 +40,7 @@ function DrawnPolygon({ paths }: { paths: google.maps.LatLngLiteral[] }) {
                 polygonRef.current = null;
             }
         };
-    }, [map, paths]);
+    }, [map]);
     
     useEffect(() => {
         if(polygonRef.current) {

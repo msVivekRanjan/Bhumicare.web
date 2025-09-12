@@ -22,3 +22,15 @@ export type Language = 'en' | 'hi' | 'or' | 'bn';
 export type Translations = {
   [key: string]: string;
 };
+
+
+export type SubRegionData = {
+  id: string;
+  polygon: { lat: number; lng: number }[];
+  nitrogen: number;
+  phosphorus: number;
+  potassium: number;
+  soilMoisture: number;
+  fertilityIndex: number;
+  recommendation: string;
+};

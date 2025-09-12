@@ -1,47 +1,55 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Map, useMap } from '@vis.gl/react-google-maps';
-import { generateSoilFertilityMap, SoilFertilityMapInput, SoilFertilityMapOutput } from '@/ai/flows/soil-fertility-map';
+import { Map, useMap, InfoWindow, AdvancedMarker } from '@vis.gl/react-google-maps';
+import { generateSoilFertilityMap, SoilFertilityMapInput, SoilFertilityMapOutput, SubRegionData } from '@/ai/flows/soil-fertility-map';
 import { Button } from '../ui/button';
 import { Wand2, Loader2, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { useTranslation } from '@/hooks/use-translation';
-import Image from 'next/image';
 import { Skeleton } from '../ui/skeleton';
 
-
-function GroundOverlay({ bounds, image }: { bounds: google.maps.LatLngBoundsLiteral; image: string }) {
+function FertilityPolygon({ subRegion, onClick }: { subRegion: SubRegionData, onClick: (subRegion: SubRegionData) => void }) {
     const map = useMap();
-    const overlayRef = useRef<google.maps.GroundOverlay | null>(null);
+    const polygonRef = useRef<google.maps.Polygon | null>(null);
+
+    const fertilityColor = (index: number) => {
+        const colors = ['#f44336', '#ff9800', '#ffeb3b', '#4caf50']; // Red, Orange, Yellow, Green
+        const colorIndex = Math.floor(index * (colors.length));
+        return colors[Math.min(colorIndex, colors.length - 1)];
+    }
 
     useEffect(() => {
         if (!map) return;
 
-        // Clean up previous overlay if it exists
-        if (overlayRef.current) {
-            overlayRef.current.setMap(null);
-        }
+        polygonRef.current = new google.maps.Polygon({
+            paths: subRegion.polygon,
+            strokeColor: "#FFFFFF",
+            strokeOpacity: 0.8,
+            strokeWeight: 1,
+            fillColor: fertilityColor(subRegion.fertilityIndex),
+            fillOpacity: 0.6,
+        });
 
-        // Create a new overlay
-        overlayRef.current = new google.maps.GroundOverlay(image, bounds);
-        overlayRef.current.setMap(map);
-        
+        polygonRef.current.setMap(map);
+        polygonRef.current.addListener('click', () => onClick(subRegion));
+
         return () => {
-            if (overlayRef.current) {
-                overlayRef.current.setMap(null);
+            if (polygonRef.current) {
+                google.maps.event.clearInstanceListeners(polygonRef.current);
+                polygonRef.current.setMap(null);
             }
         };
-    }, [map, bounds, image]);
+    }, [map, subRegion, onClick]);
 
     return null;
 }
-
 
 export function FertilityMap() {
   const [mapData, setMapData] = useState<SoilFertilityMapOutput | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<SubRegionData | null>(null);
   const { t } = useTranslation();
 
   const mockSensorData: Omit<SoilFertilityMapInput, 'fieldCoordinates'> = {
@@ -61,29 +69,27 @@ export function FertilityMap() {
     east: 77.232,
     west: 77.225,
   };
+  const fieldCoordinates = [
+      { lat: fieldBounds.north, lng: fieldBounds.west },
+      { lat: fieldBounds.north, lng: fieldBounds.east },
+      { lat: fieldBounds.south, lng: fieldBounds.east },
+      { lat: fieldBounds.south, lng: fieldBounds.west },
+  ];
   const center = { lat: (fieldBounds.north + fieldBounds.south) / 2, lng: (fieldBounds.east + fieldBounds.west) / 2 };
 
   const fetchFertilityMap = async () => {
     setLoading(true);
     setError(null);
     setMapData(null);
+    setSelectedRegion(null);
     try {
       const input = {
         ...mockSensorData,
-        fieldCoordinates: JSON.stringify(fieldBounds),
+        fieldCoordinates: JSON.stringify(fieldCoordinates),
       };
       
-      // Simulate a long call and a fake response for demonstration
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      const fakeResponse = {
-        fertilityMapDataUri: "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/Maps-pin-and-shadow.max-1000x1000.png",
-        recommendation: "The analysis shows varied moisture levels. The western part of the field is drier and may require targeted irrigation. Nutrient levels are generally stable, but consider applying a potassium-rich fertilizer to the northern edge where levels are slightly lower."
-      }
-
-      // In a real scenario, you would use the AI call:
-      // const result = await generateSoilFertilityMap(input);
-      // For this demo, we use a fake response as the AI model might not generate a valid image URI.
-      setMapData(fakeResponse);
+      const result = await generateSoilFertilityMap(input);
+      setMapData(result);
 
     } catch (err) {
       setError('Failed to generate fertility map.');
@@ -91,6 +97,16 @@ export function FertilityMap() {
     }
     setLoading(false);
   };
+  
+  const handlePolygonClick = (subRegion: SubRegionData) => {
+    setSelectedRegion(subRegion);
+  };
+
+  const getInfoWindowPosition = (polygon: {lat: number, lng: number}[]) => {
+    const bounds = new google.maps.LatLngBounds();
+    polygon.forEach(point => bounds.extend(point));
+    return bounds.getCenter().toJSON();
+  }
 
   return (
     <div className="w-full h-full flex flex-col lg:flex-row gap-4">
@@ -103,7 +119,23 @@ export function FertilityMap() {
             mapId="bhumicare_fertility_map"
             mapTypeId="satellite"
         >
-          {mapData?.fertilityMapDataUri && <GroundOverlay bounds={fieldBounds} image={mapData.fertilityMapDataUri} />}
+          {mapData?.subRegions.map((subRegion) => (
+            <FertilityPolygon key={subRegion.id} subRegion={subRegion} onClick={handlePolygonClick} />
+          ))}
+          {selectedRegion && (
+             <InfoWindow 
+                position={getInfoWindowPosition(selectedRegion.polygon)}
+                onCloseClick={() => setSelectedRegion(null)}
+             >
+                <div className="p-2">
+                    <h4 className="font-bold text-base mb-2">Region: {selectedRegion.id}</h4>
+                    <p><b>Fertility Index:</b> {(selectedRegion.fertilityIndex * 100).toFixed(0)}%</p>
+                    <p><b>N:</b> {selectedRegion.nitrogen} mg/kg, <b>P:</b> {selectedRegion.phosphorus} mg/kg, <b>K:</b> {selectedRegion.potassium} mg/kg</p>
+                    <p><b>Moisture:</b> {selectedRegion.soilMoisture}%</p>
+                    <p className="mt-2 text-xs italic"><b>Recommendation:</b> {selectedRegion.recommendation}</p>
+                </div>
+             </InfoWindow>
+          )}
         </Map>
         {loading && (
           <div className="absolute inset-0 bg-background/50 flex items-center justify-center">
@@ -115,7 +147,7 @@ export function FertilityMap() {
         <Card className="h-full">
           <CardHeader>
             <CardTitle className="font-headline">{t('ai_map_recommendation')}</CardTitle>
-            <CardDescription>Analysis from the generated map.</CardDescription>
+            <CardDescription>Click a region on the map for details.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {loading ? (
@@ -131,7 +163,10 @@ export function FertilityMap() {
                     <p>{error}</p>
                 </div>
             ) : mapData ? (
-                <p className="text-sm text-muted-foreground leading-relaxed">{mapData.recommendation}</p>
+                <div>
+                  <h4 className="font-semibold mb-2">Overall Recommendation:</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{mapData.overallRecommendation}</p>
+                </div>
             ) : (
                 <p className="text-sm text-muted-foreground">Click 'Generate Map' to get an AI-powered analysis of your field.</p>
             )}
