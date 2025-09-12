@@ -3,169 +3,120 @@
 import {
   Map,
   useMap,
-  AdvancedMarker,
   useApiIsLoaded,
 } from '@vis.gl/react-google-maps';
-import { useEffect, useState, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { useTranslation } from '@/hooks/use-translation';
-import { MapPin, Move, LocateFixed, Loader2, Undo2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
 interface RegistrationMapProps {
   onCoordinatesChange: (coordinates: string) => void;
 }
 
-function DrawnPolygon({ paths }: { paths: google.maps.LatLngLiteral[] }) {
-    const map = useMap();
-    const polygonRef = useRef<google.maps.Polygon | null>(null);
-
-    useEffect(() => {
-        if (!map) return;
-
-        if (!polygonRef.current) {
-            polygonRef.current = new google.maps.Polygon({
-                paths: paths,
-                strokeColor: "#3498DB",
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: "#3498DB",
-                fillOpacity: 0.35,
-                clickable: false,
-            });
-            polygonRef.current.setMap(map);
-        } else {
-            polygonRef.current.setPaths(paths);
-        }
-
-        return () => {
-          if (polygonRef.current) {
-              polygonRef.current.setMap(null);
-          }
-        }
-    }, [map, paths]);
-
-    return null;
-}
+const defaultCenter = { lat: 20.5937, lng: 78.9629 };
 
 export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
-  const [points, setPoints] = useState<google.maps.LatLngLiteral[]>([]);
-  const [isMarking, setIsMarking] = useState(false);
-  const [isLocating, setIsLocating] = useState(false);
-  const { t } = useTranslation();
+  const [center, setCenter] = useState(defaultCenter);
+  const [message, setMessage] = useState('Please click on the map to trace the boundary of your farm. Click on each corner of your field and click the first point again to finish.');
   const isApiLoaded = useApiIsLoaded();
   const map = useMap();
   const { toast } = useToast();
+  const [drawingManager, setDrawingManager] = useState<google.maps.drawing.DrawingManager | null>(null);
 
-  const handleMapClick = (e: google.maps.MapMouseEvent) => {
-    if (isMarking && e.latLng && points.length < 7) {
-      const newPoint = e.latLng.toJSON();
-      setPoints(prevPoints => [...prevPoints, newPoint]);
-    }
-  };
-
-  const clearBoundary = () => {
-    setPoints([]);
-  };
-
-  const undoLastPoint = () => {
-    setPoints(prevPoints => prevPoints.slice(0, -1));
-  }
-
-  const handleLocateMe = () => {
-    setIsLocating(true);
+  // Request user's location on component mount
+  useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const userLocation = {
+          setCenter({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
-          };
-          map?.moveCamera({ center: userLocation, zoom: 16 });
-          setIsLocating(false);
+          });
         },
         () => {
           toast({
-            title: "Location Access Denied",
-            description: "Please enable location permissions in your browser to use this feature.",
+            title: "Could not get your location",
+            description: "Falling back to default location. Please pan to your farm.",
             variant: "destructive"
           });
-          setIsLocating(false);
         }
       );
-    } else {
-      toast({
-        title: "Geolocation Not Supported",
-        description: "Your browser does not support geolocation.",
-        variant: "destructive"
-      });
-      setIsLocating(false);
     }
-  };
-
+  }, [toast]);
+  
+  // Initialize DrawingManager
   useEffect(() => {
-    const coordsString = JSON.stringify(points);
-    onCoordinatesChange(coordsString);
-  }, [points, onCoordinatesChange]);
+    if (!map || !isApiLoaded) return;
 
-  const getHelperText = () => {
-    if (isMarking) {
-        if (points.length < 3) {
-            return `Click to add boundary points (${points.length}/7). At least 3 are needed.`;
-        }
-        if (points.length >= 7) {
-            return 'Maximum of 7 points reached. Click "Stop Marking" to finish.';
-        }
-        return `Points added: ${points.length}/7. Click to add more or "Stop Marking".`;
+    const manager = new google.maps.drawing.DrawingManager({
+      drawingMode: google.maps.drawing.DrawingMode.POLYGON,
+      drawingControl: true,
+      drawingControlOptions: {
+        position: google.maps.ControlPosition.TOP_CENTER,
+        drawingModes: [google.maps.drawing.DrawingMode.POLYGON],
+      },
+      polygonOptions: {
+        fillColor: '#3498DB',
+        fillOpacity: 0.35,
+        strokeWeight: 2,
+        strokeColor: '#3498DB',
+        clickable: false,
+        editable: true,
+        zIndex: 1,
+      },
+    });
+    
+    manager.setMap(map);
+    setDrawingManager(manager);
+
+    return () => {
+      manager.setMap(null);
     }
-    return 'Click "Start Marking" to begin defining your field boundary.';
-  }
+
+  }, [map, isApiLoaded]);
+
+  // Listen for polygon completion
+  useEffect(() => {
+    if (!drawingManager) return;
+
+    const listener = google.maps.event.addListener(
+      drawingManager,
+      'polygoncomplete',
+      (polygon: google.maps.Polygon) => {
+        const path = polygon.getPath().getArray();
+        const coords = path.map(p => ({ lat: p.lat(), lng: p.lng() }));
+        onCoordinatesChange(JSON.stringify(coords));
+        setMessage('Farm area defined successfully! You can adjust the points if needed.');
+        // Prevent drawing another polygon
+        drawingManager.setDrawingMode(null);
+        drawingManager.setOptions({
+            drawingControl: false
+        })
+      }
+    );
+
+    return () => {
+      google.maps.event.removeListener(listener);
+    }
+  }, [drawingManager, onCoordinatesChange]);
+
 
   if (!isApiLoaded) {
-    return <div className="w-full h-full flex items-center justify-center bg-muted"><p>Loading map...</p></div>;
+    return <div className="w-full h-full flex items-center justify-center bg-muted"><Loader2 className="animate-spin" /> <p className='ml-2'>Loading map...</p></div>;
   }
 
   return (
     <div className="w-full h-full relative">
       <Map
-        defaultCenter={{ lat: 20.5937, lng: 78.9629 }}
-        defaultZoom={5}
-        gestureHandling={isMarking ? 'none' : 'cooperative'}
-        disableDefaultUI={false}
+        center={center}
+        zoom={12}
+        gestureHandling={'cooperative'}
+        disableDefaultUI={true}
         mapId="bhumicare_reg_map"
-        onClick={handleMapClick}
-        style={{ cursor: isMarking ? 'crosshair' : 'default' }}
-      >
-        {points.map((point, index) => (
-          <AdvancedMarker key={index} position={point} />
-        ))}
-        {points.length > 2 && <DrawnPolygon paths={points} />}
-      </Map>
-      <div className="absolute top-2 left-2 right-2 flex justify-between items-start gap-2">
-         <div className="flex flex-col gap-2">
-            <Button type="button" onClick={() => setIsMarking(!isMarking)} variant={isMarking ? "secondary" : "default"} size="sm">
-                {isMarking ? <Move className="mr-2 h-4 w-4" /> : <MapPin className="mr-2 h-4 w-4" />}
-                {isMarking ? 'Stop Marking' : 'Start Marking'}
-            </Button>
-            <Button type="button" onClick={handleLocateMe} variant="outline" size="sm" disabled={isLocating || isMarking}>
-                {isLocating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LocateFixed className="mr-2 h-4 w-4" />}
-                Use My Location
-            </Button>
-         </div>
-         <div className="flex flex-col gap-2">
-            {isMarking && (
-                <Button type="button" variant="outline" size="sm" onClick={undoLastPoint} disabled={points.length === 0}>
-                    <Undo2 className="mr-2 h-4 w-4" />
-                    Undo
-                </Button>
-            )}
-            <Button type="button" variant="destructive" size="sm" onClick={clearBoundary} disabled={points.length === 0}>
-              Clear
-            </Button>
-         </div>
-      </div>
-       <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center bg-background/80 p-2 rounded-md shadow-lg">
-         <p className="text-xs text-muted-foreground">{getHelperText()}</p>
+        mapTypeId="satellite"
+      />
+       <div className="absolute top-2 left-2 right-2 bg-background/80 p-2 rounded-md shadow-lg text-center">
+         <p className="text-xs text-muted-foreground">{message}</p>
       </div>
     </div>
   );

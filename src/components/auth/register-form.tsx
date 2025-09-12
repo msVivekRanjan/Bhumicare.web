@@ -21,21 +21,10 @@ export function RegisterForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      // Only check for a valid polygon if the user has started marking one.
-      const coords = JSON.parse(fieldCoordinates || '[]');
-      if (coords.length > 0 && coords.length < 3) {
-        toast({
-          title: "Incomplete Boundary",
-          description: "Please mark at least 3 points on the map, or clear the boundary to register without one.",
-          variant: "destructive",
-        })
-        return;
-      }
       
       // In a real app, you would save the form data and coordinates to your backend.
       // For this demo, we'll save it to localStorage.
-      if (coords.length >= 3) {
+      if (fieldCoordinates) {
         localStorage.setItem('bhumicare_field_coordinates', fieldCoordinates);
         console.log('Registered with field coordinates:', fieldCoordinates);
       } else {
@@ -43,14 +32,11 @@ export function RegisterForm() {
         localStorage.removeItem('bhumicare_field_coordinates');
         console.log('Registered without field coordinates.');
       }
+      toast({
+        title: "Registration Successful!",
+        description: "Your account has been created.",
+      });
       router.push('/dashboard');
-    } catch (error) {
-       toast({
-          title: "Invalid Boundary Data",
-          description: "There was an issue processing the field boundary data. Please try again.",
-          variant: "destructive",
-        })
-    }
   };
 
   return (
@@ -73,7 +59,7 @@ export function RegisterForm() {
       <div className="grid gap-2">
         <Label>{t('define_field_boundary')}</Label>
         <div className="h-64 w-full rounded-lg overflow-hidden border">
-           <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
+           <APIProvider apiKey={GOOGLE_MAPS_API_KEY} libraries={['drawing']}>
                 <RegistrationMap onCoordinatesChange={setFieldCoordinates} />
            </APIProvider>
         </div>
