@@ -7,11 +7,11 @@ import { useTranslation } from "@/hooks/use-translation";
 export default function FarmMapPage() {
     const { t } = useTranslation();
     return (
-        <Card className="h-full">
+        <Card className="h-full flex flex-col">
             <CardHeader>
                 <CardTitle className="font-headline">{t('soil_fertility_map')}</CardTitle>
             </CardHeader>
-            <CardContent className="h-[calc(100%-4rem)]">
+            <CardContent className="flex-1">
                 <FertilityMapLoader />
             </CardContent>
         </Card>

@@ -9,6 +9,7 @@ import {
 import { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
+import { MapPin, Move } from 'lucide-react';
 
 interface RegistrationMapProps {
   onCoordinatesChange: (coordinates: string) => void;
@@ -50,11 +51,12 @@ function DrawnPolygon({ paths }: { paths: google.maps.LatLngLiteral[] }) {
 
 export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
   const [points, setPoints] = useState<google.maps.LatLngLiteral[]>([]);
+  const [isMarking, setIsMarking] = useState(false);
   const { t } = useTranslation();
   const isApiLoaded = useApiIsLoaded();
 
   const handleMapClick = (e: google.maps.MapMouseEvent) => {
-    if (e.latLng && points.length < 7) {
+    if (isMarking && e.latLng && points.length < 7) {
       setPoints([...points, e.latLng.toJSON()]);
     }
   };
@@ -69,13 +71,16 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
   }, [points, onCoordinatesChange]);
 
   const getHelperText = () => {
-    if (points.length < 3) {
-      return t('click_to_add_points');
+    if (isMarking) {
+        if (points.length < 3) {
+            return `Click to add boundary points (${points.length}/7). At least 3 are needed.`;
+        }
+        if (points.length >= 7) {
+            return 'Maximum of 7 points reached.';
+        }
+        return `Points added: ${points.length}/7. Click to add more.`;
     }
-    if (points.length >= 7) {
-      return 'Maximum of 7 points reached.';
-    }
-    return `Points added: ${points.length}/7. Click to add more.`;
+    return 'Click "Start Marking" to begin defining your field boundary.';
   }
 
   if (!isApiLoaded) {
@@ -87,21 +92,28 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
       <Map
         defaultCenter={{ lat: 20.5937, lng: 78.9629 }}
         defaultZoom={5}
-        gestureHandling={'cooperative'}
-        disableDefaultUI={false}
+        gestureHandling={isMarking ? 'none' : 'cooperative'}
+        disableDefaultUI={isMarking}
         mapId="bhumicare_reg_map"
         onClick={handleMapClick}
+        style={{ cursor: isMarking ? 'crosshair' : 'grab' }}
       >
         {points.map((point, index) => (
           <AdvancedMarker key={index} position={point} />
         ))}
         {points.length > 2 && <DrawnPolygon paths={points} />}
       </Map>
-      <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center bg-background/80 p-2 rounded-md shadow-lg">
-         <p className="text-xs text-muted-foreground">{getHelperText()}</p>
+      <div className="absolute top-2 left-2 right-2 flex justify-between items-center bg-background/80 p-2 rounded-md shadow-lg">
+        <Button onClick={() => setIsMarking(!isMarking)} variant={isMarking ? "secondary" : "default"}>
+            {isMarking ? <Move className="mr-2 h-4 w-4" /> : <MapPin className="mr-2 h-4 w-4" />}
+            {isMarking ? 'Stop Marking' : 'Start Marking'}
+        </Button>
          <Button variant="destructive" size="sm" onClick={clearBoundary} disabled={points.length === 0}>
            {t('clear_boundary')}
          </Button>
+      </div>
+       <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center bg-background/80 p-2 rounded-md shadow-lg">
+         <p className="text-xs text-muted-foreground">{getHelperText()}</p>
       </div>
     </div>
   );
