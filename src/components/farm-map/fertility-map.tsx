@@ -84,7 +84,7 @@ export function FertilityMap() {
 
   const getCenter = (coords: google.maps.LatLngLiteral[]) => {
       if (!coords || coords.length === 0 || !isApiLoaded) return { lat: 20.5937, lng: 78.9629 };
-      const bounds = new google.maps.LatLngBounds();
+      const bounds = new window.google.maps.LatLngBounds();
       coords.forEach(point => bounds.extend(point));
       return bounds.getCenter().toJSON();
   }
@@ -133,7 +133,7 @@ export function FertilityMap() {
 
   const getInfoWindowPosition = (polygon: {lat: number, lng: number}[]) => {
     if (!isApiLoaded) return { lat: 0, lng: 0 };
-    const bounds = new google.maps.LatLngBounds();
+    const bounds = new window.google.maps.LatLngBounds();
     polygon.forEach(point => bounds.extend(point));
     return bounds.getCenter().toJSON();
   }
@@ -157,7 +157,7 @@ export function FertilityMap() {
                  <InfoWindow 
                     position={getInfoWindowPosition(selectedRegion.polygon)}
                     onCloseClick={() => setSelectedRegion(null)}
-                    options={{ pixelOffset: new google.maps.Size(0, -30) }}
+                    options={{ pixelOffset: new window.google.maps.Size(0, -30) }}
                  >
                     <div className="p-2 text-black">
                         <h4 className="font-bold text-base mb-2">Region: {selectedRegion.id}</h4>

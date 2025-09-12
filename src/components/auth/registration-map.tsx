@@ -6,7 +6,7 @@ import {
   AdvancedMarker,
   useApiIsLoaded,
 } from '@vis.gl/react-google-maps';
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
 import { MapPin, Move, LocateFixed, Loader2 } from 'lucide-react';
@@ -109,9 +109,9 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
             return `Click to add boundary points (${points.length}/7). At least 3 are needed.`;
         }
         if (points.length >= 7) {
-            return 'Maximum of 7 points reached.';
+            return 'Maximum of 7 points reached. Click "Stop Marking" to finish.';
         }
-        return `Points added: ${points.length}/7. Click to add more.`;
+        return `Points added: ${points.length}/7. Click to add more or "Stop Marking".`;
     }
     return 'Click "Start Marking" to begin defining your field boundary.';
   }
@@ -129,7 +129,7 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
         disableDefaultUI={isMarking}
         mapId="bhumicare_reg_map"
         onClick={handleMapClick}
-        style={{ cursor: isMarking ? 'crosshair' : 'grab' }}
+        style={{ cursor: isMarking ? 'crosshair' : 'default' }}
       >
         {points.map((point, index) => (
           <AdvancedMarker key={index} position={point} />
