@@ -15,7 +15,7 @@ import ErrorBoundary from '../error-boundary';
 
 export function RegisterForm() {
   const { t } = useTranslation();
-  const [location, setLocation] = useState<string>('');
+  const [fieldCoordinates, setFieldCoordinates] = useState<string>('');
   const router = useRouter();
   const { toast } = useToast();
 
@@ -23,10 +23,25 @@ export function RegisterForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
       
-      if (location) {
-        localStorage.setItem('bhumicare_user_location', location);
-        // Clear any old polygon data
-        localStorage.removeItem('bhumicare_field_coordinates');
+      // For demonstration, we save to local storage.
+      // In a real app, this would be sent to the server.
+      if (fieldCoordinates) {
+        localStorage.setItem('bhumicare_field_coordinates', fieldCoordinates);
+         try {
+            const coords = JSON.parse(fieldCoordinates);
+            if (coords.length > 0) {
+                 // Save the center of the polygon as the user's location for map centering
+                const bounds = new window.google.maps.LatLngBounds();
+                coords.forEach((coord: google.maps.LatLngLiteral) => bounds.extend(coord));
+                const center = bounds.getCenter().toJSON();
+                localStorage.setItem('bhumicare_user_location', JSON.stringify(center));
+            }
+        } catch (error) {
+            console.error("Could not parse field coordinates to set user location", error);
+        }
+      } else {
+        // If no field is defined, we can clear old data or use a default
+         localStorage.removeItem('bhumicare_field_coordinates');
       }
       
       toast({
@@ -55,14 +70,14 @@ export function RegisterForm() {
 
       <div className="grid gap-2">
         <Label>{t('define_field_boundary')}</Label>
-        <div className="h-64 w-full rounded-lg overflow-hidden border">
+        <div className="h-96 w-full rounded-lg overflow-hidden border">
           <ErrorBoundary fallback={<p>Something went wrong with the map.</p>}>
-            <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
-                  <RegistrationMap onLocationChange={setLocation} />
+            <APIProvider apiKey={GOOGLE_MAPS_API_KEY} libraries={['drawing', 'geometry']}>
+                  <RegistrationMap onPolygonChange={setFieldCoordinates} />
             </APIProvider>
           </ErrorBoundary>
         </div>
-        <Input id="coordinates" type="hidden" value={location} />
+        <Input id="coordinates" type="hidden" value={fieldCoordinates} />
       </div>
 
       <Button type="submit" className="w-full">
