@@ -15,7 +15,7 @@ function FertilityPolygon({ subRegion, onClick }: { subRegion: SubRegionData, on
     const polygonRef = useRef<google.maps.Polygon | null>(null);
 
     const fertilityColor = (index: number) => {
-        const colors = ['#f44336', '#ff9800', '#ffeb3b', '#4caf50']; // Red, Orange, Yellow, Green
+        const colors = ['#d7191c', '#fdae61', '#ffffbf', '#a6d96a', '#1a9641']; // Red -> Yellow -> Green
         const colorIndex = Math.floor(index * (colors.length));
         return colors[Math.min(colorIndex, colors.length - 1)];
     }
@@ -55,7 +55,7 @@ export function FertilityMap() {
   const { t } = useTranslation();
   
   const defaultFieldBounds = {
-    north: 28.615, south: 28.612, east: 77.230, west: 77.225
+    north: 28.6135, south: 28.6120, east: 77.2285, west: 77.2265
   };
   const defaultFieldCoordinates = [
       { lat: defaultFieldBounds.north, lng: defaultFieldBounds.west },
@@ -142,7 +142,7 @@ export function FertilityMap() {
         {fieldCoordinates.length > 0 ? (
             <Map
                 center={getCenter(fieldCoordinates)}
-                zoom={17}
+                zoom={18}
                 gestureHandling={'greedy'}
                 disableDefaultUI={false}
                 mapId="bhumicare_fertility_map"
