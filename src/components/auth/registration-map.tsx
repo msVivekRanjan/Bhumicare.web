@@ -161,10 +161,10 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
         center={center}
         zoom={5}
         gestureHandling={'cooperative'}
-        disableDefaultUI={true}
+        disableDefaultUI={false}
         mapId="bhumicare_reg_map"
         mapTypeId="satellite"
-        fullscreenControl={false}
+        fullscreenControl={true}
       >
         {vertices.map((v, i) => <AdvancedMarker key={i} position={v} />)}
       </Map>
@@ -181,7 +181,7 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
             )}
        </div>
 
-      <div className="absolute top-2 right-2 z-10">
+      <div className="absolute top-2 right-12 z-10">
         <Button type="button" size="icon" variant="secondary" onClick={handleFullscreen} title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}>
              {isFullscreen ? <Shrink className="h-5 w-5" /> : <Expand className="h-5 w-5" />}
         </Button>
