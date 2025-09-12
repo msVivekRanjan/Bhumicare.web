@@ -40,7 +40,6 @@ const BivariateMap = () => {
 
     const [isLoadingMap, setIsLoadingMap] = useState(false);
     const [mapData, setMapData] = useState<SoilFertilityMapOutput | null>(null);
-    const [isRecommendationVisible, setIsRecommendationVisible] = useState(true);
 
 
     useEffect(() => {
@@ -101,7 +100,6 @@ const BivariateMap = () => {
         setMarkers([]);
         setIsDefiningArea(true);
         setHoverData(null);
-        setIsRecommendationVisible(true);
     };
     
     const finishDefiningArea = useCallback(() => {
@@ -330,19 +328,6 @@ const BivariateMap = () => {
                 </div>
              )}
              
-             {mapData && !isLoadingMap && isRecommendationVisible && (
-                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/80 p-3 rounded-lg shadow-lg text-center z-20 max-w-lg">
-                    <div className="flex justify-between items-start gap-4">
-                        <div>
-                            <h4 className="font-bold font-headline text-primary">{t('ai_map_recommendation')}</h4>
-                            <p className="text-sm text-muted-foreground">{mapData.overallRecommendation}</p>
-                        </div>
-                         <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={() => setIsRecommendationVisible(false)}>
-                            <EyeOff className="h-4 w-4" />
-                         </Button>
-                    </div>
-                </div>
-             )}
             <div className="absolute bottom-4 right-4 z-10">
                 <MapLegend />
             </div>
