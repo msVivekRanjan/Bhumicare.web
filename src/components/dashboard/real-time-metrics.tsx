@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { MetricCard } from './metric-card';
-import { Thermometer, Droplets, Wind, Sun, Leaf, Atom } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Thermometer, Wind } from 'lucide-react';
 import type { SensorData } from '@/types';
 import { useTranslation } from '@/hooks/use-translation';
-import { format } from 'date-fns';
 
 const initialData: SensorData = {
   soilMoisture: 45.2,
@@ -45,12 +43,6 @@ export default function RealTimeMetrics() {
   return (
     <>
       <MetricCard
-        title={t('soil_moisture')}
-        value={data.soilMoisture}
-        unit="%"
-        icon={<Droplets className="h-4 w-4" />}
-      />
-      <MetricCard
         title={t('temperature')}
         value={data.temperature}
         unit="°C"
@@ -62,18 +54,6 @@ export default function RealTimeMetrics() {
         unit="%"
         icon={<Wind className="h-4 w-4" />}
       />
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">NPK Ratio</CardTitle>
-            <Leaf className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-            <div className="text-2xl font-bold font-headline">
-                {data.nitrogen}:{data.phosphorus}:{data.potassium}
-            </div>
-            <p className="text-xs text-muted-foreground">mg/kg</p>
-        </CardContent>
-      </Card>
     </>
   );
 }
