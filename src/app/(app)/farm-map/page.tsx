@@ -1,3 +1,5 @@
+'use client';
+
 import { FertilityMapLoader } from "@/components/farm-map/fertility-map-loader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/use-translation";

@@ -1,3 +1,5 @@
+'use client';
+
 import { AlertItem } from "@/components/alerts/alert-item";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/use-translation";
