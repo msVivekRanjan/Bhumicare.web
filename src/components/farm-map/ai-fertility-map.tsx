@@ -144,6 +144,8 @@ const BivariateMap = () => {
             return;
         }
         setFieldPath(markers);
+        localStorage.setItem('bhumicare_field_coordinates', JSON.stringify(markers));
+
 
         const bounds = new google.maps.LatLngBounds();
         markers.forEach(coord => bounds.extend(coord));
@@ -170,10 +172,10 @@ const BivariateMap = () => {
     return (
         <>
             {markers.map((pos, index) => <AdvancedMarker key={index} position={pos} />)}
-            {fieldPath.length > 2 && (
+            {fieldPath.length > 2 && fieldBounds && (
                 <>
                     <Polygon paths={fieldPath} fillColor="#00FF00" fillOpacity={0.1} strokeColor="#00FF00" strokeWeight={2} />
-                    <FertilityGrid bounds={fieldBounds!} onCellHover={setHoverData} />
+                    <FertilityGrid bounds={fieldBounds} onCellHover={setHoverData} />
                 </>
             )}
              {hoverData && (
