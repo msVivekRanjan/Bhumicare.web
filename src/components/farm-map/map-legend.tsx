@@ -25,7 +25,7 @@ export function MapLegend() {
                                 <div key={level} className="flex items-center gap-2">
                                     <div
                                         className="w-5 h-5 rounded-sm border border-black/20"
-                                        style={{ backgroundColor: getColorFromimizationndex(level) }}
+                                        style={{ backgroundColor: getColorFromIndex(level) }}
                                     ></div>
                                     <span className="text-xs text-muted-foreground">{(level * 100).toFixed(0)}%</span>
                                 </div>
