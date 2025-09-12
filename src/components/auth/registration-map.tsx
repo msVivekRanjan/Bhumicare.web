@@ -103,7 +103,7 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
     polygon?.setMap(null);
 
     if (vertices.length > 1) {
-      const newPolygon = new google.maps.Polygon({
+      const newPolygon = new window.google.maps.Polygon({
         paths: vertices,
         strokeColor: '#4C8BF5',
         strokeOpacity: 0.8,
