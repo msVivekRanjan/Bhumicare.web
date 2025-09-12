@@ -54,38 +54,44 @@ export function FertilityMap() {
   const [fieldCoordinates, setFieldCoordinates] = useState<google.maps.LatLngLiteral[]>([]);
   const { t } = useTranslation();
   const isApiLoaded = useApiIsLoaded();
+  const map = useMap();
   
-  const defaultFieldBounds = {
-    north: 28.6135, south: 28.6120, east: 77.2285, west: 77.2265
-  };
   const defaultFieldCoordinates = [
-      { lat: defaultFieldBounds.north, lng: defaultFieldBounds.west },
-      { lat: defaultFieldBounds.north, lng: defaultFieldBounds.east },
-      { lat: defaultFieldBounds.south, lng: defaultFieldBounds.east },
-      { lat: defaultFieldBounds.south, lng: defaultFieldBounds.west },
+      { lat: 28.6139, lng: 77.2090 }, // India Gate, New Delhi
+      { lat: 28.6130, lng: 77.2100 },
+      { lat: 28.6120, lng: 77.2085 },
+      { lat: 28.6129, lng: 77.2075 }
   ];
 
   useEffect(() => {
     const savedCoords = localStorage.getItem('bhumicare_field_coordinates');
+    let coordsToUse = defaultFieldCoordinates;
     if (savedCoords) {
       try {
         const parsedCoords = JSON.parse(savedCoords);
         if (Array.isArray(parsedCoords) && parsedCoords.length > 2) {
-          setFieldCoordinates(parsedCoords);
-          return;
+          coordsToUse = parsedCoords;
         }
       } catch (e) {
-        console.error("Failed to parse coordinates from localStorage", e);
+        console.error("Failed to parse coordinates from localStorage, using default.", e);
       }
     }
-    setFieldCoordinates(defaultFieldCoordinates);
+    setFieldCoordinates(coordsToUse);
   }, []);
 
+  useEffect(() => {
+    if (map && isApiLoaded && fieldCoordinates.length > 0) {
+        const bounds = new window.google.maps.LatLngBounds();
+        fieldCoordinates.forEach(point => bounds.extend(point));
+        map.fitBounds(bounds);
+    }
+  }, [fieldCoordinates, map, isApiLoaded]);
 
-  const getCenter = (coords: google.maps.LatLngLiteral[]) => {
-      if (!coords || coords.length === 0 || !isApiLoaded) return { lat: 20.5937, lng: 78.9629 };
+
+  const getCenter = () => {
+      if (!isApiLoaded || !fieldCoordinates || fieldCoordinates.length === 0) return { lat: 20.5937, lng: 78.9629 };
       const bounds = new window.google.maps.LatLngBounds();
-      coords.forEach(point => bounds.extend(point));
+      fieldCoordinates.forEach(point => bounds.extend(point));
       return bounds.getCenter().toJSON();
   }
 
@@ -132,7 +138,7 @@ export function FertilityMap() {
   };
 
   const getInfoWindowPosition = (polygon: {lat: number, lng: number}[]) => {
-    if (!isApiLoaded) return { lat: 0, lng: 0 };
+    if (!isApiLoaded || !polygon || polygon.length === 0) return { lat: 0, lng: 0 };
     const bounds = new window.google.maps.LatLngBounds();
     polygon.forEach(point => bounds.extend(point));
     return bounds.getCenter().toJSON();
@@ -143,7 +149,7 @@ export function FertilityMap() {
       <div className="flex-1 h-1/2 lg:h-full rounded-lg overflow-hidden relative border">
         {isApiLoaded && fieldCoordinates.length > 0 ? (
             <Map
-                center={getCenter(fieldCoordinates)}
+                center={getCenter()}
                 zoom={18}
                 gestureHandling={'cooperative'}
                 disableDefaultUI={false}
@@ -171,7 +177,7 @@ export function FertilityMap() {
             </Map>
         ) : (
              <div className="w-full h-full flex items-center justify-center bg-muted">
-                <p>Loading map...</p>
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         )}
         {loading && (
@@ -184,7 +190,7 @@ export function FertilityMap() {
         <Card className="h-full">
           <CardHeader>
             <CardTitle className="font-headline">{t('ai_map_recommendation')}</CardTitle>
-            <CardDescription>Click a region on the map for details.</CardDescription>
+            <CardDescription>Click a region on the map for details, or generate a new analysis.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {loading ? (

@@ -9,7 +9,7 @@ import {
 import { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
-import { MapPin, Move, LocateFixed, Loader2 } from 'lucide-react';
+import { MapPin, Move, LocateFixed, Loader2, Undo2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface RegistrationMapProps {
@@ -59,13 +59,18 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
 
   const handleMapClick = (e: google.maps.MapMouseEvent) => {
     if (isMarking && e.latLng && points.length < 7) {
-      setPoints([...points, e.latLng.toJSON()]);
+      const newPoint = e.latLng.toJSON();
+      setPoints(prevPoints => [...prevPoints, newPoint]);
     }
   };
 
   const clearBoundary = () => {
     setPoints([]);
   };
+
+  const undoLastPoint = () => {
+    setPoints(prevPoints => prevPoints.slice(0, -1));
+  }
 
   const handleLocateMe = () => {
     setIsLocating(true);
@@ -142,14 +147,22 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
                 {isMarking ? <Move className="mr-2 h-4 w-4" /> : <MapPin className="mr-2 h-4 w-4" />}
                 {isMarking ? 'Stop Marking' : 'Start Marking'}
             </Button>
-            <Button onClick={handleLocateMe} variant="outline" size="sm" disabled={isLocating}>
+            <Button onClick={handleLocateMe} variant="outline" size="sm" disabled={isLocating || isMarking}>
                 {isLocating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LocateFixed className="mr-2 h-4 w-4" />}
                 Use My Location
             </Button>
          </div>
-         <Button variant="destructive" size="sm" onClick={clearBoundary} disabled={points.length === 0}>
-           {t('clear_boundary')}
-         </Button>
+         <div className="flex flex-col gap-2">
+            {isMarking && (
+                <Button variant="outline" size="sm" onClick={undoLastPoint} disabled={points.length === 0}>
+                    <Undo2 className="mr-2 h-4 w-4" />
+                    Undo
+                </Button>
+            )}
+            <Button variant="destructive" size="sm" onClick={clearBoundary} disabled={points.length === 0}>
+              Clear
+            </Button>
+         </div>
       </div>
        <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center bg-background/80 p-2 rounded-md shadow-lg">
          <p className="text-xs text-muted-foreground">{getHelperText()}</p>
