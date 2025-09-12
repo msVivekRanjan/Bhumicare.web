@@ -58,14 +58,18 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
             lng: position.coords.longitude,
           };
           setCenter(userLoc);
-          map?.panTo(userLoc);
-          map?.setZoom(15);
+          if (map) {
+            map.panTo(userLoc);
+            map.setZoom(15);
+          }
            toast({ title: "Location found!", description: "Map centered on your current location." });
         },
         () => {
             toast({ title: "Could not get location.", description: "Defaulting to a central location.", variant: "destructive" });
-            map?.panTo(FALLBACK_CENTER);
-            map?.setZoom(5);
+            if(map) {
+              map.panTo(FALLBACK_CENTER);
+              map.setZoom(5);
+            }
         }
       );
     } else {
@@ -92,7 +96,7 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
     });
 
     return () => {
-      clickListener.remove();
+      google.maps.event.removeListener(clickListener);
     };
   }, [map, isMarking]);
 
@@ -101,7 +105,9 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
     if (!map) return;
 
     // Clear existing polygon
-    polygon?.setMap(null);
+    if (polygon) {
+      polygon.setMap(null);
+    }
 
     if (vertices.length > 1) {
       const newPolygon = new window.google.maps.Polygon({
@@ -120,7 +126,9 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
     
     // Clean up polygon on component unmount
     return () => {
-        polygon?.setMap(null);
+        if (polygon) {
+          polygon.setMap(null);
+        }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, vertices]);
@@ -175,13 +183,13 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
       </Map>
 
        <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 flex gap-2">
-            <Button type="button" onClick={toggleMarking}>
+            <Button type="button" onClick={toggleMarking} variant="default" size="sm">
                 {isMarking ? "Finish Marking" : "Start Marking Farm Area"}
             </Button>
             {isMarking && (
                 <>
-                    <Button type="button" variant="secondary" onClick={handleUndo} disabled={vertices.length === 0}><Undo className="mr-2 h-4 w-4" /> Undo</Button>
-                    <Button type="button" variant="destructive" onClick={handleClear} disabled={vertices.length === 0}><X className="mr-2 h-4 w-4" /> Clear All</Button>
+                    <Button type="button" variant="secondary" size="sm" onClick={handleUndo} disabled={vertices.length === 0}><Undo className="mr-2 h-4 w-4" /> Undo</Button>
+                    <Button type="button" variant="destructive" size="sm" onClick={handleClear} disabled={vertices.length === 0}><X className="mr-2 h-4 w-4" /> Clear All</Button>
                 </>
             )}
        </div>
