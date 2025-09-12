@@ -45,5 +45,8 @@
   "already_have_account": "पहले से ही एक खाता है?",
   "define_field_boundary": "अपने खेत की सीमा परिभाषित करें",
   "click_to_add_points": "सीमा बिंदु जोड़ने के लिए मानचित्र पर क्लिक करें (कम से कम 3)।",
-  "clear_boundary": "सीमा साफ़ करें"
+  "clear_boundary": "सीमा साफ़ करें",
+  "reports": "रिपोर्ट्स",
+  "community_forum": "सामुदायिक मंच",
+  "help_support": "सहायता और समर्थन"
 }

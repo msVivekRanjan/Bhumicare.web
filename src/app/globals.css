@@ -28,7 +28,7 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --radius: 0.8rem;
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -80,6 +80,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    overflow: hidden;
   }
 
   body::before {
@@ -89,10 +90,11 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-image: url('https://images.unsplash.com/photo-1499578124509-1611b77778c8?q=80&w=2070&auto=format&fit=crop');
+    background-image: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2832&auto=format&fit=crop');
     background-size: cover;
     background-position: center;
-    filter: blur(20px) brightness(0.7);
+    filter: blur(8px) brightness(0.6);
+    transform: scale(1.1);
     z-index: -1;
   }
 }

@@ -34,7 +34,7 @@
   "generate_map": "Generate Map",
   "generating_map_and_recommendation": "Generating map and recommendation...",
   "ai_map_recommendation": "AI Map Recommendation",
-  "login_to_bhumicare": "Login",
+  "login_to_bhumicare": "Login to Bhumicare",
   "email": "Email",
   "password": "Password",
   "login": "Login",
@@ -45,5 +45,8 @@
   "already_have_account": "Already have an account?",
   "define_field_boundary": "Define Your Field Boundary",
   "click_to_add_points": "Click on the map to add boundary points (at least 3).",
-  "clear_boundary": "Clear Boundary"
+  "clear_boundary": "Clear Boundary",
+  "reports": "Reports",
+  "community_forum": "Community Forum",
+  "help_support": "Help & Support"
 }

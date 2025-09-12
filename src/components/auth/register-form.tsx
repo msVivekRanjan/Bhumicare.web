@@ -28,16 +28,16 @@ export function RegisterForm() {
       <div className="grid grid-cols-2 gap-4">
         <div className="grid gap-2">
           <Label htmlFor="full-name">{t('full_name')}</Label>
-          <Input id="full-name" placeholder="Ram Kumar" required />
+          <Input id="full-name" placeholder="Ram Kumar" required className="bg-background/50" />
         </div>
          <div className="grid gap-2">
             <Label htmlFor="email">{t('email')}</Label>
-            <Input id="email" type="email" placeholder="ram@example.com" required />
+            <Input id="email" type="email" placeholder="ram@example.com" required className="bg-background/50" />
          </div>
       </div>
       <div className="grid gap-2">
         <Label htmlFor="password">{t('password')}</Label>
-        <Input id="password" type="password" required />
+        <Input id="password" type="password" required className="bg-background/50" />
       </div>
 
       <div className="grid gap-2">

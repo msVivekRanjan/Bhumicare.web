@@ -7,6 +7,9 @@ import {
   Map,
   Bell,
   Settings,
+  FileText,
+  MessageSquare,
+  LifeBuoy,
 } from 'lucide-react';
 
 import {
@@ -26,8 +29,11 @@ export default function AppSidebar() {
   const menuItems = [
     { href: '/dashboard', label: t('dashboard'), icon: LayoutDashboard },
     { href: '/farm-map', label: t('farm_map'), icon: Map },
+    { href: '/reports', label: t('reports'), icon: FileText },
+    { href: '/community', label: t('community_forum'), icon: MessageSquare },
     { href: '/alerts', label: t('alerts'), icon: Bell },
     { href: '/settings', label: t('settings'), icon: Settings },
+    { href: '/support', label: t('help_support'), icon: LifeBuoy },
   ];
 
   return (
