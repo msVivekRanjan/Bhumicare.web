@@ -1,3 +1,40 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "user-avatar-1",
+      "description": "User avatar",
+      "imageUrl": "https://picsum.photos/seed/user1/40/40",
+      "imageHint": "person face"
+    },
+    {
+      "id": "weather-sunny",
+      "description": "Sunny weather icon",
+      "imageUrl": "https://picsum.photos/seed/sun/64/64",
+      "imageHint": "sun sky"
+    },
+    {
+      "id": "weather-partly-cloudy",
+      "description": "Partly cloudy weather icon",
+      "imageUrl": "https://picsum.photos/seed/partlycloudy/64/64",
+      "imageHint": "cloud sun"
+    },
+    {
+      "id": "weather-cloudy",
+      "description": "Cloudy weather icon",
+      "imageUrl": "https://picsum.photos/seed/cloudy/64/64",
+      "imageHint": "clouds sky"
+    },
+    {
+      "id": "weather-rain",
+      "description": "Rainy weather icon",
+      "imageUrl": "https://picsum.photos/seed/rain/64/64",
+      "imageHint": "rain drops"
+    },
+    {
+      "id": "fertility-map-placeholder",
+      "description": "Placeholder for AI-generated fertility map",
+      "imageUrl": "https://picsum.photos/seed/map/800/600",
+      "imageHint": "map abstract"
+    }
+  ]
 }
