@@ -4,14 +4,51 @@ import {
   Map,
   useMap,
   AdvancedMarker,
-  Polygon,
 } from '@vis.gl/react-google-maps';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
 
 interface RegistrationMapProps {
   onCoordinatesChange: (coordinates: string) => void;
+}
+
+function DrawnPolygon({ paths }: { paths: google.maps.LatLngLiteral[] }) {
+    const map = useMap();
+    const polygonRef = useRef<google.maps.Polygon | null>(null);
+
+    useEffect(() => {
+        if (!map) return;
+
+        if (!polygonRef.current) {
+            polygonRef.current = new google.maps.Polygon({
+                paths: paths,
+                strokeColor: "#3498DB",
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: "#3498DB",
+                fillOpacity: 0.35,
+            });
+            polygonRef.current.setMap(map);
+        } else {
+            polygonRef.current.setPaths(paths);
+        }
+
+        return () => {
+            if (polygonRef.current) {
+                polygonRef.current.setMap(null);
+                polygonRef.current = null;
+            }
+        };
+    }, [map, paths]);
+    
+    useEffect(() => {
+        if(polygonRef.current) {
+            polygonRef.current.setPaths(paths);
+        }
+    }, [paths]);
+
+    return null;
 }
 
 export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
@@ -46,7 +83,7 @@ export function RegistrationMap({ onCoordinatesChange }: RegistrationMapProps) {
         {points.map((point, index) => (
           <AdvancedMarker key={index} position={point} />
         ))}
-        {points.length > 2 && <Polygon paths={points} strokeColor="#3498DB" strokeOpacity={0.8} strokeWeight={2} fillColor="#3498DB" fillOpacity={0.35} />}
+        {points.length > 2 && <DrawnPolygon paths={points} />}
       </Map>
       <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center bg-background/80 p-2 rounded-md shadow-lg">
          <p className="text-xs text-muted-foreground">{t('click_to_add_points')}</p>
