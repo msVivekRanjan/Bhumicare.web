@@ -8,7 +8,7 @@ import {
 } from '@vis.gl/react-google-maps';
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Redo, Undo, X } from 'lucide-react';
+import { Loader2, Redo, Undo, X, LocateFixed } from 'lucide-react';
 import { Button } from '../ui/button';
 
 interface RegistrationMapProps {
@@ -28,8 +28,7 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
   const isApiLoaded = useApiIsLoaded();
   const { toast } = useToast();
 
-  // 1. Geolocation on load
-  useEffect(() => {
+  const getUserLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -38,18 +37,25 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
             lng: position.coords.longitude,
           };
           setCenter(userLoc);
-          map?.setCenter(userLoc);
+          map?.panTo(userLoc);
           map?.setZoom(15);
+           toast({ title: "Location found!", description: "Map centered on your current location." });
         },
         () => {
             toast({ title: "Could not get location.", description: "Defaulting to a central location.", variant: "destructive" });
-            setCenter(FALLBACK_CENTER);
-            map?.setCenter(FALLBACK_CENTER);
+            map?.panTo(FALLBACK_CENTER);
             map?.setZoom(5);
         }
       );
+    } else {
+         toast({ title: "Geolocation not supported.", description: "Your browser does not support geolocation.", variant: "destructive" });
     }
-  }, [map, toast]);
+  }
+
+  // 1. Geolocation on load
+  useEffect(() => {
+    getUserLocation();
+  }, [map]);
 
   // Handle map clicks during marking mode
   useEffect(() => {
@@ -146,11 +152,17 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
             </Button>
             {isMarking && (
                 <>
-                    <Button type="button" variant="secondary" onClick={handleUndo} disabled={vertices.length === 0}><Undo className="mr-2" /> Undo</Button>
-                    <Button type="button" variant="destructive" onClick={handleClear} disabled={vertices.length === 0}><X className="mr-2" /> Clear All</Button>
+                    <Button type="button" variant="secondary" onClick={handleUndo} disabled={vertices.length === 0}><Undo className="mr-2 h-4 w-4" /> Undo</Button>
+                    <Button type="button" variant="destructive" onClick={handleClear} disabled={vertices.length === 0}><X className="mr-2 h-4 w-4" /> Clear All</Button>
                 </>
             )}
        </div>
+
+      <div className="absolute top-2 right-2 z-10">
+        <Button type="button" size="icon" variant="secondary" onClick={getUserLocation} title="Get my current location">
+            <LocateFixed className="h-5 w-5" />
+        </Button>
+      </div>
 
       {isMarking && (
         <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-background/80 p-2 rounded-md shadow-lg text-center z-10">
