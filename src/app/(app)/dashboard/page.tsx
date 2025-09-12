@@ -8,6 +8,9 @@ import { WeatherWidget } from '@/components/dashboard/weather-widget';
 import { RecommendationCard } from '@/components/dashboard/recommendation-card';
 import { DataChart } from '@/components/dashboard/data-chart';
 import { useTranslation } from '@/hooks/use-translation';
+import { MarketPrices } from '@/components/dashboard/market-prices';
+import { CropCalendar } from '@/components/dashboard/crop-calendar';
+import { PestAlerts } from '@/components/dashboard/pest-alerts';
 
 export default function DashboardPage() {
   const { t } = useTranslation();
@@ -17,7 +20,7 @@ export default function DashboardPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <RealTimeMetrics />
       </div>
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
            <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -29,24 +32,23 @@ export default function DashboardPage() {
                         {t('export_csv')}
                     </span>
                  </Button>
-                 <Button variant="outline" size="sm" className="h-8 gap-1">
-                    <Download className="h-3.5 w-3.5" />
-                    <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                        {t('export_pdf')}
-                    </span>
-                 </Button>
               </div>
             </CardHeader>
             <CardContent>
               <DataChart />
             </CardContent>
           </Card>
+          <MarketPrices />
         </div>
         <div className="space-y-6">
           <WeatherWidget />
           <RecommendationCard />
         </div>
       </div>
+       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <CropCalendar />
+          <PestAlerts />
+        </div>
     </div>
   );
 }
