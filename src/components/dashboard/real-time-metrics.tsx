@@ -21,11 +21,14 @@ const initialData: SensorData = {
 
 export default function RealTimeMetrics() {
   const [data, setData] = useState<SensorData>(initialData);
+  const [lastUpdated, setLastUpdated] = useState('');
   const { t } = useTranslation();
-  const lastUpdated = new Date(data.timestamp).toLocaleTimeString();
 
   useEffect(() => {
+    setLastUpdated(new Date(initialData.timestamp).toLocaleTimeString());
+    
     const interval = setInterval(() => {
+      const newTimestamp = Date.now();
       setData((prevData) => ({
         soilMoisture: parseFloat((prevData.soilMoisture + (Math.random() - 0.5)).toFixed(1)),
         temperature: parseFloat((prevData.temperature + (Math.random() - 0.5) * 0.2).toFixed(1)),
@@ -35,8 +38,9 @@ export default function RealTimeMetrics() {
         potassium: Math.round(prevData.potassium + (Math.random() - 0.5) * 1.5),
         lightLevel: 98,
         gasLevel: 29,
-        timestamp: Date.now(),
+        timestamp: newTimestamp,
       }));
+      setLastUpdated(new Date(newTimestamp).toLocaleTimeString());
     }, 2000); // Update every 2 seconds
 
     return () => clearInterval(interval);
@@ -46,7 +50,7 @@ export default function RealTimeMetrics() {
     <Card>
       <CardHeader>
         <CardTitle className="font-headline">{t('real_time_data')}</CardTitle>
-        <CardDescription>{t('last_updated')} {lastUpdated}</CardDescription>
+        {lastUpdated && <CardDescription>{t('last_updated')} {lastUpdated}</CardDescription>}
       </CardHeader>
       <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <MetricCard
