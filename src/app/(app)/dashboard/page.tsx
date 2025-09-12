@@ -7,9 +7,9 @@ import { RecommendationCard } from '@/components/dashboard/recommendation-card';
 import { DataChart } from '@/components/dashboard/data-chart';
 import { useTranslation } from '@/hooks/use-translation';
 import { MarketPrices } from '@/components/dashboard/market-prices';
-import { CropCalendar } from '@/components/dashboard/crop-calendar';
-import { PestAlerts } from '@/components/dashboard/pest-alerts';
 import { WelcomeBanner } from '@/components/dashboard/welcome-banner';
+import { PestAlerts } from '@/components/dashboard/pest-alerts';
+import { CropCalendar } from '@/components/dashboard/crop-calendar';
 
 export default function DashboardPage() {
   const { t } = useTranslation();
@@ -34,13 +34,13 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
            <MarketPrices />
+           <PestAlerts />
         </div>
         
         {/* Right Column: Widgets & Tools */}
         <div className="space-y-6">
           <WeatherWidget />
           <RecommendationCard />
-          <PestAlerts />
           <CropCalendar />
         </div>
       </div>

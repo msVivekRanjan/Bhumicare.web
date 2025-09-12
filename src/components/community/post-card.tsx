@@ -3,6 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 import { MessageCircle, ThumbsUp } from "lucide-react";
 
 interface Post {
@@ -21,6 +22,15 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, onLike }: PostCardProps) {
+    const { toast } = useToast();
+
+    const handleViewComments = () => {
+        toast({
+            title: "Feature Coming Soon!",
+            description: "The ability to view and add comments is under development."
+        })
+    }
+
     return (
         <Card>
             <CardHeader>
@@ -43,11 +53,11 @@ export function PostCard({ post, onLike }: PostCardProps) {
                     <Button variant="ghost" size="sm" className="flex items-center gap-2" onClick={onLike}>
                         <ThumbsUp className="h-4 w-4" /> {post.likes}
                     </Button>
-                    <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" className="flex items-center gap-2" onClick={handleViewComments}>
                         <MessageCircle className="h-4 w-4" /> {post.commentsCount}
                     </Button>
                  </div>
-                 <Button variant="outline" size="sm">View Comments</Button>
+                 <Button variant="outline" size="sm" onClick={handleViewComments}>View Comments</Button>
             </CardFooter>
         </Card>
     );
