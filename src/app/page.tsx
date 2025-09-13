@@ -149,7 +149,7 @@ export default function LandingPage() {
                     </motion.div>
                 </section>
                 
-                <>
+              
                   {/* Social Proof Marquee */}
                   <SocialProof />
                   <SectionDivider />
@@ -393,7 +393,7 @@ export default function LandingPage() {
                           </motion.div>
                       </div>
                   </section>
-                </>
+                
             </main>
             
             <LandingFooter />
