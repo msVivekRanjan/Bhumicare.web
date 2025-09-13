@@ -39,12 +39,12 @@ export default function AppSidebar() {
   return (
     <>
       <SidebarHeader>
-        <div className="flex items-center gap-2 p-2">
+        <Link href="/" className="flex items-center gap-2 p-2">
           <BhumicareLogo className="w-8 h-8 text-primary" />
           <span className="font-headline text-lg font-semibold group-data-[collapsible=icon]:hidden">
             {t('bhumicare')}
           </span>
-        </div>
+        </Link>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
