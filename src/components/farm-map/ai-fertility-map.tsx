@@ -7,7 +7,6 @@ import { MapLegend } from './map-legend';
 import { Button } from '../ui/button';
 import { Loader2, LocateFixed, Undo, Expand, Shrink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { generateSoilFertilityMap, SoilFertilityMapOutput } from '@/ai/flows/soil-fertility-map';
 import { getSmartRecommendation } from '@/ai/flows/smart-recommendations';
 import { useTranslation } from '@/hooks/use-translation';
 import { Skeleton } from '../ui/skeleton';
@@ -25,6 +24,68 @@ type CellData = {
     soilMoisture: number;
     fertilityIndex: number;
 };
+
+// --- Helper functions for client-side simulation ---
+const calculateFertilityIndex = (data: { nitrogen: number, phosphorus: number, potassium: number, soilMoisture: number }): number => {
+    const { nitrogen, phosphorus, potassium, soilMoisture } = data;
+
+    // Normalize each parameter to a 0-1 scale where 1 is optimal
+    const normN = 1 - Math.abs(150 - nitrogen) / 150; // Optimal at 150
+    const normP = 1 - Math.abs(50 - phosphorus) / 50;   // Optimal at 50
+    const normK = 1 - Math.abs(100 - potassium) / 100; // Optimal at 100
+    const normMoisture = 1 - Math.abs(50 - soilMoisture) / 50; // Optimal at 50
+
+    // Clamp values between 0 and 1
+    const clampedValues = [normN, normP, normK, normMoisture].map(v => Math.max(0, Math.min(1, v)));
+    
+    // Weighted average
+    const fertility = (clampedValues[0] * 0.4) + (clampedValues[1] * 0.2) + (clampedValues[2] * 0.2) + (clampedValues[3] * 0.2);
+    
+    return Math.max(0, Math.min(1, fertility));
+};
+
+const simulateSensorDataForGrid = (
+    baseData: { nitrogen: number, phosphorus: number, potassium: number, soilMoisture: number },
+    gridCells: {id: string, center: google.maps.LatLngLiteral}[]
+): CellData[] => {
+    return gridCells.map(cell => {
+        // Create slight, logical variations based on coordinates
+        const latFactor = (cell.center.lat % 0.01) * 100;
+        const lngFactor = (cell.center.lng % 0.01) * 100;
+
+        const simulatedData = {
+            nitrogen: baseData.nitrogen + (latFactor - 5) * 2, // +/- 10
+            phosphorus: baseData.phosphorus + (lngFactor - 5), // +/- 5
+            potassium: baseData.potassium + (latFactor - lngFactor), // +/- 10
+            soilMoisture: baseData.soilMoisture - (latFactor - 5), // +/- 5
+        };
+
+        const fertilityIndex = calculateFertilityIndex(simulatedData);
+        
+        const cellPoly = cell.id.split('_').map(Number);
+        const i = cellPoly[1];
+        const j = cellPoly[2];
+
+        // This part is a placeholder as the actual polygons are created later.
+        // We just need to pass the data through.
+        const dummyPolygon = [
+             { lat: 0, lng: 0 },
+             { lat: 0, lng: 0 },
+             { lat: 0, lng: 0 },
+             { lat: 0, lng: 0 },
+        ];
+
+        return {
+            id: cell.id,
+            center: cell.center,
+            polygon: dummyPolygon, // Will be replaced later
+            ...simulatedData,
+            fertilityIndex,
+        };
+    });
+};
+// --- End of helper functions ---
+
 
 const BivariateMap = () => {
     const map = useMap();
@@ -224,84 +285,73 @@ const BivariateMap = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [map, fieldPath]);
     
-    // Grid Generation and AI call logic
+    // Grid Generation and Simulation logic
     useEffect(() => {
         if (fieldPath.length < 3 || !map) return;
 
-        const mainPolygonForCheck = new google.maps.Polygon({ paths: fieldPath });
-        const bounds = new google.maps.LatLngBounds();
-        fieldPath.forEach(p => bounds.extend(p));
-        const sw = bounds.getSouthWest();
-        const ne = bounds.getNorthEast();
-
-        const cellsToAnalyze: {id: string, center: google.maps.LatLngLiteral}[] = [];
-        const cellPolygons: {id: string, polygon: google.maps.LatLngLiteral[], center: google.maps.LatLngLiteral}[] = [];
-
-        const latStep = (ne.lat() - sw.lat()) / GRID_RESOLUTION;
-        const lngStep = (ne.lng() - sw.lng()) / GRID_RESOLUTION;
-
-        for (let i = 0; i < GRID_RESOLUTION; i++) {
-            for (let j = 0; j < GRID_RESOLUTION; j++) {
-                const cellSW = { lat: sw.lat() + i * latStep, lng: sw.lng() + j * lngStep };
-                const cellNE = { lat: sw.lat() + (i + 1) * latStep, lng: sw.lng() + (j + 1) * lngStep };
-                const cellCenter = { lat: cellSW.lat + latStep / 2, lng: cellSW.lng + lngStep / 2 };
-                
-                if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(cellCenter), mainPolygonForCheck)) {
-                    const id = `cell_${i}_${j}`;
-                    cellsToAnalyze.push({ id, center: cellCenter });
-                    cellPolygons.push({
-                        id,
-                        center: cellCenter,
-                        polygon: [
-                            cellSW,
-                            { lat: cellSW.lat, lng: cellNE.lng },
-                            cellNE,
-                            { lat: cellNE.lat, lng: cellSW.lng }
-                        ]
-                    });
-                }
-            }
-        }
+        setIsLoadingMap(true);
+        setMapData(null);
+        gridPolygons.forEach(p => p.setMap(null));
+        setGridPolygons([]);
 
         const generateMap = async () => {
+             const mainPolygonForCheck = new google.maps.Polygon({ paths: fieldPath });
+             const bounds = new google.maps.LatLngBounds();
+             fieldPath.forEach(p => bounds.extend(p));
+             const sw = bounds.getSouthWest();
+             const ne = bounds.getNorthEast();
+
+             const cellsToAnalyze: {id: string, center: google.maps.LatLngLiteral}[] = [];
+             const cellPolygons: {id: string, polygon: google.maps.LatLngLiteral[], center: google.maps.LatLngLiteral}[] = [];
+
+             const latStep = (ne.lat() - sw.lat()) / GRID_RESOLUTION;
+             const lngStep = (ne.lng() - sw.lng()) / GRID_RESOLUTION;
+
+             for (let i = 0; i < GRID_RESOLUTION; i++) {
+                 for (let j = 0; j < GRID_RESOLUTION; j++) {
+                     const cellSW = { lat: sw.lat() + i * latStep, lng: sw.lng() + j * lngStep };
+                     const cellNE = { lat: sw.lat() + (i + 1) * latStep, lng: sw.lng() + (j + 1) * lngStep };
+                     const cellCenter = { lat: cellSW.lat + latStep / 2, lng: cellSW.lng + lngStep / 2 };
+                    
+                     if (google.maps.geometry.poly.containsLocation(new google.maps.LatLng(cellCenter), mainPolygonForCheck)) {
+                         const id = `cell_${i}_${j}`;
+                         cellsToAnalyze.push({ id, center: cellCenter });
+                         cellPolygons.push({
+                             id,
+                             center: cellCenter,
+                             polygon: [
+                                 cellSW,
+                                 { lat: cellSW.lat, lng: cellNE.lng },
+                                 cellNE,
+                                 { lat: cellNE.lat, lng: cellSW.lng }
+                             ]
+                         });
+                     }
+                 }
+             }
+
             if(cellsToAnalyze.length === 0) {
                 toast({ variant: "destructive", title: "No area to analyze", description: "The defined field area is too small."});
+                setIsLoadingMap(false);
                 return;
             };
 
-            setIsLoadingMap(true);
-            setMapData(null);
-            gridPolygons.forEach(p => p.setMap(null));
-            setGridPolygons([]);
+            // Simulate the data on the client
+            const baseData = { soilMoisture: 45, nitrogen: 150, phosphorus: 50, potassium: 100 };
+            const result = simulateSensorDataForGrid(baseData, cellsToAnalyze);
             
-            try {
-                const result = await generateSoilFertilityMap({
-                    soilMoisture: 45,
-                    nitrogen: 150,
-                    phosphorus: 50,
-                    potassium: 100,
-                    gridCells: cellsToAnalyze,
-                });
-                
-                const combinedData: CellData[] = result.subRegions.map(region => {
-                    const cellPoly = cellPolygons.find(p => p.id === region.id);
-                    return { ...region, polygon: cellPoly!.polygon, center: cellPoly!.center };
-                });
+            const combinedData: CellData[] = result.map(region => {
+                const cellPoly = cellPolygons.find(p => p.id === region.id);
+                return { ...region, polygon: cellPoly!.polygon, center: cellPoly!.center };
+            });
 
-                setMapData(combinedData);
-            } catch (error) {
-                console.error("Failed to generate AI map:", error);
-                toast({
-                    variant: "destructive",
-                    title: "AI Analysis Failed",
-                    description: "Could not generate the soil fertility map. Please try again."
-                });
-            } finally {
-                setIsLoadingMap(false);
-            }
+            setMapData(combinedData);
+            setIsLoadingMap(false);
         };
 
-        generateMap();
+        // Added a timeout to simulate a quick loading process and prevent UI blocking on heavy fields
+        setTimeout(generateMap, 100);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fieldPath, map, toast]);
     
@@ -365,8 +415,8 @@ const BivariateMap = () => {
                         <p className="text-xs font-mono">Lat: {hoverData.center.lat.toFixed(4)}, Lng: {hoverData.center.lng.toFixed(4)}</p>
                         <hr className="my-2"/>
                         <p className="text-xs"><b>Fertility Index:</b> {(hoverData.fertilityIndex * 100).toFixed(0)}%</p>
-                        <p className="text-xs"><b>Moisture:</b> {hoverData.soilMoisture}%</p>
-                        <p className="text-xs"><b>N:</b> {hoverData.nitrogen} | <b>P:</b> {hoverData.phosphorus} | <b>K:</b> {hoverData.potassium}</p>
+                        <p className="text-xs"><b>Moisture:</b> {hoverData.soilMoisture.toFixed(1)}%</p>
+                        <p className="text-xs"><b>N:</b> {hoverData.nitrogen.toFixed(0)} | <b>P:</b> {hoverData.phosphorus.toFixed(0)} | <b>K:</b> {hoverData.potassium.toFixed(0)}</p>
                         <div className="mt-2 text-xs italic">
                            {isRecommendationLoading ? (
                             <div className="space-y-1">
@@ -484,5 +534,7 @@ export const getColorFromIndex = (fertilityIndex: number) => {
     const hue = (fertilityIndex * 120).toString(10);
     return `hsl(${hue}, 100%, 45%)`;
 };
+
+    
 
     
