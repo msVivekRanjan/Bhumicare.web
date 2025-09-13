@@ -17,7 +17,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id);
 
 const teamMembers = [
-    { name: 'Raj Sahashranshu Biswal', avatarUrl: getImage('team-raj')?.imageUrl!, role: 'Project Lead', bio: 'Raj is the visionary behind Bhumicare, leading the AI development and full-stack architecture to turn complex data into actionable insights for farmers.', linkedin: '#' },
+    { name: 'Raj Sahasransu Biswal', avatarUrl: getImage('team-raj')?.imageUrl!, role: 'Project Lead', bio: 'Raj is the visionary behind Bhumicare, leading the AI development and full-stack architecture to turn complex data into actionable insights for farmers.', linkedin: '#' },
     { name: 'Vivek Ranjan Sahoo', avatarUrl: getImage('team-vivek')?.imageUrl!, role: 'UI/UX & Frontend', bio: 'Vivek crafts the user experience, ensuring the Bhumicare dashboard is intuitive, accessible, and presents complex information in a simple, beautiful interface.', linkedin: '#' },
     { name: 'Ayush Ranjan Pradhan', avatarUrl: getImage('team-ayush')?.imageUrl!, role: 'Hardware & IoT', bio: 'Ayush engineers the heart of our solution—the IoT device. His expertise in hardware ensures our sensors are reliable, accurate, and built to last in the field.', linkedin: '#' },
     { name: 'Subasis Mishra', avatarUrl: getImage('team-subasis')?.imageUrl!, role: 'App Developer', bio: 'Subasis drives the product strategy and market outreach, connecting our technology with the farmers and organizations who need it most.', linkedin: '#' },
@@ -332,10 +332,10 @@ export default function LandingPage() {
                                   <div>
                                       <h4 className="font-semibold">SDG Contribution</h4>
                                       <div className="flex items-center gap-3 mt-2">
-                                          <Image src="/sdg-2.svg" alt="SDG 2" width={32} height={32} />
-                                          <Image src="/sdg-6.svg" alt="SDG 6" width={32} height={32} />
-                                          <Image src="/sdg-12.svg" alt="SDG 12" width={32} height={32} />
-                                          <Image src="/sdg-13.svg" alt="SDG 13" width={32} height={32} />
+                                          <Image src="https://commons.wikimedia.org/wiki/File:Sustainable_Development_Goals.svg#/media/File:Sustainable_Development_Goal_02ZeroHunger.svg" alt="SDG 2" width={32} height={32} />
+                                          <Image src="https://commons.wikimedia.org/wiki/File:Sustainable_Development_Goals.svg#/media/File:Sustainable_Development_Goal_06CleanWaterSanitation.svg" alt="SDG 6" width={32} height={32} />
+                                          <Image src="https://commons.wikimedia.org/wiki/File:Sustainable_Development_Goals.svg#/media/File:Sustainable_Development_Goal_12ResponsibleConsumption.svg" alt="SDG 12" width={32} height={32} />
+                                          <Image src="https://commons.wikimedia.org/wiki/File:Sustainable_Development_Goals.svg#/media/File:Sustainable_Development_Goal_13Climate.svg" alt="SDG 13" width={32} height={32} />
                                       </div>
                                   </div>
                             </div>

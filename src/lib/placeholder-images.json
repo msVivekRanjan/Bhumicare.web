@@ -3,37 +3,37 @@
     {
       "id": "dashboard-dark",
       "description": "Bhumicare Dashboard Preview",
-      "imageUrl": "https://picsum.photos/seed/dashboard-dark/1200/800",
+      "imageUrl": "/Assets/Dashboard/web_collage.png",
       "imageHint": "dashboard dark"
     },
     {
       "id": "team-raj",
       "description": "Avatar for Raj Sahashranshu Biswal",
-      "imageUrl": "https://picsum.photos/seed/dev1/100/100",
+      "imageUrl": "/Assets/Team/Team_Raj.png",
       "imageHint": "man portrait"
     },
     {
       "id": "team-vivek",
       "description": "Avatar for Vivek Ranjan Sahoo",
-      "imageUrl": "/Team_1.png",
+      "imageUrl": "/Assets/Team/Team_Vivek.png",
       "imageHint": "man portrait"
     },
     {
       "id": "team-ayush",
       "description": "Avatar for Ayush Ranjan Pradhan",
-      "imageUrl": "https://picsum.photos/seed/dev3/100/100",
+      "imageUrl": "/Assets/Team/Team_Ayush.png",
       "imageHint": "man portrait"
     },
     {
       "id": "team-subasis",
       "description": "Avatar for Subasis Mishra",
-      "imageUrl": "https://picsum.photos/seed/dev4/100/100",
+      "imageUrl": "/Assets/Team/Team_Subasis.png",
       "imageHint": "man portrait"
     },
     {
       "id": "supporter-aic-soa",
       "description": "AIC SOA Foundation Logo",
-      "imageUrl": "/aic-soa-logo.png",
+      "imageUrl": "/Assets/Supporters/AIC_logo.png",
       "imageHint": "logo abstract"
     },
     {
@@ -44,8 +44,8 @@
     },
     {
       "id": "endorsement-mentor",
-      "description": "Avatar for Rohan Mehta",
-      "imageUrl": "https://picsum.photos/seed/mentor/100/100",
+      "description": "Dr. Bharat Jyoti Ranjan Sahu",
+      "imageUrl": "/Assets/Testinomials/bharat_sir.png",
       "imageHint": "man portrait"
     },
     {
