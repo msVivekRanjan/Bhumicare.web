@@ -7,7 +7,7 @@
  * - SoilFertilityMapOutput - The return type for the generateSoilFertilityMap function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai} from '@/ai/config';
 import {z} from 'genkit';
 
 const GridCellInputSchema = z.object({
@@ -85,5 +85,3 @@ const soilFertilityMapFlow = ai.defineFlow(
     return output!;
   }
 );
-
-    

@@ -8,7 +8,7 @@
  * - SmartRecommendationOutput - The return type for the getSmartRecommendation function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai} from '@/ai/config';
 import {z} from 'genkit';
 
 const SmartRecommendationInputSchema = z.object({
