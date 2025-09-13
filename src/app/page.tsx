@@ -18,8 +18,8 @@ const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id);
 
 const teamMembers = [
     { name: 'Raj Sahashranshu Biswal', avatarUrl: getImage('team-raj')?.imageUrl!, role: 'Project Lead', bio: 'Raj is the visionary behind Bhumicare, leading the AI development and full-stack architecture to turn complex data into actionable insights for farmers.', linkedin: '#' },
-    { name: 'Vivek Ranjan Sahoo', avatarUrl: getImage('team-vivek')?.imageUrl!, role: 'UI/UX & Frontend', bio: 'Vivek engineers the heart of our solution—the IoT device. His expertise in hardware ensures our sensors are reliable, accurate, and built to last in the field.', linkedin: '#' },
-    { name: 'Ayush Ranjan Pradhan', avatarUrl: getImage('team-ayush')?.imageUrl!, role: 'Hardware & IoT', bio: 'Ayush crafts the user experience, ensuring the Bhumicare dashboard is intuitive, accessible, and presents complex information in a simple, beautiful interface.', linkedin: '#' },
+    { name: 'Vivek Ranjan Sahoo', avatarUrl: getImage('team-vivek')?.imageUrl!, role: 'UI/UX & Frontend', bio: 'Vivek crafts the user experience, ensuring the Bhumicare dashboard is intuitive, accessible, and presents complex information in a simple, beautiful interface.', linkedin: '#' },
+    { name: 'Ayush Ranjan Pradhan', avatarUrl: getImage('team-ayush')?.imageUrl!, role: 'Hardware & IoT', bio: 'Ayush engineers the heart of our solution—the IoT device. His expertise in hardware ensures our sensors are reliable, accurate, and built to last in the field.', linkedin: '#' },
     { name: 'Subasis Mishra', avatarUrl: getImage('team-subasis')?.imageUrl!, role: 'App Developer', bio: 'Subasis drives the product strategy and market outreach, connecting our technology with the farmers and organizations who need it most.', linkedin: '#' },
 ];
 
