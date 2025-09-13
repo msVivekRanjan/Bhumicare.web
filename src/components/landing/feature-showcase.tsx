@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { Sprout, Mic, CheckCircle, Leaf } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -74,7 +74,7 @@ export const FeatureShowcase = () => {
                     <p className="text-lg text-muted-foreground">Our integrated system of hardware and AI provides a complete, modern solution to an age-old problem.</p>
                 </div>
                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-                     <div className="sticky top-24 space-y-8">
+                     <div className="lg:sticky top-24 space-y-8">
                         {features.map((feature, index) => (
                              <motion.div 
                                 key={feature.id}
