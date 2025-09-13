@@ -1,5 +1,6 @@
+'use client';
 import Image from 'next/image';
-import { Card } from '@/components/ui/card';
+import { motion } from 'framer-motion';
 
 interface TeamMemberCardProps {
     name: string;
@@ -7,9 +8,20 @@ interface TeamMemberCardProps {
     avatarUrl: string;
 }
 
+const cardAnimation = {
+  initial: { opacity: 0, y: 30 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5, ease: 'easeInOut' },
+};
+
 export function TeamMemberCard({ name, role, avatarUrl }: TeamMemberCardProps) {
     return (
-        <Card className="text-center p-4">
+        <motion.div 
+            className="text-center p-4 rounded-2xl glass-card"
+            variants={cardAnimation}
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+        >
             <Image 
                 src={avatarUrl} 
                 alt={name} 
@@ -17,8 +29,8 @@ export function TeamMemberCard({ name, role, avatarUrl }: TeamMemberCardProps) {
                 height={100} 
                 className="rounded-full mx-auto mb-4 border-2 border-primary"
             />
-            <h4 className="font-bold font-headline text-lg">{name}</h4>
+            <h4 className="font-bold text-lg">{name}</h4>
             <p className="text-sm text-muted-foreground">{role}</p>
-        </Card>
+        </motion.div>
     );
 }

@@ -1,38 +1,35 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { motion, useMotionValue, useTransform, animate, useInView } from 'framer-motion';
+import { useRef } from 'react';
 
 interface AnimatedNumberProps {
     value: number;
     className?: string;
     prefix?: string;
+    postfix?: string;
 }
 
-export function AnimatedNumber({ value, className, prefix = '+' }: AnimatedNumberProps) {
-    const [currentValue, setCurrentValue] = useState(0);
+export function AnimatedNumber({ value, className, prefix = '', postfix = '%' }: AnimatedNumberProps) {
+    const count = useMotionValue(0);
+    const rounded = useTransform(count, (latest) => Math.round(latest));
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, margin: "-100px" });
 
     useEffect(() => {
-        let start = 0;
-        const end = value;
-        if (start === end) return;
-        
-        const duration = 1500;
-        const incrementTime = (duration / end);
-
-        const timer = setInterval(() => {
-            start += 1;
-            setCurrentValue(start);
-            if (start === end) {
-                clearInterval(timer);
-            }
-        }, incrementTime);
-
-        return () => clearInterval(timer);
-    }, [value]);
+        if (isInView) {
+            const controls = animate(count, value, { 
+                duration: 2, 
+                ease: 'easeOut' 
+            });
+            return controls.stop;
+        }
+    }, [isInView, value, count]);
 
     return (
-        <span className={className}>
-            {prefix}{currentValue}%
+        <span ref={ref} className={className}>
+            {prefix}<motion.span>{rounded}</motion.span>{postfix}
         </span>
     );
 }
