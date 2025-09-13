@@ -8,19 +8,12 @@ interface TeamMemberCardProps {
     avatarUrl: string;
 }
 
-const cardAnimation = {
-  initial: { opacity: 0, y: 30 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, ease: 'easeInOut' },
-};
-
 export function TeamMemberCard({ name, role, avatarUrl }: TeamMemberCardProps) {
     return (
         <motion.div 
-            className="text-center p-4 rounded-2xl glass-card"
-            variants={cardAnimation}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: 'spring', stiffness: 300 }}
+            className="text-center p-4 glass-card"
+            whileHover={{ y: -5, boxShadow: "0 10px 30px -10px rgba(0,0,0,0.2)" }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
         >
             <Image 
                 src={avatarUrl} 

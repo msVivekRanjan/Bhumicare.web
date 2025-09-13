@@ -39,10 +39,16 @@ export const HowItWorks = () => {
     return (
         <section ref={targetRef} id="how-it-works" className="relative h-[400vh] bg-background">
             <div className="sticky top-0 h-screen flex items-center overflow-hidden">
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 text-center space-y-2 z-10">
-                    <h2 className="text-3xl md:text-5xl font-bold">Simple Technology, Powerful Results</h2>
+                 <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.5}}
+                    transition={{ duration: 0.8, ease: 'easeInOut' }}
+                    className="absolute top-1/4 left-1/2 -translate-x-1/2 text-center space-y-2 z-10"
+                >
+                    <h2 className="text-3xl md:text-4xl font-semibold">Simple Technology, Powerful Results</h2>
                     <p className="text-lg text-muted-foreground">A seamless 4-step process from soil to solution.</p>
-                </div>
+                </motion.div>
                 <motion.div style={{ x }} className="flex gap-16 pl-16">
                     {steps.map((step, index) => (
                         <Card key={step.title} step={step} index={index} scrollYProgress={scrollYProgress} />
@@ -78,7 +84,7 @@ const Card = ({ step, index, scrollYProgress }: CardProps) => {
         <motion.div
             style={{ scale, opacity }}
             className={cn(
-                "h-[450px] w-[300px] md:h-[500px] md:w-[450px] flex flex-col items-center justify-center p-8 rounded-3xl relative",
+                "h-[450px] w-[300px] md:h-[500px] md:w-[450px] flex flex-col items-center justify-center p-8 relative",
                 "glass-card"
             )}
         >
@@ -90,5 +96,3 @@ const Card = ({ step, index, scrollYProgress }: CardProps) => {
         </motion.div>
     );
 };
-
-    
