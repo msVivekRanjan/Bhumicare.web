@@ -10,25 +10,29 @@ import {
 } from './carousel-buttons'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
+import { PlaceHolderImages } from '@/lib/placeholder-images'
+
+const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id);
+
 
 const endorsements = [
   {
     quote: "Bhumicare's ground-level data is the missing piece in precision agriculture. It has the potential to revolutionize how we manage soil health at scale.",
     author: "Dr. Anjali Verma",
     title: "Agricultural Scientist, IARI",
-    avatar: "https://picsum.photos/seed/scientist/100/100"
+    avatar: getImage('endorsement-scientist')?.imageUrl!
   },
   {
     quote: "A brilliant application of IoT and AI to solve a real-world problem for millions. This is the future of sustainable farming.",
     author: "Rohan Mehta",
     title: "Startup Mentor, AGNIi",
-     avatar: "https://picsum.photos/seed/mentor/100/100"
+     avatar: getImage('endorsement-mentor')?.imageUrl!
   },
   {
     quote: "The simplicity of receiving advice in my own dialect makes all the difference. It's like having an expert in my pocket.",
     author: "Suresh Patel",
     title: "Farmer, Odisha",
-     avatar: "https://picsum.photos/seed/farmer/100/100"
+     avatar: getImage('endorsement-farmer')?.imageUrl!
   }
 ]
 

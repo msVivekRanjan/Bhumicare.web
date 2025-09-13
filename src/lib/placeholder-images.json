@@ -1,40 +1,64 @@
 {
   "placeholderImages": [
     {
-      "id": "user-avatar-1",
-      "description": "User avatar",
-      "imageUrl": "https://picsum.photos/seed/user1/40/40",
-      "imageHint": "person face"
+      "id": "dashboard-dark",
+      "description": "Bhumicare Dashboard Preview",
+      "imageUrl": "https://picsum.photos/seed/dashboard-dark/1200/800",
+      "imageHint": "dashboard dark"
     },
     {
-      "id": "weather-sunny",
-      "description": "Sunny weather icon",
-      "imageUrl": "https://picsum.photos/seed/sun/64/64",
-      "imageHint": "sun sky"
+      "id": "team-raj",
+      "description": "Avatar for Raj Sahashranshu Biswal",
+      "imageUrl": "https://picsum.photos/seed/dev1/100/100",
+      "imageHint": "man portrait"
     },
     {
-      "id": "weather-partly-cloudy",
-      "description": "Partly cloudy weather icon",
-      "imageUrl": "https://picsum.photos/seed/partlycloudy/64/64",
-      "imageHint": "cloud sun"
+      "id": "team-vivek",
+      "description": "Avatar for Vivek Ranjan Sahoo",
+      "imageUrl": "https://picsum.photos/seed/dev2/100/100",
+      "imageHint": "man portrait"
     },
     {
-      "id": "weather-cloudy",
-      "description": "Cloudy weather icon",
-      "imageUrl": "https://picsum.photos/seed/cloudy/64/64",
-      "imageHint": "clouds sky"
+      "id": "team-ayush",
+      "description": "Avatar for Ayush Ranjan Pradhan",
+      "imageUrl": "https://picsum.photos/seed/dev3/100/100",
+      "imageHint": "man portrait"
     },
     {
-      "id": "weather-rain",
-      "description": "Rainy weather icon",
-      "imageUrl": "https://picsum.photos/seed/rain/64/64",
-      "imageHint": "rain drops"
+      "id": "team-subasis",
+      "description": "Avatar for Subasis Mishra",
+      "imageUrl": "https://picsum.photos/seed/dev4/100/100",
+      "imageHint": "man portrait"
     },
     {
-      "id": "fertility-map-placeholder",
-      "description": "Placeholder for AI-generated fertility map",
-      "imageUrl": "https://picsum.photos/seed/map/800/600",
-      "imageHint": "map abstract"
+      "id": "supporter-aic-soa",
+      "description": "AIC SOA Foundation Logo",
+      "imageUrl": "/aic-soa-logo.png",
+      "imageHint": "logo abstract"
+    },
+    {
+      "id": "endorsement-scientist",
+      "description": "Avatar for Dr. Anjali Verma",
+      "imageUrl": "https://picsum.photos/seed/scientist/100/100",
+      "imageHint": "woman portrait"
+    },
+    {
+      "id": "endorsement-mentor",
+      "description": "Avatar for Rohan Mehta",
+      "imageUrl": "https://picsum.photos/seed/mentor/100/100",
+      "imageHint": "man portrait"
+    },
+    {
+      "id": "endorsement-farmer",
+      "description": "Avatar for Suresh Patel",
+      "imageUrl": "https://picsum.photos/seed/farmer/100/100",
+      "imageHint": "man farmer"
+    },
+    {
+      "id": "problem-viz",
+      "description": "Data visualization of farming problem",
+      "imageUrl": "https://picsum.photos/seed/problem-viz/800/600",
+      "imageHint": "data chart"
     }
   ]
 }

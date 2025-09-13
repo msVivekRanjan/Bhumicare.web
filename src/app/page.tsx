@@ -12,12 +12,15 @@ import { FeatureShowcase } from '@/components/landing/feature-showcase';
 import { SocialProof } from '@/components/landing/social-proof';
 import { EndorsementCarousel } from '@/components/landing/endorsement-carousel';
 import { useState } from 'react';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+
+const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id);
 
 const teamMembers = [
-    { name: 'Raj Sahashranshu Biswal', avatarUrl: 'https://picsum.photos/seed/dev1/100/100', role: 'Full Stack & AI', bio: 'Raj is the visionary behind Bhumicare, leading the AI development and full-stack architecture to turn complex data into actionable insights for farmers.', linkedin: '#' },
-    { name: 'Vivek Ranjan Sahoo', avatarUrl: 'https://picsum.photos/seed/dev2/100/100', role: 'Hardware & IoT', bio: 'Vivek engineers the heart of our solution—the IoT device. His expertise in hardware ensures our sensors are reliable, accurate, and built to last in the field.', linkedin: '#' },
-    { name: 'Ayush Ranjan Pradhan', avatarUrl: 'https://picsum.photos/seed/dev3/100/100', role: 'UI/UX & Frontend', bio: 'Ayush crafts the user experience, ensuring the Bhumicare dashboard is intuitive, accessible, and presents complex information in a simple, beautiful interface.', linkedin: '#' },
-    { name: 'Subasis Mishra', avatarUrl: 'https://picsum.photos/seed/dev4/100/100', role: 'Product & Marketing', bio: 'Subasis drives the product strategy and market outreach, connecting our technology with the farmers and organizations who need it most.', linkedin: '#' },
+    { name: 'Raj Sahashranshu Biswal', avatarUrl: getImage('team-raj')?.imageUrl!, role: 'Full Stack & AI', bio: 'Raj is the visionary behind Bhumicare, leading the AI development and full-stack architecture to turn complex data into actionable insights for farmers.', linkedin: '#' },
+    { name: 'Vivek Ranjan Sahoo', avatarUrl: getImage('team-vivek')?.imageUrl!, role: 'Hardware & IoT', bio: 'Vivek engineers the heart of our solution—the IoT device. His expertise in hardware ensures our sensors are reliable, accurate, and built to last in the field.', linkedin: '#' },
+    { name: 'Ayush Ranjan Pradhan', avatarUrl: getImage('team-ayush')?.imageUrl!, role: 'UI/UX & Frontend', bio: 'Ayush crafts the user experience, ensuring the Bhumicare dashboard is intuitive, accessible, and presents complex information in a simple, beautiful interface.', linkedin: '#' },
+    { name: 'Subasis Mishra', avatarUrl: getImage('team-subasis')?.imageUrl!, role: 'Product & Marketing', bio: 'Subasis drives the product strategy and market outreach, connecting our technology with the farmers and organizations who need it most.', linkedin: '#' },
 ];
 
 const Section = ({ children, className, id, ...props }: { children: React.ReactNode, className?: string, id?: string }) => (
@@ -97,6 +100,10 @@ export default function LandingPage() {
         mouseX.set(clientX - left);
         mouseY.set(clientY - top);
     };
+    
+    const dashboardImage = getImage('dashboard-dark');
+    const problemImage = getImage('problem-viz');
+    const aicSoaLogo = getImage('supporter-aic-soa');
 
     return (
         <div className="bg-background text-foreground font-sans antialiased">
@@ -183,13 +190,13 @@ export default function LandingPage() {
                               transition={{ duration: 0.8, ease: 'easeOut' }}
                               viewport={{ once: true }}
                           >
-                            <Image 
-                                  src="https://picsum.photos/seed/problem-viz/800/600" 
-                                  alt="Data visualization of farming problem"
-                                  data-ai-hint="data chart" 
+                            {problemImage && <Image 
+                                  src={problemImage.imageUrl} 
+                                  alt={problemImage.description}
+                                  data-ai-hint={problemImage.imageHint}
                                   width={800} height={600} 
                                   className="rounded-lg shadow-2xl shadow-primary/10 opacity-70"
-                            />
+                            />}
                             <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
                           </motion.div>
                       </div>
@@ -216,14 +223,14 @@ export default function LandingPage() {
                           transition={{ duration: 1, ease: 'easeOut' }}
                       >
                           <div className="absolute -inset-2 rounded-2xl bg-gradient-to-r from-primary/20 to-purple-600/20 opacity-20 blur-2xl" />
-                          <Image 
-                              src="https://picsum.photos/seed/dashboard-dark/1200/800"
-                              alt="Bhumicare Dashboard Preview"
-                              data-ai-hint="dashboard dark"
+                          {dashboardImage && <Image 
+                              src={dashboardImage.imageUrl}
+                              alt={dashboardImage.description}
+                              data-ai-hint={dashboardImage.imageHint}
                               width={1200}
                               height={800}
                               className="relative rounded-xl border border-white/10 shadow-2xl shadow-primary/10"
-                          />
+                          />}
                           {/* Animated elements to make it feel alive */}
                           <motion.div
                               className="absolute"
@@ -367,7 +374,7 @@ export default function LandingPage() {
                       <div className="text-center mt-24">
                           <p className="text-lg text-muted-foreground">Proudly Supported and Incubated by</p>
                           <div className="mt-6 flex justify-center items-center">
-                            <Image src="/aic-soa-logo.png" alt="AIC SOA Foundation" width={200} height={80} className="filter-grayscale contrast-0 brightness-200" />
+                            {aicSoaLogo && <Image src={aicSoaLogo.imageUrl} alt={aicSoaLogo.description} data-ai-hint={aicSoaLogo.imageHint} width={200} height={80} className="filter-grayscale contrast-0 brightness-200" />}
                           </div>
                       </div>
                   </Section>

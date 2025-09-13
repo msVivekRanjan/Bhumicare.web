@@ -2,9 +2,12 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
+
+const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id);
 
 const logos = [
-    { src: "/aic-soa-logo.png", alt: "AIC SOA Foundation" },
+    { src: getImage('supporter-aic-soa')?.imageUrl!, alt: "AIC SOA Foundation" },
     { src: "https://picsum.photos/seed/logo1/150/50?grayscale", alt: "Placeholder Logo 1" },
     { src: "https://picsum.photos/seed/logo2/150/50?grayscale", alt: "Placeholder Logo 2" },
     { src: "https://picsum.photos/seed/logo3/150/50?grayscale", alt: "Placeholder Logo 3" },
