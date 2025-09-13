@@ -5,7 +5,7 @@ import { APIProvider, Map, useMap, InfoWindow, AdvancedMarker } from '@vis.gl/re
 import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
 import { MapLegend } from './map-legend';
 import { Button } from '../ui/button';
-import { Loader2, LocateFixed, Undo, Expand, Shrink, EyeOff } from 'lucide-react';
+import { Loader2, LocateFixed, Undo, Expand, Shrink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateSoilFertilityMap, SoilFertilityMapOutput } from '@/ai/flows/soil-fertility-map';
 import { getSmartRecommendation } from '@/ai/flows/smart-recommendations';
@@ -484,3 +484,5 @@ export const getColorFromIndex = (fertilityIndex: number) => {
     const hue = (fertilityIndex * 120).toString(10);
     return `hsl(${hue}, 100%, 45%)`;
 };
+
+    
