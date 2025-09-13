@@ -102,11 +102,11 @@ export default function LandingPage() {
         <div className="bg-background text-foreground font-sans antialiased">
             <LandingHeader />
 
-            <main>
+            <main className="bg-aurora-static">
                 {/* Hero Section */}
                 <section 
                     id="home" 
-                    className="relative h-screen min-h-[700px] flex items-center justify-center text-center px-6 overflow-hidden"
+                    className="relative h-screen min-h-[700px] flex items-center justify-center text-center px-6 overflow-hidden bg-aurora-hero"
                     onMouseMove={handleMouseMove}
                 >
                      <motion.div 
@@ -398,4 +398,3 @@ export default function LandingPage() {
         </div>
     );
 }
-
