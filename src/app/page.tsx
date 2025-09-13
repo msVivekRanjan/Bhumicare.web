@@ -7,8 +7,10 @@ import { LandingFooter } from '@/components/landing/footer';
 import { AnimatedNumber } from '@/components/landing/animated-number';
 import { IconCard } from '@/components/landing/icon-card';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { HowItWorks } from '@/components/landing/how-it-works';
+import { EndorsementCarousel } from '@/components/landing/endorsement-carousel';
+import { Icons } from '@/components/icons';
 
 const solutions = [
     {
@@ -66,6 +68,17 @@ const wordAnimation = {
 
 export default function LandingPage() {
     const heroTitle = "From Guesswork to Guidance";
+    
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+
+    const backgroundX = useTransform(mouseX, [0, window.innerWidth], ["-10%", "10%"]);
+    const backgroundY = useTransform(mouseY, [0, window.innerHeight], ["-10%", "10%"]);
+
+    const handleMouseMove = (event: React.MouseEvent<HTMLElement>) => {
+        mouseX.set(event.clientX);
+        mouseY.set(event.clientY);
+    };
 
     return (
         <div className="bg-background text-foreground font-sans">
@@ -76,20 +89,20 @@ export default function LandingPage() {
                 <motion.section 
                     id="home" 
                     className="relative h-screen flex items-center justify-center text-center text-white px-4"
+                    onMouseMove={handleMouseMove}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 1 }}
                 >
-                    <div className="absolute inset-0 overflow-hidden z-0">
-                        <video
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            className="w-full h-full object-cover"
-                            src="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4"
-                        />
-                        <div className="absolute inset-0 bg-black/50" />
+                     <motion.div
+                        className="absolute inset-0 z-0 bg-black"
+                        style={{
+                            background: `radial-gradient(400px at ${mouseX}px ${mouseY}px, hsla(var(--secondary), 0.3), transparent 80%)`,
+                        }}
+                    />
+
+                    <div className="absolute inset-0 overflow-hidden z-0 bg-cover bg-center" style={{backgroundImage: "url('/hero-bg.jpg')"}}>
+                         <div className="absolute inset-0 bg-black/60" />
                     </div>
 
                     <div className="relative z-10 space-y-6 max-w-4xl">
@@ -213,6 +226,32 @@ export default function LandingPage() {
                                 <p className="text-xl font-semibold mt-2">Water Usage</p>
                             </motion.div>
                         </motion.div>
+                        
+                        <div className="pt-8">
+                             <motion.div className="grid md:grid-cols-3 gap-8" variants={staggerContainer}>
+                                <motion.div className="glass-card p-6 text-center rounded-2xl flex flex-col items-center" variants={fadeIn}>
+                                    <Cpu className="h-10 w-10 text-secondary mb-3" />
+                                    <h3 className="font-bold text-lg mb-2">Validated & Ready</h3>
+                                    <p className="text-sm text-muted-foreground">Technology Readiness Level: TRL 4</p>
+                                </motion.div>
+                                <motion.div className="glass-card p-6 text-center rounded-2xl flex flex-col items-center" variants={fadeIn}>
+                                    <Image src="/ashoka.svg" alt="Ashoka" width={40} height={40} className="mb-3" />
+                                    <h3 className="font-bold text-lg mb-2">Aligned with National Missions</h3>
+                                    <p className="text-sm text-muted-foreground">Digital Agriculture Mission, PM-KISAN, Soil Health Card Scheme, PMKSY</p>
+                                </motion.div>
+                                 <motion.div className="glass-card p-6 text-center rounded-2xl flex flex-col items-center" variants={fadeIn}>
+                                    <div className="grid grid-cols-2 gap-2 mb-3">
+                                        <Image src="/sdg-2.svg" alt="SDG 2" width={40} height={40} />
+                                        <Image src="/sdg-6.svg" alt="SDG 6" width={40} height={40} />
+                                        <Image src="/sdg-12.svg" alt="SDG 12" width={40} height={40} />
+                                        <Image src="/sdg-13.svg" alt="SDG 13" width={40} height={40} />
+                                    </div>
+                                    <h3 className="font-bold text-lg mb-2">Contributing to SDGs</h3>
+                                    <p className="text-sm text-muted-foreground">Zero Hunger, Clean Water, Responsible Production, and Climate Action.</p>
+                                </motion.div>
+                            </motion.div>
+                        </div>
+                        
                         <motion.p className="text-md text-muted-foreground pt-4" variants={fadeIn}>
                             The device pays for itself in one season and is fully aligned with India's Digital Agriculture Mission.
                         </motion.p>
@@ -237,20 +276,8 @@ export default function LandingPage() {
                             {teamMembers.map(member => <TeamMemberCard key={member.name} {...member} />)}
                         </motion.div>
 
-                        <motion.div className="grid md:grid-cols-2 gap-8 pt-8 text-left" variants={staggerContainer}>
-                            <motion.div className="glass-card p-6 rounded-2xl" variants={fadeIn}>
-                                <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground">
-                                    "Bhumicare's ground-level data is the missing piece in precision agriculture. It has the potential to revolutionize how we manage soil health at scale."
-                                </blockquote>
-                                <p className="mt-4 font-semibold">— Agricultural Scientist</p>
-                            </motion.div>
-                            <motion.div className="glass-card p-6 rounded-2xl" variants={fadeIn}>
-                                 <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground">
-                                    "A brilliant application of IoT and AI to solve a real-world problem for millions. This is the future of sustainable farming."
-                                </blockquote>
-                                <p className="mt-4 font-semibold">— Startup Mentor</p>
-                            </motion.div>
-                        </motion.div>
+                        <EndorsementCarousel />
+                        
                     </motion.div>
                 </motion.section>
 
@@ -284,3 +311,5 @@ export default function LandingPage() {
         </div>
     );
 }
+
+    

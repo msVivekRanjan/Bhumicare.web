@@ -31,19 +31,19 @@ export const HowItWorks = () => {
     const targetRef = useRef<HTMLDivElement | null>(null);
     const { scrollYProgress } = useScroll({
         target: targetRef,
-        offset: ['start start', 'end start'],
+        offset: ['start start', 'end end'],
     });
 
-    const x = useTransform(scrollYProgress, [0, 1], ['0%', '-75%']);
+    const x = useTransform(scrollYProgress, [0, 1], ["25%", "-100%"]);
 
     return (
         <section ref={targetRef} id="how-it-works" className="relative h-[400vh] bg-background">
             <div className="sticky top-0 h-screen flex items-center overflow-hidden">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center space-y-2">
+                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 text-center space-y-2 z-10">
                     <h2 className="text-3xl md:text-5xl font-bold">Simple Technology, Powerful Results</h2>
                     <p className="text-lg text-muted-foreground">A seamless 4-step process from soil to solution.</p>
                 </div>
-                <motion.div style={{ x }} className="flex gap-16 pl-[12.5%]" >
+                <motion.div style={{ x }} className="flex gap-16 pl-16">
                     {steps.map((step, index) => (
                         <Card key={step.title} step={step} index={index} scrollYProgress={scrollYProgress} />
                     ))}
@@ -60,13 +60,17 @@ interface CardProps {
 }
 
 const Card = ({ step, index, scrollYProgress }: CardProps) => {
+    const totalSteps = steps.length;
+    const start = index / totalSteps;
+    const end = start + 1 / totalSteps;
+    
     const scale = useTransform(scrollYProgress,
-        [ (index * 0.25) - 0.1, index * 0.25, (index * 0.25) + 0.1 ],
-        [ 0.8, 1, 0.8 ]
+        [start - 0.1, start, end, end + 0.1],
+        [0.8, 1, 1, 0.8]
     );
      const opacity = useTransform(scrollYProgress,
-        [ (index * 0.25) - 0.1, index * 0.25, (index * 0.25) + 0.1 ],
-        [ 0.5, 1, 0.5 ]
+        [start - 0.1, start, end, end + 0.1],
+        [0.5, 1, 1, 0.5]
     );
 
 
@@ -74,7 +78,7 @@ const Card = ({ step, index, scrollYProgress }: CardProps) => {
         <motion.div
             style={{ scale, opacity }}
             className={cn(
-                "h-[450px] w-[300px] md:h-[600px] md:w-[450px] flex flex-col items-center justify-center p-8 rounded-3xl relative",
+                "h-[450px] w-[300px] md:h-[500px] md:w-[450px] flex flex-col items-center justify-center p-8 rounded-3xl relative",
                 "glass-card"
             )}
         >
@@ -86,3 +90,5 @@ const Card = ({ step, index, scrollYProgress }: CardProps) => {
         </motion.div>
     );
 };
+
+    
