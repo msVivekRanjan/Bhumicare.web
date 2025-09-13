@@ -15,7 +15,7 @@
     --popover: 224 71.4% 4.1%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 142 70.6% 45.3%; /* Electric Green for reference */
+    --primary: 142 70.6% 45.3%; /* Electric Green */
     --primary-foreground: 0 0% 98%;
 
     --secondary: 38 92.1% 50.2%; /* #f59e0b */
@@ -49,7 +49,7 @@
     --popover: 224 71.4% 4.1%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 142 70.6% 45.3%; /* Electric Green for reference */
+    --primary: 142 70.6% 45.3%; /* Electric Green */
     --primary-foreground: 0 0% 98%;
 
     --secondary: 38 92.1% 50.2%; /* #f59e0b */
@@ -94,11 +94,11 @@
    .bg-aurora-hero {
       background-image: radial-gradient(
         ellipse 80% 50% at 50% 120%,
-        hsla(190, 100%, 50%, 0.15),
+        hsla(142, 70%, 45%, 0.15),
         transparent
       ), radial-gradient(
         ellipse 80% 50% at 50% 120%,
-        hsla(280, 100%, 50%, 0.1),
+        hsla(190, 100%, 50%, 0.1),
         transparent
       );
       animation: aurora 20s linear infinite;
@@ -106,7 +106,7 @@
      .bg-aurora-cta {
       background-image: radial-gradient(
         ellipse 100% 100% at 50% 50%,
-        hsla(190, 100%, 50%, 0.15),
+        hsla(142, 70%, 45%, 0.15),
         transparent
       ), radial-gradient(
         ellipse 100% 100% at 50% 50%,

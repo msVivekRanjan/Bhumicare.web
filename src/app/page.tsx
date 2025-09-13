@@ -1,22 +1,23 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { Check, Cpu, Cloud, BrainCircuit, MicVocal } from 'lucide-react';
+import { Check, Cpu, Cloud, BrainCircuit, MicVocal, Linkedin } from 'lucide-react';
 import { LandingHeader } from '@/components/landing/header';
 import { LandingFooter } from '@/components/landing/footer';
 import { AnimatedNumber } from '@/components/landing/animated-number';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { FeatureShowcase } from '@/components/landing/feature-showcase';
-import { EndorsementCarousel } from '@/components/landing/endorsement-carousel';
 import { SocialProof } from '@/components/landing/social-proof';
+import { EndorsementCarousel } from '@/components/landing/endorsement-carousel';
+import { useState } from 'react';
 
 const teamMembers = [
-    { name: 'Raj Sahashranshu Biswal', avatarUrl: 'https://picsum.photos/seed/dev1/100/100', role: 'Full Stack & AI' },
-    { name: 'Vivek Ranjan Sahoo', avatarUrl: 'https://picsum.photos/seed/dev2/100/100', role: 'Hardware & IoT' },
-    { name: 'Ayush Ranjan Pradhan', avatarUrl: 'https://picsum.photos/seed/dev3/100/100', role: 'UI/UX & Frontend' },
-    { name: 'Subasis Mishra', avatarUrl: 'https://picsum.photos/seed/dev4/100/100', role: 'Product & Marketing' },
+    { name: 'Raj Sahashranshu Biswal', avatarUrl: 'https://picsum.photos/seed/dev1/100/100', role: 'Full Stack & AI', bio: 'Raj is the visionary behind Bhumicare, leading the AI development and full-stack architecture to turn complex data into actionable insights for farmers.', linkedin: '#' },
+    { name: 'Vivek Ranjan Sahoo', avatarUrl: 'https://picsum.photos/seed/dev2/100/100', role: 'Hardware & IoT', bio: 'Vivek engineers the heart of our solution—the IoT device. His expertise in hardware ensures our sensors are reliable, accurate, and built to last in the field.', linkedin: '#' },
+    { name: 'Ayush Ranjan Pradhan', avatarUrl: 'https://picsum.photos/seed/dev3/100/100', role: 'UI/UX & Frontend', bio: 'Ayush crafts the user experience, ensuring the Bhumicare dashboard is intuitive, accessible, and presents complex information in a simple, beautiful interface.', linkedin: '#' },
+    { name: 'Subasis Mishra', avatarUrl: 'https://picsum.photos/seed/dev4/100/100', role: 'Product & Marketing', bio: 'Subasis drives the product strategy and market outreach, connecting our technology with the farmers and organizations who need it most.', linkedin: '#' },
 ];
 
 const Section = ({ children, className, id, ...props }: { children: React.ReactNode, className?: string, id?: string }) => (
@@ -36,20 +37,83 @@ const Section = ({ children, className, id, ...props }: { children: React.ReactN
 );
 
 const SectionDivider = () => (
-    <div className="h-px w-full bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+    <div className="h-px w-full bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 )
 
 
+const FlipCard = ({ member }: { member: typeof teamMembers[0] }) => {
+    const [isFlipped, setIsFlipped] = useState(false);
+
+    return (
+        <div
+            className="perspective-1000"
+            onMouseEnter={() => setIsFlipped(true)}
+            onMouseLeave={() => setIsFlipped(false)}
+        >
+            <motion.div
+                className="relative w-full h-64"
+                style={{ transformStyle: 'preserve-3d' }}
+                animate={{ rotateY: isFlipped ? 180 : 0 }}
+                transition={{ duration: 0.6 }}
+            >
+                {/* Front of card */}
+                <div className="absolute w-full h-full backface-hidden flex flex-col items-center justify-center text-center p-4 bg-background-secondary border border-white/10 rounded-2xl">
+                     <Image 
+                        src={member.avatarUrl} 
+                        alt={member.name} 
+                        width={80} 
+                        height={80} 
+                        className="rounded-full mx-auto mb-4 border-2 border-primary"
+                    />
+                    <h4 className="font-semibold">{member.name}</h4>
+                    <p className="text-sm text-muted-foreground">{member.role}</p>
+                </div>
+                
+                {/* Back of card */}
+                <div className="absolute w-full h-full backface-hidden [transform:rotateY(180deg)] flex flex-col items-center justify-center text-center p-6 bg-background-secondary border border-white/10 rounded-2xl">
+                    <p className="text-xs text-muted-foreground mb-4">{member.bio}</p>
+                    <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80">
+                        <Linkedin className="w-6 h-6" />
+                    </a>
+                </div>
+            </motion.div>
+        </div>
+    );
+};
+
+
 export default function LandingPage() {
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+
+    const spotlightStyle = useTransform(
+        [mouseX, mouseY],
+        ([x, y]) => `radial-gradient(circle at ${x}px ${y}px, hsl(var(--secondary) / 0.15), transparent 40%)`
+    );
+
+    const handleMouseMove = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        const { clientX, clientY, currentTarget } = event;
+        const { left, top } = currentTarget.getBoundingClientRect();
+        mouseX.set(clientX - left);
+        mouseY.set(clientY - top);
+    };
+
     return (
         <div className="bg-background text-foreground font-sans antialiased">
             <LandingHeader />
 
             <main>
                 {/* Hero Section */}
-                <section id="home" className="relative h-screen min-h-[700px] flex items-center justify-center text-center px-6 overflow-hidden">
-                    <div className="absolute inset-0 bg-aurora-hero -z-10" />
-                     <div className="absolute inset-0 bg-background/80 z-0" />
+                <section 
+                    id="home" 
+                    className="relative h-screen min-h-[700px] flex items-center justify-center text-center px-6 overflow-hidden"
+                    onMouseMove={handleMouseMove}
+                >
+                     <motion.div 
+                        className="absolute inset-0 z-0"
+                        style={{ background: spotlightStyle }}
+                    />
+                    <div className="absolute inset-0 bg-background/80 -z-10" />
 
                     <motion.div 
                         className="relative z-10 space-y-8 max-w-4xl"
@@ -123,7 +187,7 @@ export default function LandingPage() {
                                 alt="Data visualization of farming problem"
                                 data-ai-hint="data chart" 
                                 width={800} height={600} 
-                                className="rounded-lg shadow-2xl shadow-blue-500/10 opacity-70"
+                                className="rounded-lg shadow-2xl shadow-primary/10 opacity-70"
                            />
                            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
                         </motion.div>
@@ -150,14 +214,14 @@ export default function LandingPage() {
                         viewport={{ once: true, amount: 0.3 }}
                         transition={{ duration: 1, ease: 'easeOut' }}
                     >
-                        <div className="absolute -inset-2 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 opacity-20 blur-2xl" />
+                        <div className="absolute -inset-2 rounded-2xl bg-gradient-to-r from-primary/20 to-purple-600/20 opacity-20 blur-2xl" />
                         <Image 
                             src="https://picsum.photos/seed/dashboard-dark/1200/800"
                             alt="Bhumicare Dashboard Preview"
                             data-ai-hint="dashboard dark"
                             width={1200}
                             height={800}
-                            className="relative rounded-xl border border-white/10 shadow-2xl shadow-purple-500/10"
+                            className="relative rounded-xl border border-white/10 shadow-2xl shadow-primary/10"
                         />
                          {/* Animated elements to make it feel alive */}
                         <motion.div
@@ -197,7 +261,11 @@ export default function LandingPage() {
                                 { icon: BrainCircuit, title: '3. Analyze', description: 'Our AI advisor combines soil, crop, and weather data to generate insights.' },
                                 { icon: MicVocal, title: '4. Advise', description: 'Receive simple, voice-first advice in your own language directly on the app.' },
                             ].map((step, index) => (
-                                <div key={index} className="relative text-center p-6 bg-background-secondary border border-white/10 rounded-2xl">
+                                <motion.div 
+                                    key={index}
+                                    className="relative text-center p-6 bg-background-secondary border border-white/10 rounded-2xl"
+                                    whileHover={{ y: -8, boxShadow: "0 10px 20px hsla(var(--primary) / 0.1)" }}
+                                >
                                     <div className="flex items-center justify-center mb-4">
                                          <div className="bg-background p-4 rounded-full border border-white/10">
                                             <step.icon className="w-8 h-8 text-primary" />
@@ -205,7 +273,7 @@ export default function LandingPage() {
                                     </div>
                                     <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
                                     <p className="text-muted-foreground text-sm">{step.description}</p>
-                                </div>
+                                </motion.div>
                             ))
                         }
                     </div>
@@ -282,26 +350,16 @@ export default function LandingPage() {
                         <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">Our Team & Supporters</h2>
                         <p className="text-lg text-muted-foreground">We are a passionate team of engineers and innovators dedicated to revolutionizing agriculture.</p>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
                         {teamMembers.map((member, i) => (
                              <motion.div 
                                 key={member.name}
-                                className="text-center p-4 bg-background-secondary border border-white/10 rounded-2xl"
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                                whileHover={{ y: -5, boxShadow: "0 10px 20px rgba(0,0,0,0.2)" }}
                             >
-                                <Image 
-                                    src={member.avatarUrl} 
-                                    alt={member.name} 
-                                    width={80} 
-                                    height={80} 
-                                    className="rounded-full mx-auto mb-4 border-2 border-primary"
-                                />
-                                <h4 className="font-semibold">{member.name}</h4>
-                                <p className="text-sm text-muted-foreground">{member.role}</p>
+                                <FlipCard member={member} />
                             </motion.div>
                         ))}
                     </div>
@@ -340,3 +398,4 @@ export default function LandingPage() {
         </div>
     );
 }
+
