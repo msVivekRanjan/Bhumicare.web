@@ -51,5 +51,3 @@ export const NextButton: React.FC<PropType & {enabled: boolean}> = (props) => {
     </button>
   )
 }
-
-    

@@ -99,5 +99,3 @@ export const EndorsementCarousel = () => {
     </motion.div>
   )
 }
-
-    
