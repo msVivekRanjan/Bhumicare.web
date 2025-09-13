@@ -9,19 +9,26 @@ import {
   NextButton,
 } from './carousel-buttons'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 
 const endorsements = [
   {
     quote: "Bhumicare's ground-level data is the missing piece in precision agriculture. It has the potential to revolutionize how we manage soil health at scale.",
-    author: "— Agricultural Scientist"
+    author: "Dr. Anjali Verma",
+    title: "Agricultural Scientist, IARI",
+    avatar: "https://picsum.photos/seed/scientist/100/100"
   },
   {
     quote: "A brilliant application of IoT and AI to solve a real-world problem for millions. This is the future of sustainable farming.",
-    author: "— Startup Mentor"
+    author: "Rohan Mehta",
+    title: "Startup Mentor, AGNIi",
+     avatar: "https://picsum.photos/seed/mentor/100/100"
   },
   {
     quote: "The simplicity of receiving advice in my own dialect makes all the difference. It's like having an expert in my pocket.",
-    author: "— Farmer, Odisha"
+    author: "Suresh Patel",
+    title: "Farmer, Odisha",
+     avatar: "https://picsum.photos/seed/farmer/100/100"
   }
 ]
 
@@ -73,11 +80,15 @@ export const EndorsementCarousel = () => {
         <div className="flex -ml-4">
           {endorsements.map((endorsement, index) => (
             <div className="flex-grow-0 flex-shrink-0 basis-full min-w-0 pl-4" key={index}>
-              <div className="glass-card p-8 rounded-2xl text-left">
-                <blockquote className="border-l-4 border-primary pl-6 italic text-muted-foreground text-lg md:text-xl">
-                  {endorsement.quote}
+              <div className="glass-card p-8 rounded-2xl text-center flex flex-col items-center">
+                 <Image src={endorsement.avatar} alt={endorsement.author} width={80} height={80} className="rounded-full mb-4 border-2 border-primary/50" />
+                <blockquote className="border-l-0 pl-0 italic text-muted-foreground text-lg md:text-xl max-w-2xl">
+                  "{endorsement.quote}"
                 </blockquote>
-                <p className="mt-6 font-semibold text-right text-lg">{endorsement.author}</p>
+                <div className="mt-6">
+                    <p className="font-semibold text-lg">{endorsement.author}</p>
+                    <p className="text-sm text-muted-foreground">{endorsement.title}</p>
+                </div>
               </div>
             </div>
           ))}

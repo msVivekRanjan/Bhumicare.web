@@ -31,68 +31,70 @@ export const HowItWorks = () => {
     const targetRef = useRef<HTMLDivElement | null>(null);
     const { scrollYProgress } = useScroll({
         target: targetRef,
-        offset: ['start start', 'end end'],
+        offset: ['start end', 'end start'],
     });
 
-    const x = useTransform(scrollYProgress, [0, 1], ["25%", "-100%"]);
-
     return (
-        <section ref={targetRef} id="how-it-works" className="relative h-[400vh] bg-background">
-            <div className="sticky top-0 h-screen flex items-center overflow-hidden">
-                 <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, amount: 0.5}}
-                    transition={{ duration: 0.8, ease: 'easeInOut' }}
-                    className="absolute top-1/4 left-1/2 -translate-x-1/2 text-center space-y-2 z-10"
-                >
-                    <h2 className="text-3xl md:text-4xl font-semibold">Simple Technology, Powerful Results</h2>
-                    <p className="text-lg text-muted-foreground">A seamless 4-step process from soil to solution.</p>
-                </motion.div>
-                <motion.div style={{ x }} className="flex gap-16 pl-16">
-                    {steps.map((step, index) => (
-                        <Card key={step.title} step={step} index={index} scrollYProgress={scrollYProgress} />
-                    ))}
-                </motion.div>
+        <section ref={targetRef} id="how-it-works" className="py-16 md:py-24 bg-foreground/5">
+            <div className="container mx-auto max-w-7xl px-6">
+                <div className="text-center max-w-4xl mx-auto space-y-4 mb-12">
+                    <motion.h2 
+                        className="text-3xl md:text-4xl font-semibold"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.5 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        Simple Technology, Powerful Results
+                    </motion.h2>
+                    <motion.p 
+                        className="text-lg text-muted-foreground"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.5 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                    >
+                        A seamless 4-step process from soil to solution.
+                    </motion.p>
+                </div>
+                <div className="relative">
+                    {/* Vertical line */}
+                    <div className="absolute left-4 md:left-1/2 -translate-x-1/2 w-0.5 h-full bg-border" />
+
+                    <div className="space-y-16">
+                        {steps.map((step, index) => {
+                            const isEven = index % 2 === 0;
+                            return (
+                                <motion.div
+                                    key={step.title}
+                                    className={cn(
+                                        "flex flex-col md:flex-row items-center gap-8",
+                                        !isEven && "md:flex-row-reverse"
+                                    )}
+                                     initial={{ opacity: 0, y: 50 }}
+                                     whileInView={{ opacity: 1, y: 0 }}
+                                     viewport={{ once: true, amount: 0.5 }}
+                                     transition={{ duration: 0.8 }}
+                                >
+                                    <div className="flex-1">
+                                        <div className="glass-card p-6 md:p-8">
+                                            <div className="flex items-center gap-4 mb-4">
+                                                <div className="bg-primary/10 p-3 rounded-full border border-primary/20">
+                                                    <step.icon className="h-8 w-8 text-primary" />
+                                                </div>
+                                                <h3 className="text-2xl font-bold">{step.title}</h3>
+                                            </div>
+                                            <p className="text-muted-foreground">{step.description}</p>
+                                        </div>
+                                    </div>
+                                    <div className="w-8 h-8 rounded-full bg-primary border-4 border-background ring-4 ring-primary flex-shrink-0 z-10" />
+                                    <div className="flex-1 hidden md:block" />
+                                </motion.div>
+                            );
+                        })}
+                    </div>
+                </div>
             </div>
         </section>
-    );
-};
-
-interface CardProps {
-    step: typeof steps[0];
-    index: number;
-    scrollYProgress: any;
-}
-
-const Card = ({ step, index, scrollYProgress }: CardProps) => {
-    const totalSteps = steps.length;
-    const start = index / totalSteps;
-    const end = start + 1 / totalSteps;
-    
-    const scale = useTransform(scrollYProgress,
-        [start - 0.1, start, end, end + 0.1],
-        [0.8, 1, 1, 0.8]
-    );
-     const opacity = useTransform(scrollYProgress,
-        [start - 0.1, start, end, end + 0.1],
-        [0.5, 1, 1, 0.5]
-    );
-
-
-    return (
-        <motion.div
-            style={{ scale, opacity }}
-            className={cn(
-                "h-[450px] w-[300px] md:h-[500px] md:w-[450px] flex flex-col items-center justify-center p-8 relative",
-                "glass-card"
-            )}
-        >
-            <div className="text-center space-y-4">
-                <step.icon className="h-16 w-16 mx-auto text-primary" />
-                <h3 className="text-2xl md:text-3xl font-bold">{step.title}</h3>
-                <p className="text-base md:text-lg text-muted-foreground">{step.description}</p>
-            </div>
-        </motion.div>
     );
 };
