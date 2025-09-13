@@ -96,4 +96,9 @@
     transform: scale(1.1);
     z-index: -1;
   }
+
+  .light {
+     --background: 220 20% 97%;
+     --card: 255 255% 255%;
+  }
 }
