@@ -16,7 +16,7 @@ export const DotButton: React.FC<PropType & { selected: boolean }> = (
   const { children, selected, ...restProps } = props
 
   return (
-    <button type="button" {...restProps} className={`w-3 h-3 rounded-full transition-colors ${selected ? 'bg-primary' : 'bg-muted'}`} />
+    <button type="button" {...restProps} className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${selected ? 'bg-primary scale-110' : 'bg-muted/50'}`} />
   )
 }
 
@@ -25,12 +25,12 @@ export const PrevButton: React.FC<PropType & {enabled: boolean}> = (props) => {
 
   return (
     <button
-      className="h-10 w-10 flex items-center justify-center rounded-full bg-background/50 border border-border disabled:opacity-50 transition-opacity"
+      className="h-10 w-10 flex items-center justify-center rounded-full bg-background-secondary border border-white/10 disabled:opacity-50 transition-all hover:border-primary/50 hover:bg-primary/10"
       type="button"
       {...restProps}
       disabled={!enabled}
     >
-      <ChevronLeft className="h-6 w-6 text-primary" />
+      <ChevronLeft className="h-5 w-5 text-primary" />
       {children}
     </button>
   )
@@ -41,12 +41,12 @@ export const NextButton: React.FC<PropType & {enabled: boolean}> = (props) => {
 
   return (
      <button
-      className="h-10 w-10 flex items-center justify-center rounded-full bg-background/50 border border-border disabled:opacity-50 transition-opacity"
+      className="h-10 w-10 flex items-center justify-center rounded-full bg-background-secondary border border-white/10 disabled:opacity-50 transition-all hover:border-primary/50 hover:bg-primary/10"
       type="button"
       {...restProps}
       disabled={!enabled}
     >
-      <ChevronRight className="h-6 w-6 text-primary" />
+      <ChevronRight className="h-5 w-5 text-primary" />
       {children}
     </button>
   )

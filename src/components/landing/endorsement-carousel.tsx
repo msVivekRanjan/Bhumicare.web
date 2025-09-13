@@ -32,15 +32,8 @@ const endorsements = [
   }
 ]
 
-const fadeIn = {
-  initial: { opacity: 0, y: 30 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.8, ease: 'easeInOut' },
-};
-
-
 export const EndorsementCarousel = () => {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 5000, stopOnInteraction: true })])
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 5000, stopOnInteraction: true, stopOnMouseEnter: true })])
   const [prevBtnEnabled, setPrevBtnEnabled] = useState(false)
   const [nextBtnEnabled, setNextBtnEnabled] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -75,17 +68,17 @@ export const EndorsementCarousel = () => {
   }, [emblaApi, setScrollSnaps, onSelect])
 
   return (
-    <motion.div className="w-full max-w-4xl mx-auto" variants={fadeIn}>
+    <div className="w-full max-w-4xl mx-auto">
       <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex -ml-4">
+        <div className="flex -ml-6">
           {endorsements.map((endorsement, index) => (
-            <div className="flex-grow-0 flex-shrink-0 basis-full min-w-0 pl-4" key={index}>
-              <div className="glass-card p-8 rounded-2xl text-center flex flex-col items-center">
-                 <Image src={endorsement.avatar} alt={endorsement.author} width={80} height={80} className="rounded-full mb-4 border-2 border-primary/50" />
+            <div className="flex-grow-0 flex-shrink-0 basis-full min-w-0 pl-6" key={index}>
+              <div className="p-8 rounded-2xl text-center flex flex-col items-center bg-background-secondary border border-white/10">
+                 <Image src={endorsement.avatar} alt={endorsement.author} width={80} height={80} className="rounded-full mb-6 border-2 border-primary/50" />
                 <blockquote className="border-l-0 pl-0 italic text-muted-foreground text-lg md:text-xl max-w-2xl">
                   "{endorsement.quote}"
                 </blockquote>
-                <div className="mt-6">
+                <div className="mt-8">
                     <p className="font-semibold text-lg">{endorsement.author}</p>
                     <p className="text-sm text-muted-foreground">{endorsement.title}</p>
                 </div>
@@ -94,9 +87,9 @@ export const EndorsementCarousel = () => {
           ))}
         </div>
       </div>
-       <div className="flex items-center justify-center gap-4 mt-6">
+       <div className="flex items-center justify-center gap-4 mt-8">
           <PrevButton onClick={scrollPrev} enabled={prevBtnEnabled} />
-           <div className="flex items-center justify-center gap-2">
+           <div className="flex items-center justify-center gap-3">
             {scrollSnaps.map((_, index) => (
               <DotButton
                 key={index}
@@ -107,6 +100,6 @@ export const EndorsementCarousel = () => {
           </div>
           <NextButton onClick={scrollNext} enabled={nextBtnEnabled} />
         </div>
-    </motion.div>
+    </div>
   )
 }

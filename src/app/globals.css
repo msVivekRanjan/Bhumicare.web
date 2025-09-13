@@ -4,64 +4,68 @@
 
 @layer base {
   :root {
-    --background: 0 0% 96.9%; /* #f7f7f7 */
-    --foreground: 224 71.4% 4.1%; /* #0d1117 */
+    --background: 224 71.4% 4.1%; /* #0A0A0A */
+    --foreground: 0 0% 98%; /* #FAFAFA */
+    
+    --background-secondary: 224 40% 9%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-
-    --primary: 142 70.6% 45.3%; /* #22c55e */
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 38 92.1% 50.2%; /* #f59e0b */
-    --secondary-foreground: 224 71.4% 4.1%;
-
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-
-    --accent: 142 70.6% 45.3%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 142 70.6% 45.3%;
-
-    --radius: 0.8rem;
-  }
-
-  .dark {
-    --background: 222 83% 4%; /* #0d1117 */
-    --foreground: 0 0% 98%; /* #fafafa */
-
-    --card: 222 47% 11%;
+    --card: 224 40% 9%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 222 47% 11%;
+    --popover: 224 71.4% 4.1%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 142 70.6% 45.3%; /* #22c55e */
+    --primary: 142 70.6% 45.3%; /* Electric Green for reference */
     --primary-foreground: 0 0% 98%;
 
     --secondary: 38 92.1% 50.2%; /* #f59e0b */
     --secondary-foreground: 224 71.4% 4.1%;
 
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
+    --muted: 224 40% 15%;
+    --muted-foreground: 0 0% 62.9%;
 
-    --accent: 142 60% 30%;
+    --accent: 224 40% 15%;
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 25%;
-    --input: 0 0% 14.9%;
+    --border: 240 4% 25%;
+    --input: 240 4% 15%;
+    --ring: 142 71% 45%;
+
+    --radius: 0.8rem;
+  }
+
+  .dark {
+    --background: 224 71.4% 4.1%; /* #0A0A0A */
+    --foreground: 0 0% 98%; /* #FAFAFA */
+
+    --background-secondary: 224 40% 9%;
+
+    --card: 224 40% 9%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 224 71.4% 4.1%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 142 70.6% 45.3%; /* Electric Green for reference */
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 38 92.1% 50.2%; /* #f59e0b */
+    --secondary-foreground: 224 71.4% 4.1%;
+
+    --muted: 224 40% 15%;
+    --muted-foreground: 0 0% 62.9%;
+
+    --accent: 224 40% 15%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 4% 25%;
+    --input: 240 4% 15%;
     --ring: 142 71% 45%;
   }
 }
@@ -73,21 +77,42 @@
   body {
     @apply bg-background text-foreground;
   }
-
-  .glass-card {
-    @apply bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl shadow-lg;
-  }
-
-  .dark .glass-card {
-    @apply bg-gray-500/10 backdrop-blur-lg border border-white/10;
+  .filter-white {
+    filter: brightness(0) invert(1);
   }
 }
 
 @layer utilities {
-    .bg-aurora {
-        background-image: radial-gradient(ellipse 50% 50% at 50% 50%, hsla(var(--primary), 0.2), transparent 80%);
+    @keyframes aurora {
+      from {
+        background-position: 50% 50%, 50% 50%;
+      }
+      to {
+        background-position: 350% 50%, 350% 50%;
+      }
     }
-    .dark .bg-aurora {
-        background-image: radial-gradient(ellipse 50% 50% at 50% 50%, hsla(var(--primary), 0.1), transparent 80%);
+   .bg-aurora-hero {
+      background-image: radial-gradient(
+        ellipse 80% 50% at 50% 120%,
+        hsla(190, 100%, 50%, 0.15),
+        transparent
+      ), radial-gradient(
+        ellipse 80% 50% at 50% 120%,
+        hsla(280, 100%, 50%, 0.1),
+        transparent
+      );
+      animation: aurora 20s linear infinite;
+    }
+     .bg-aurora-cta {
+      background-image: radial-gradient(
+        ellipse 100% 100% at 50% 50%,
+        hsla(190, 100%, 50%, 0.15),
+        transparent
+      ), radial-gradient(
+        ellipse 100% 100% at 50% 50%,
+        hsla(280, 100%, 50%, 0.1),
+        transparent
+      );
+       animation: aurora 20s linear infinite;
     }
 }

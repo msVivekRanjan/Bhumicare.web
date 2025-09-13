@@ -5,19 +5,20 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { BhumicareLogo } from '@/components/icons';
 import { cn } from '@/lib/utils';
-import { motion, useScroll, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 
 export function LandingHeader() {
-    const { scrollY } = useScroll();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    useEffect(() => {
-        return scrollY.on('change', (latest) => {
-            setIsScrolled(latest > 50);
-        });
-    }, [scrollY]);
+     useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 50);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
     
     useEffect(() => {
         if (isMenuOpen) {
@@ -56,7 +57,7 @@ export function LandingHeader() {
         y: 0,
         transition: {
           delay: i * 0.1 + 0.3,
-          ease: 'easeInOut'
+          ease: 'easeOut'
         }
       })
     };
@@ -69,16 +70,11 @@ export function LandingHeader() {
                     "fixed top-0 left-0 right-0 z-50 transition-colors duration-300",
                     isScrolled ? "bg-background/80 border-b border-white/10 backdrop-blur-lg" : "bg-transparent"
                 )}
-                initial={false}
-                animate={{
-                     boxShadow: isScrolled ? '0 5px 15px rgba(0,0,0,0.1)' : '0 0px 0px rgba(0,0,0,0)',
-                }}
-                transition={{ type: 'tween', duration: 0.3 }}
             >
                 <div className="container mx-auto flex items-center justify-between h-20 px-6 max-w-7xl">
                     <Link href="/" className="flex items-center gap-2" onClick={() => setIsMenuOpen(false)}>
                         <BhumicareLogo className="w-8 h-8 text-primary" />
-                        <span className="text-xl font-semibold">Bhumicare</span>
+                        <span className="text-xl font-semibold tracking-tighter">Bhumicare</span>
                     </Link>
                     
                     <nav className="hidden lg:flex items-center gap-8">
@@ -120,7 +116,7 @@ export function LandingHeader() {
                         animate="open"
                         exit="closed"
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        className="fixed inset-0 z-50 bg-background/80 backdrop-blur-xl h-screen w-screen"
+                        className="fixed inset-0 z-50 bg-background/95 backdrop-blur-xl h-screen w-screen"
                     >
                         <div className="container mx-auto px-6 h-full flex flex-col">
                             <div className="flex items-center justify-between h-20">
@@ -152,7 +148,7 @@ export function LandingHeader() {
                                     className="flex flex-col gap-4 pt-8 w-full max-w-xs"
                                     initial={{opacity: 0, y: 20}}
                                     animate={{opacity: 1, y: 0}}
-                                    transition={{delay: 0.6, ease: 'easeInOut'}}
+                                    transition={{delay: 0.6, ease: 'easeOut'}}
                                 >
                                     <Button variant="outline" size="lg" asChild>
                                         <Link href="/login" onClick={() => setIsMenuOpen(false)}>Login</Link>

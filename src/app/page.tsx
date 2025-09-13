@@ -1,45 +1,16 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Cloud, Cpu, Mic, Sprout } from 'lucide-react';
-import { TeamMemberCard } from '@/components/landing/team-member-card';
+import { Check, Cpu, Cloud, BrainCircuit, MicVocal } from 'lucide-react';
 import { LandingHeader } from '@/components/landing/header';
 import { LandingFooter } from '@/components/landing/footer';
 import { AnimatedNumber } from '@/components/landing/animated-number';
-import { IconCard } from '@/components/landing/icon-card';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { HowItWorks } from '@/components/landing/how-it-works';
-import { EndorsementCarousel } from '@/components/landing/endorsement-carousel';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-
-const solutions = [
-    {
-        icon: <Sprout className="h-8 w-8 text-primary" />,
-        title: 'Live Soil Health Data',
-        description: 'Continuous, real-time data on soil nutrients, pH, and moisture, replacing infrequent and slow lab tests.',
-    },
-    {
-        icon: <Mic className="h-8 w-8 text-primary" />,
-        title: 'Voice-First AI Advice',
-        description: 'Simple, actionable guidance in regional dialects (Hindi, Odia, English) that farmers can easily understand and act upon.',
-    },
-    {
-        icon: <CheckCircle className="h-8 w-8 text-primary" />,
-        title: 'Offline-First Design',
-        description: 'The device and app are designed to work reliably even without a stable internet connection, caching data until it can sync.',
-    },
-    {
-        icon: <Image src="/map-icon.svg" alt="Dynamic Map" width={32} height={32} />,
-        title: 'Dynamic Soil Fertility Maps',
-        description: 'Live, aggregated maps provide a ground-level truth for farmers and policymakers, unlike static government surveys.',
-    },
-    {
-        icon: <CheckCircle className="h-8 w-8 text-primary" />,
-        title: 'Affordable & Accessible',
-        description: 'A low-cost IoT device paired with a simple subscription model, ensuring the technology is within reach for all farmers.',
-    }
-];
+import { FeatureShowcase } from '@/components/landing/feature-showcase';
+import { EndorsementCarousel } from '@/components/landing/endorsement-carousel';
+import { SocialProof } from '@/components/landing/social-proof';
 
 const teamMembers = [
     { name: 'Raj Sahashranshu Biswal', avatarUrl: 'https://picsum.photos/seed/dev1/100/100', role: 'Full Stack & AI' },
@@ -48,180 +19,321 @@ const teamMembers = [
     { name: 'Subasis Mishra', avatarUrl: 'https://picsum.photos/seed/dev4/100/100', role: 'Product & Marketing' },
 ];
 
-const Section = ({ children, className, id }: { children: React.ReactNode, className?: string, id: string }) => (
+const Section = ({ children, className, id, ...props }: { children: React.ReactNode, className?: string, id?: string }) => (
     <motion.section
         id={id}
-        className={cn("py-16 md:py-24", className)}
+        className={cn("relative py-24 sm:py-32 px-6", className)}
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.8, ease: 'easeInOut' }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+        {...props}
     >
-        <div className="container mx-auto max-w-7xl px-6">
+        <div className="container mx-auto max-w-7xl">
             {children}
         </div>
     </motion.section>
 );
 
+const SectionDivider = () => (
+    <div className="h-px w-full bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+)
+
 
 export default function LandingPage() {
     return (
-        <div className="bg-background text-foreground font-sans">
+        <div className="bg-background text-foreground font-sans antialiased">
             <LandingHeader />
 
-            <main className="overflow-x-hidden">
+            <main>
                 {/* Hero Section */}
-                <section id="home" className="relative h-screen flex items-center justify-center text-center px-4 overflow-hidden">
-                     <div className="absolute inset-0 bg-aurora z-0" />
-                     <div className="absolute inset-0 bg-background/50 z-0" />
+                <section id="home" className="relative h-screen min-h-[700px] flex items-center justify-center text-center px-6 overflow-hidden">
+                    <div className="absolute inset-0 bg-aurora-hero -z-10" />
+                     <div className="absolute inset-0 bg-background/80 z-0" />
 
-                    <div className="relative z-10 space-y-6 max-w-4xl text-center flex flex-col items-center">
+                    <motion.div 
+                        className="relative z-10 space-y-8 max-w-4xl"
+                        initial="hidden"
+                        animate="visible"
+                        variants={{
+                            visible: { transition: { staggerChildren: 0.1 } }
+                        }}
+                    >
                          <motion.h1 
-                            className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, ease: 'easeInOut' }}
+                            className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter"
+                            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } }}}
                         >
                             From Guesswork to Guidance
                         </motion.h1>
                         <motion.p 
                             className="text-lg md:text-xl text-foreground/80 max-w-3xl mx-auto"
-                             initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.2, ease: 'easeInOut' }}
+                            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } }}}
                         >
-                            Real-Time Soil Wisdom for Every Farmer. Bhumicare replaces outdated reports with simple, actionable advice, helping farmers increase yields, save resources, and secure their future.
+                            Bhumicare replaces outdated reports with simple, actionable advice, helping farmers increase yields, save resources, and secure their future.
                         </motion.p>
                         <motion.div 
-                            className="pt-4"
-                             initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.4, ease: 'easeInOut' }}
+                            className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
+                            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } }}}
                         >
-                            <Button size="lg" asChild>
-                                <Link href="/register">Get Started</Link>
+                            <Button size="lg" asChild className="w-full sm:w-auto">
+                                <Link href="/register">Get Started Free</Link>
+                            </Button>
+                            <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
+                                <Link href="#how-it-works">How It Works</Link>
                             </Button>
                         </motion.div>
-                    </div>
+                    </motion.div>
                 </section>
+                
+                {/* Social Proof Marquee */}
+                <SocialProof />
+                <SectionDivider />
 
                 {/* The Problem Section */}
                 <Section id="problem">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
-                        <div className="space-y-4 text-center lg:text-left">
-                            <h2 className="text-3xl md:text-4xl font-semibold">The Challenge Facing Indian Agriculture</h2>
+                        <div className="space-y-4">
+                            <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">The Challenge Facing Indian Agriculture</h2>
                             <p className="text-lg text-muted-foreground">
-                                Today, both farmers and the government face the same big problem: wrong or missing soil data. This leads to wasted resources and uncertainty.
+                                Today, both farmers and the government face the same big problem: wrong or missing soil data. This leads to wasted resources and uncertainty. Farmers guess on water and fertilizer because soil tests are rare and slow. Official surveys are costly, infrequent, and quickly become obsolete.
                             </p>
+                             <ul className="space-y-3 pt-4">
+                                <li className="flex items-center gap-3">
+                                    <Check className="h-5 w-5 text-primary" />
+                                    <span className="text-muted-foreground">Inefficient resource use (water, fertilizer)</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <Check className="h-5 w-5 text-primary" />
+                                    <span className="text-muted-foreground">Outdated data for policy-making</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <Check className="h-5 w-5 text-primary" />
+                                    <span className="text-muted-foreground">Uncertainty in crop and yield planning</span>
+                                </li>
+                            </ul>
                         </div>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <IconCard
-                                title="Guesswork for Farmers"
-                                description="Farmers guess when to water or add fertilizer because soil test reports are rare, slow to arrive, and hard to understand."
-                            />
-                            <IconCard
-                                title="Outdated Government Data"
-                                description="Official surveys are costly, infrequent, and quickly become obsolete, making it impossible to plan subsidies or policies effectively."
-                            />
-                        </div>
+                        <motion.div 
+                            className="relative aspect-video rounded-2xl p-8 flex items-center justify-center bg-background-secondary border border-white/10"
+                            whileInView={{ scale: [0.95, 1], opacity: [0.5, 1] }}
+                            transition={{ duration: 0.8, ease: 'easeOut' }}
+                            viewport={{ once: true }}
+                        >
+                           <Image 
+                                src="https://picsum.photos/seed/problem-viz/800/600" 
+                                alt="Data visualization of farming problem"
+                                data-ai-hint="data chart" 
+                                width={800} height={600} 
+                                className="rounded-lg shadow-2xl shadow-blue-500/10 opacity-70"
+                           />
+                           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+                        </motion.div>
                     </div>
                 </Section>
-
+                <SectionDivider />
+                
                 {/* The Solution Section */}
-                <Section id="solution" className="bg-foreground/5">
-                    <div className="text-center max-w-4xl mx-auto space-y-4">
-                        <h2 className="text-3xl md:text-4xl font-semibold">This is Where Bhumicare Makes the Difference</h2>
-                        <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                            Our integrated system of hardware and AI provides a complete, modern solution to an age-old problem.
+                <FeatureShowcase />
+                <SectionDivider />
+
+                {/* Dashboard Preview Section */}
+                <Section id="dashboard-preview">
+                    <div className="text-center max-w-4xl mx-auto space-y-6">
+                        <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">Your Central Hub for Soil Intelligence</h2>
+                        <p className="text-lg text-muted-foreground">
+                            Our intuitive dashboard makes complex soil data simple to understand and act upon. Get real-time metrics, AI-powered recommendations, and historical trends at a glance.
                         </p>
                     </div>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-12">
-                       {solutions.map((solution, i) => (
-                           <IconCard key={i} {...solution} />
-                       ))}
-                    </div>
+                    <motion.div 
+                        className="relative mt-16"
+                        initial={{ y: 50, opacity: 0}}
+                        whileInView={{ y: 0, opacity: 1 }}
+                        viewport={{ once: true, amount: 0.3 }}
+                        transition={{ duration: 1, ease: 'easeOut' }}
+                    >
+                        <div className="absolute -inset-2 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 opacity-20 blur-2xl" />
+                        <Image 
+                            src="https://picsum.photos/seed/dashboard-dark/1200/800"
+                            alt="Bhumicare Dashboard Preview"
+                            data-ai-hint="dashboard dark"
+                            width={1200}
+                            height={800}
+                            className="relative rounded-xl border border-white/10 shadow-2xl shadow-purple-500/10"
+                        />
+                         {/* Animated elements to make it feel alive */}
+                        <motion.div
+                            className="absolute"
+                            style={{ top: '45%', left: '35%', width: '20%', height: '2px' }}
+                            animate={{
+                                background: [
+                                    'linear-gradient(90deg, transparent, hsl(var(--primary)), transparent)',
+                                    'linear-gradient(90deg, transparent, hsl(var(--secondary)), transparent)',
+                                    'linear-gradient(90deg, transparent, hsl(var(--primary)), transparent)',
+                                ],
+                            }}
+                            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                        />
+                         <motion.div
+                            className="absolute rounded-full bg-primary/50"
+                            style={{ top: '65%', right: '28%', width: '12px', height: '12px' }}
+                            animate={{ scale: [1, 1.5, 1], opacity: [0.7, 1, 0.7] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                         />
+                    </motion.div>
                 </Section>
+                <SectionDivider />
 
                 {/* How It Works Section */}
-                <HowItWorks />
+                <Section id="how-it-works">
+                     <div className="text-center max-w-4xl mx-auto space-y-4 mb-16">
+                        <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">Simple Technology, Powerful Results</h2>
+                        <p className="text-lg text-muted-foreground">A seamless 4-step process from soil to solution.</p>
+                    </div>
+                    <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                         <div className="absolute top-1/2 left-0 w-full h-px bg-border -translate-y-1/2 hidden lg:block" />
+                        {
+                            [
+                                { icon: Cpu, title: '1. Sense', description: 'Our IoT device continuously measures NPK, pH, moisture, and temperature in the soil.' },
+                                { icon: Cloud, title: '2. Sync', description: 'Data is sent to the cloud via Wi-Fi, LoRa, or 5G, with offline caching for reliability.' },
+                                { icon: BrainCircuit, title: '3. Analyze', description: 'Our AI advisor combines soil, crop, and weather data to generate insights.' },
+                                { icon: MicVocal, title: '4. Advise', description: 'Receive simple, voice-first advice in your own language directly on the app.' },
+                            ].map((step, index) => (
+                                <div key={index} className="relative text-center p-6 bg-background-secondary border border-white/10 rounded-2xl">
+                                    <div className="flex items-center justify-center mb-4">
+                                         <div className="bg-background p-4 rounded-full border border-white/10">
+                                            <step.icon className="w-8 h-8 text-primary" />
+                                        </div>
+                                    </div>
+                                    <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
+                                    <p className="text-muted-foreground text-sm">{step.description}</p>
+                                </div>
+                            ))
+                        }
+                    </div>
+                </Section>
+                <SectionDivider />
 
                 {/* The Impact Section */}
                 <Section id="impact">
-                    <div className="grid lg:grid-cols-2 gap-12 items-center">
-                        <div className="space-y-4">
-                            <h2 className="text-3xl md:text-4xl font-semibold">Grow More. Spend Less. Protect the Future.</h2>
+                     <div className="grid lg:grid-cols-2 gap-16 items-center">
+                        <div className="space-y-6">
+                            <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">Grow More. Spend Less. Protect the Future.</h2>
                             <p className="text-lg text-muted-foreground">Bhumicare delivers tangible, data-driven results that empower farmers and strengthen the agricultural ecosystem.</p>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-8">
-                                <IconCard
-                                    icon={<Cpu className="h-8 w-8 text-secondary" />}
-                                    title="Validated & Ready"
-                                    description="Technology Readiness Level: TRL 4"
-                                />
-                                <IconCard
-                                     icon={<Image src="/ashoka.svg" alt="Ashoka" width={32} height={32} />}
-                                    title="National Alignment"
-                                    description="Supports Digital Agriculture Mission, PM-KISAN, and more."
-                                />
-                                 <IconCard
-                                    icon={<div className="grid grid-cols-2 gap-1">
+                             {/* Core Metrics */}
+                            <div className="flex flex-col sm:flex-row gap-8 pt-4">
+                                <div className="text-left">
+                                    <AnimatedNumber value={30} className="text-5xl font-bold text-primary" prefix="+" />
+                                    <p className="text-muted-foreground mt-1">Crop Yield Increase</p>
+                                </div>
+                                <div className="text-left">
+                                    <AnimatedNumber value={30} className="text-5xl font-bold text-primary" prefix="-" />
+                                    <p className="text-muted-foreground mt-1">Fertilizer Costs</p>
+                                </div>
+                                 <div className="text-left">
+                                    <AnimatedNumber value={40} className="text-5xl font-bold text-primary" prefix="-" />
+                                    <p className="text-muted-foreground mt-1">Water Usage</p>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Credibility Column */}
+                        <div className="space-y-8 p-8 bg-background-secondary border border-white/10 rounded-2xl">
+                           <div className="flex items-start gap-4">
+                                <div className="p-3 bg-background rounded-lg border border-white/10"><Cpu className="h-6 w-6 text-secondary" /></div>
+                                <div>
+                                    <h4 className="font-semibold">Validated Technology</h4>
+                                    <p className="text-muted-foreground text-sm">Technology Readiness Level: TRL 4, field-tested and ready for deployment.</p>
+                                </div>
+                           </div>
+                            <div className="flex items-start gap-4">
+                                 <div className="p-3 bg-background rounded-lg border border-white/10"><Image src="/ashoka.svg" alt="Ashoka" width={24} height={24} className="filter-white"/></div>
+                                <div>
+                                    <h4 className="font-semibold">National Alignment</h4>
+                                    <p className="text-muted-foreground text-sm">Supports Digital Agriculture Mission, PM-KISAN, and more.</p>
+                                </div>
+                           </div>
+                            <div className="flex items-start gap-4">
+                                 <div className="p-3 bg-background rounded-lg border border-white/10"><Check className="h-6 w-6 text-primary" /></div>
+                                <div>
+                                    <h4 className="font-semibold">SDG Contribution</h4>
+                                     <div className="flex items-center gap-3 mt-2">
                                         <Image src="/sdg-2.svg" alt="SDG 2" width={32} height={32} />
                                         <Image src="/sdg-6.svg" alt="SDG 6" width={32} height={32} />
                                         <Image src="/sdg-12.svg" alt="SDG 12" width={32} height={32} />
                                         <Image src="/sdg-13.svg" alt="SDG 13" width={32} height={32} />
-                                    </div>}
-                                    title="SDG Contribution"
-                                    description="Aiding global goals for hunger, water, and climate."
-                                />
-                            </div>
-                        </div>
-                         <div className="grid grid-cols-1 gap-8">
-                            <div className="glass-card p-8 text-center rounded-2xl">
-                                <AnimatedNumber value={30} className="text-6xl md:text-7xl font-bold text-primary" prefix="+" />
-                                <p className="text-xl font-semibold mt-2">Crop Yield Increase</p>
-                            </div>
-                             <div className="glass-card p-8 text-center rounded-2xl">
-                                <AnimatedNumber value={30} className="text-6xl md:text-7xl font-bold text-primary" prefix="-" />
-                                <p className="text-xl font-semibold mt-2">Fertilizer Costs</p>
-                            </div>
-                             <div className="glass-card p-8 text-center rounded-2xl">
-                                <AnimatedNumber value={40} className="text-6xl md:text-7xl font-bold text-primary" prefix="-" />
-                                <p className="text-xl font-semibold mt-2">Water Usage</p>
-                            </div>
+                                    </div>
+                                </div>
+                           </div>
                         </div>
                     </div>
                 </Section>
+                <SectionDivider />
                 
-                 {/* Team & Mentors Section */}
-                <Section id="team" className="bg-foreground/5">
-                    <div className="text-center max-w-4xl mx-auto space-y-12">
-                        <h2 className="text-3xl md:text-4xl font-semibold">Our Team & Mentors</h2>
-                        
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                            {teamMembers.map(member => <TeamMemberCard key={member.name} {...member} />)}
-                        </div>
+                {/* Testimonials Section */}
+                <Section id="testimonials">
+                    <div className="text-center max-w-4xl mx-auto space-y-4 mb-16">
+                        <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">What Experts & Farmers Are Saying</h2>
+                    </div>
+                     <EndorsementCarousel />
+                </Section>
+                <SectionDivider />
 
-                        <EndorsementCarousel />
+                {/* Team & Supporters Section */}
+                <Section id="team">
+                    <div className="text-center max-w-4xl mx-auto space-y-6 mb-16">
+                        <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">Our Team & Supporters</h2>
+                        <p className="text-lg text-muted-foreground">We are a passionate team of engineers and innovators dedicated to revolutionizing agriculture.</p>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+                        {teamMembers.map((member, i) => (
+                             <motion.div 
+                                key={member.name}
+                                className="text-center p-4 bg-background-secondary border border-white/10 rounded-2xl"
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5, delay: i * 0.1 }}
+                                whileHover={{ y: -5, boxShadow: "0 10px 20px rgba(0,0,0,0.2)" }}
+                            >
+                                <Image 
+                                    src={member.avatarUrl} 
+                                    alt={member.name} 
+                                    width={80} 
+                                    height={80} 
+                                    className="rounded-full mx-auto mb-4 border-2 border-primary"
+                                />
+                                <h4 className="font-semibold">{member.name}</h4>
+                                <p className="text-sm text-muted-foreground">{member.role}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                     <div className="text-center mt-24">
+                        <p className="text-lg text-muted-foreground">Proudly Supported and Incubated by</p>
+                        <div className="mt-6 flex justify-center items-center">
+                           <Image src="/aic-soa-logo.png" alt="AIC SOA Foundation" width={200} height={80} className="filter-grayscale contrast-0 brightness-200" />
+                        </div>
                     </div>
                 </Section>
 
-                {/* Field Validation & Supporters Section */}
-                <Section id="supporters">
-                     <div className="text-center max-w-4xl mx-auto space-y-8">
-                        <h2 className="text-3xl md:text-4xl font-semibold">Field Validation & Supporters</h2>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <Image src="https://picsum.photos/seed/field1/400/400" alt="Field test 1" width={400} height={400} className="rounded-lg shadow-md" />
-                            <Image src="https://picsum.photos/seed/field2/400/400" alt="Field test 2" width={400} height={400} className="rounded-lg shadow-md" />
-                            <Image src="https://picsum.photos/seed/field3/400/400" alt="Field test 3" width={400} height={400} className="rounded-lg shadow-md" />
-                            <Image src="https://picsum.photos/seed/field4/400/400" alt="Field test 4" width={400} height={400} className="rounded-lg shadow-md" />
-                        </div>
-                        <div className="pt-8">
-                            <p className="text-lg text-muted-foreground">Proudly Supported and Incubated by</p>
-                            <div className="mt-4 flex justify-center items-center">
-                               <Image src="/aic-soa-logo.png" alt="AIC SOA Foundation" width={200} height={80} />
-                            </div>
-                        </div>
+                {/* Final CTA Section */}
+                 <section className="py-24 sm:py-32">
+                    <div className="container mx-auto max-w-4xl px-6 text-center">
+                        <motion.div 
+                             initial={{ opacity: 0, y: 30 }}
+                             whileInView={{ opacity: 1, y: 0 }}
+                             viewport={{ once: true }}
+                             transition={{ duration: 0.8, ease: 'easeOut' }}
+                             className="relative p-12 bg-background-secondary border border-white/10 rounded-2xl overflow-hidden"
+                        >
+                            <div className="absolute inset-0 bg-aurora-cta -z-10" />
+                            <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">Ready to Transform Your Farm?</h2>
+                            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mt-4 mb-8">
+                                Join the future of farming today. Get real-time soil data, AI-powered advice, and increase your profitability.
+                            </p>
+                            <Button size="lg" asChild>
+                                <Link href="/register">Get Started For Free</Link>
+                            </Button>
+                        </motion.div>
                     </div>
-                </Section>
+                </section>
             </main>
             
             <LandingFooter />
