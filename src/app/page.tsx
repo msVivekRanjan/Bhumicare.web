@@ -17,10 +17,10 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id);
 
 const teamMembers = [
-    { name: 'Raj Sahashranshu Biswal', avatarUrl: getImage('team-raj')?.imageUrl!, role: 'Full Stack & AI', bio: 'Raj is the visionary behind Bhumicare, leading the AI development and full-stack architecture to turn complex data into actionable insights for farmers.', linkedin: '#' },
-    { name: 'Vivek Ranjan Sahoo', avatarUrl: getImage('team-vivek')?.imageUrl!, role: 'Hardware & IoT', bio: 'Vivek engineers the heart of our solution—the IoT device. His expertise in hardware ensures our sensors are reliable, accurate, and built to last in the field.', linkedin: '#' },
-    { name: 'Ayush Ranjan Pradhan', avatarUrl: getImage('team-ayush')?.imageUrl!, role: 'UI/UX & Frontend', bio: 'Ayush crafts the user experience, ensuring the Bhumicare dashboard is intuitive, accessible, and presents complex information in a simple, beautiful interface.', linkedin: '#' },
-    { name: 'Subasis Mishra', avatarUrl: getImage('team-subasis')?.imageUrl!, role: 'Product & Marketing', bio: 'Subasis drives the product strategy and market outreach, connecting our technology with the farmers and organizations who need it most.', linkedin: '#' },
+    { name: 'Raj Sahashranshu Biswal', avatarUrl: getImage('team-raj')?.imageUrl!, role: 'Project Lead', bio: 'Raj is the visionary behind Bhumicare, leading the AI development and full-stack architecture to turn complex data into actionable insights for farmers.', linkedin: '#' },
+    { name: 'Vivek Ranjan Sahoo', avatarUrl: getImage('team-vivek')?.imageUrl!, role: 'UI/UX & Frontend', bio: 'Vivek engineers the heart of our solution—the IoT device. His expertise in hardware ensures our sensors are reliable, accurate, and built to last in the field.', linkedin: '#' },
+    { name: 'Ayush Ranjan Pradhan', avatarUrl: getImage('team-ayush')?.imageUrl!, role: 'Hardware & IoT', bio: 'Ayush crafts the user experience, ensuring the Bhumicare dashboard is intuitive, accessible, and presents complex information in a simple, beautiful interface.', linkedin: '#' },
+    { name: 'Subasis Mishra', avatarUrl: getImage('team-subasis')?.imageUrl!, role: 'App Developer', bio: 'Subasis drives the product strategy and market outreach, connecting our technology with the farmers and organizations who need it most.', linkedin: '#' },
 ];
 
 const Section = ({ children, className, id, ...props }: { children: React.ReactNode, className?: string, id?: string }) => (
@@ -54,7 +54,7 @@ const FlipCard = ({ member }: { member: typeof teamMembers[0] }) => {
             onMouseLeave={() => setIsFlipped(false)}
         >
             <motion.div
-                className="relative w-full h-64"
+                className="relative w-full h-80"
                 style={{ transformStyle: 'preserve-3d' }}
                 animate={{ rotateY: isFlipped ? 180 : 0 }}
                 transition={{ duration: 0.6 }}
@@ -64,18 +64,19 @@ const FlipCard = ({ member }: { member: typeof teamMembers[0] }) => {
                      <Image 
                         src={member.avatarUrl} 
                         alt={member.name} 
-                        width={80} 
-                        height={80} 
+                        width={100} 
+                        height={100} 
                         className="rounded-full mx-auto mb-4 border-2 border-primary"
                     />
-                    <h4 className="font-semibold">{member.name}</h4>
-                    <p className="text-sm text-muted-foreground">{member.role}</p>
+                    <h4 className="text-lg font-semibold">{member.name}</h4>
+                    <p className="text-sm text-primary/80">{member.role}</p>
+                    <p className="text-xs text-muted-foreground mt-4 italic">Click to know more</p>
                 </div>
                 
                 {/* Back of card */}
-                <div className="absolute w-full h-full backface-hidden [transform:rotateY(180deg)] flex flex-col items-center justify-center text-center p-6 bg-background-secondary border border-white/10 rounded-2xl">
-                    <p className="text-xs text-muted-foreground mb-4">{member.bio}</p>
-                    <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80">
+                <div className="absolute w-full h-full backface-hidden [transform:rotateY(180deg)] flex flex-col items-center justify-center text-center p-6 bg-card border border-primary/20 rounded-2xl">
+                    <p className="text-sm text-muted-foreground mb-4">{member.bio}</p>
+                    <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 transition-colors">
                         <Linkedin className="w-6 h-6" />
                     </a>
                 </div>
