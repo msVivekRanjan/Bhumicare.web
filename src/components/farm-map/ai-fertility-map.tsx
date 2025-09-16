@@ -296,6 +296,11 @@ const BivariateMap = () => {
         setGridPolygons([]);
 
         const generateMap = async () => {
+             if (!window.google || !window.google.maps.geometry) {
+                toast({ variant: "destructive", title: "Map geometry library not loaded."});
+                setIsLoadingMap(false);
+                return;
+             }
              const mainPolygonForCheck = new google.maps.Polygon({ paths: fieldPath });
              const bounds = new google.maps.LatLngBounds();
              fieldPath.forEach(p => bounds.extend(p));
@@ -405,7 +410,7 @@ const BivariateMap = () => {
         <>
             {isDefiningArea && markers.map((pos, index) => <AdvancedMarker key={index} position={pos} />)}
 
-             {hoverData && (
+             {hoverData && window.google && (
                 <InfoWindow
                     position={hoverData.center}
                     onCloseClick={() => setHoverData(null)}
@@ -505,7 +510,7 @@ export function AIFertilityMap() {
     }
     
     return (
-        <ErrorBoundary fallback={<p className='p-4 text-center text-destructive'>The map could not load. Please check your Google Maps API key in `src/lib/constants.ts`.</p>}>
+        <ErrorBoundary fallback={<p className='p-4 text-center text-destructive'>The map could not load. The Google Maps API key in `src/lib/constants.ts` is likely invalid or missing. Please replace it with your own key.</p>}>
             <APIProvider apiKey={GOOGLE_MAPS_API_KEY} libraries={['geometry']}>
                 <div ref={mapContainerRef} className="w-full h-full relative bg-muted">
                     <Map
@@ -537,7 +542,3 @@ export const getColorFromIndex = (fertilityIndex: number) => {
     const hue = (fertilityIndex * 120).toString(10);
     return `hsl(${hue}, 100%, 45%)`;
 };
-
-    
-
-    

@@ -42,7 +42,7 @@ export function RegisterForm() {
         localStorage.setItem('bhumicare_field_coordinates', fieldCoordinates);
          try {
             const coords = JSON.parse(fieldCoordinates);
-            if (coords.length > 0) {
+            if (coords.length > 0 && window.google) {
                  // Save the center of the polygon as the user's location for map centering
                 const bounds = new window.google.maps.LatLngBounds();
                 coords.forEach((coord: google.maps.LatLngLiteral) => bounds.extend(coord));
@@ -84,7 +84,7 @@ export function RegisterForm() {
       <div className="grid gap-2">
         <Label>{t('define_field_boundary')}</Label>
         <div className="h-96 w-full rounded-lg overflow-hidden border">
-          <ErrorBoundary fallback={<p className='p-4 text-center text-destructive'>Map could not load. Please check your Google Maps API Key in `src/lib/constants.ts`.</p>}>
+          <ErrorBoundary fallback={<p className='p-4 text-center text-destructive'>The map could not load. The Google Maps API key in `src/lib/constants.ts` is likely invalid or missing. Please replace it with your own key.</p>}>
             <APIProvider apiKey={GOOGLE_MAPS_API_KEY} libraries={['drawing', 'geometry']}>
                   <RegistrationMap onPolygonChange={setFieldCoordinates} />
             </APIProvider>
