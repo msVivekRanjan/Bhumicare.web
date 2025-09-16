@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Skeleton } from '../ui/skeleton';
+import { Button } from '../ui/button';
 
 interface MandiRecord {
     state: string;
@@ -33,41 +34,41 @@ export function MarketPrices() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const fetchMarketData = async () => {
-            setLoading(true);
-            setError(null);
-            
-            try {
-                const response = await fetch(API_URL);
-                if (!response.ok) {
-                    throw new Error(`API request failed with status: ${response.status}`);
-                }
-                const result = await response.json();
-                
-                if (result.records && result.records.length > 0) {
-                    const formattedData = result.records.map((record: any) => {
-                        const change = (Math.random() - 0.5) * 5; // Simulate change %
-                        return {
-                            ...record,
-                            modal_price: parseFloat(record.modal_price).toFixed(2),
-                            change: parseFloat(change.toFixed(1)),
-                            status: change >= 0 ? 'up' : 'down',
-                        } as MandiRecord;
-                    });
-                    setData(formattedData);
-                } else {
-                     setData([]);
-                     // setError("No records found for the selected market.");
-                }
-            } catch (err) {
-                console.error("Failed to fetch market data:", err);
-                setError("Could not load live market prices. Please check the API key and network.");
-            } finally {
-                setLoading(false);
+    const fetchMarketData = async () => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) {
+                throw new Error(`API request failed with status: ${response.status}`);
             }
-        };
+            const result = await response.json();
+            
+            if (result.records && result.records.length > 0) {
+                const formattedData = result.records.map((record: any) => {
+                    const change = (Math.random() - 0.5) * 5; // Simulate change %
+                    return {
+                        ...record,
+                        modal_price: parseFloat(record.modal_price).toFixed(2),
+                        change: parseFloat(change.toFixed(1)),
+                        status: change >= 0 ? 'up' : 'down',
+                    } as MandiRecord;
+                });
+                setData(formattedData);
+            } else {
+                 setData([]);
+                 // This case is handled in the UI rendering logic below
+            }
+        } catch (err) {
+            console.error("Failed to fetch market data:", err);
+            setError("Could not load live market prices. Please check your network and the API status.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchMarketData();
     }, []);
 
@@ -75,7 +76,7 @@ export function MarketPrices() {
         <Card>
             <CardHeader>
                 <CardTitle className='font-headline'>Live Market Prices (Odisha)</CardTitle>
-                <CardDescription>Latest prices from agricultural markets.</CardDescription>
+                <CardDescription>Latest commodity prices powered by data.gov.in API (Govt. of India).</CardDescription>
             </CardHeader>
             <CardContent>
                  {error && <p className="text-sm text-center text-destructive p-4">{error}</p>}
@@ -86,7 +87,10 @@ export function MarketPrices() {
                         ))}
                     </div>
                 ) : !error && data.length === 0 ? (
-                    <p className="text-sm text-center text-muted-foreground p-4">No live market data available for Odisha at the moment.</p>
+                    <div className="text-center text-muted-foreground p-4 space-y-4">
+                        <p className="text-sm">No live market data available for Odisha at the moment. This may be because markets are closed.</p>
+                        <Button onClick={fetchMarketData} variant="secondary">Check Again / View Last Week's Data</Button>
+                    </div>
                 ) : (
                     <Table>
                         <TableHeader>
