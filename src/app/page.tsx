@@ -13,6 +13,7 @@ import { SocialProof } from '@/components/landing/social-proof';
 import { EndorsementCarousel } from '@/components/landing/endorsement-carousel';
 import { useState } from 'react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { ProductCarousel } from '@/components/landing/product-carousel';
 
 const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id);
 
@@ -343,6 +344,24 @@ export default function LandingPage() {
                       </div>
                   </Section>
                   <SectionDivider />
+
+                   {/* Product Testing Gallery Section */}
+                  <Section id="testing-gallery">
+                      <div className="text-center max-w-4xl mx-auto space-y-4 mb-16">
+                          <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">From Lab to Field: Our Technology in Action</h2>
+                          <p className="text-lg text-muted-foreground">
+                              We are continuously testing and refining our hardware to ensure it meets the rigorous demands of real-world farming.
+                          </p>
+                      </div>
+                      <ProductCarousel />
+                      <div className="text-center max-w-2xl mx-auto mt-12">
+                          <p className="text-md text-muted-foreground">
+                            Our current hardware prototype is a field-validated unit, currently undergoing testing for Technology Readiness Level (TRL) 5. This involves validating the integrated components in a simulated, farmer-centric environment to ensure reliability and accuracy.
+                          </p>
+                      </div>
+                  </Section>
+                  <SectionDivider />
+
                   
                   {/* Testimonials Section */}
                   <Section id="testimonials">
