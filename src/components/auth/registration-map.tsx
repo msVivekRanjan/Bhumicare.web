@@ -6,7 +6,7 @@ import {
   useApiIsLoaded,
   AdvancedMarker,
 } from '@vis.gl/react-google-maps';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Redo, Undo, X, LocateFixed, Expand, Shrink } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -50,7 +50,7 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
     return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
   }, []);
 
-  const getUserLocation = () => {
+  const getUserLocation = useCallback(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -60,24 +60,18 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
           };
           setCenter(userLoc);
           setZoom(15);
-          if (map) {
-            map.panTo(userLoc);
-          }
            toast({ title: "Location found!", description: "Map centered on your current location." });
         },
         () => {
             toast({ title: "Could not get location.", description: "Defaulting to a central location.", variant: "destructive" });
             setCenter(FALLBACK_CENTER);
             setZoom(5);
-            if(map) {
-              map.panTo(FALLBACK_CENTER);
-            }
         }
       );
     } else {
          toast({ title: "Geolocation not supported.", description: "Your browser does not support geolocation.", variant: "destructive" });
     }
-  }
+  }, [toast]);
 
   // 1. Geolocation on load
   useEffect(() => {
@@ -172,6 +166,8 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
       <Map
         center={center}
         zoom={zoom}
+        onCenterChanged={(e) => setCenter(e.detail.center)}
+        onZoomChanged={(e) => setZoom(e.detail.zoom)}
         gestureHandling={'cooperative'}
         disableDefaultUI={false}
         mapId="bhumicare_reg_map"
