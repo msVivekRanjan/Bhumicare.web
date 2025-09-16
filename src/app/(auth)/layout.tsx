@@ -1,3 +1,4 @@
+'use client';
 import { BhumicareLogo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -16,11 +17,11 @@ export default function AuthLayout({
           <div className="absolute inset-0 bg-background/60" />
        </div>
 
-       <div className="absolute top-8 left-8 flex items-center gap-2 z-10">
+       <div className="absolute top-8 left-8 flex items-center gap-2 z-20">
          <BhumicareLogo className="h-8 w-8 text-primary" />
          <span className="text-xl font-bold font-headline">Bhumicare</span>
        </div>
-        <div className="absolute top-8 right-8 z-10">
+        <div className="absolute top-8 right-8 z-20">
             <Button variant="outline" asChild>
                 <Link href="/">
                     <ArrowLeft className="mr-2 h-4 w-4" />

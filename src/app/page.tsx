@@ -13,6 +13,7 @@ import { SocialProof } from '@/components/landing/social-proof';
 import { EndorsementCarousel } from '@/components/landing/endorsement-carousel';
 import { useState } from 'react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { ProductCarousel } from '@/components/landing/product-carousel';
 
 const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id);
 
@@ -343,7 +344,22 @@ export default function LandingPage() {
                       </div>
                   </Section>
                   <SectionDivider />
-                  
+                   
+                   {/* Product Testing Gallery */}
+                    <Section id="product-gallery">
+                        <div className="text-center max-w-4xl mx-auto space-y-4 mb-16">
+                            <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">Hardware in Action</h2>
+                            <p className="text-lg text-muted-foreground">From prototype to field, see the evolution of our IoT device.</p>
+                        </div>
+                        <ProductCarousel />
+                        <div className="text-center mt-8 max-w-2xl mx-auto">
+                            <p className="text-sm text-muted-foreground">
+                                Our proprietary hardware is currently at Technology Readiness Level 5 (TRL 5), undergoing rigorous testing in simulated and real-world environments to ensure accuracy and durability.
+                            </p>
+                        </div>
+                    </Section>
+                    <SectionDivider />
+
                   {/* Testimonials Section */}
                   <Section id="testimonials">
                       <div className="text-center max-w-4xl mx-auto space-y-4 mb-16">
