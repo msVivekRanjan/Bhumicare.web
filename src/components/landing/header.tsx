@@ -116,7 +116,7 @@ export function LandingHeader() {
                         animate="open"
                         exit="closed"
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        className="fixed inset-0 z-50 bg-background/95 backdrop-blur-xl h-screen w-screen"
+                        className="fixed inset-0 z-[100] bg-background/95 backdrop-blur-xl h-screen w-screen"
                     >
                         <div className="container mx-auto px-6 h-full flex flex-col">
                             <div className="flex items-center justify-between h-20">
