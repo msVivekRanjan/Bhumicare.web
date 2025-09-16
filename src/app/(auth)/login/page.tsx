@@ -7,7 +7,7 @@ import { useTranslation } from '@/hooks/use-translation';
 export default function LoginPage() {
   const { t } = useTranslation();
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full max-w-sm bg-background/30 backdrop-blur-xl border-white/20">
       <CardHeader>
         <CardTitle className="text-2xl font-headline">{t('login_to_bhumicare')}</CardTitle>
         <CardDescription>

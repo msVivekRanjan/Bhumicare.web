@@ -26,7 +26,7 @@ export function LoginForm() {
           placeholder="m@example.com"
           required
           defaultValue="farmer@bhumicare.com"
-          className="bg-background/50"
+          className="bg-transparent"
         />
       </div>
       <div className="grid gap-2">
@@ -36,7 +36,7 @@ export function LoginForm() {
                 Forgot your password?
             </Link>
         </div>
-        <Input id="password" type="password" required defaultValue="password" className="bg-background/50" />
+        <Input id="password" type="password" required defaultValue="password" className="bg-transparent" />
       </div>
       <Button type="submit" className="w-full">
         {t('login')}

@@ -69,21 +69,21 @@ export function RegisterForm() {
       <div className="grid grid-cols-2 gap-4">
         <div className="grid gap-2">
           <Label htmlFor="full-name">{t('full_name')}</Label>
-          <Input ref={nameInputRef} id="full-name" placeholder="Ram Kumar" required className="bg-background/50" />
+          <Input ref={nameInputRef} id="full-name" placeholder="Ram Kumar" required className="bg-transparent" />
         </div>
          <div className="grid gap-2">
             <Label htmlFor="email">{t('email')}</Label>
-            <Input ref={emailInputRef} id="email" type="email" placeholder="ram@example.com" required className="bg-background/50" />
+            <Input ref={emailInputRef} id="email" type="email" placeholder="ram@example.com" required className="bg-transparent" />
          </div>
       </div>
       <div className="grid gap-2">
         <Label htmlFor="password">{t('password')}</Label>
-        <Input id="password" type="password" required className="bg-background/50" />
+        <Input id="password" type="password" required className="bg-transparent" />
       </div>
 
       <div className="grid gap-2">
         <Label htmlFor="plot-id">Plot Unique Id</Label>
-        <Input id="plot-id" type="text" className="bg-background/50" />
+        <Input id="plot-id" type="text" className="bg-transparent" />
         <p className="text-xs text-muted-foreground">
           Find your plot ID on the Govt. of Odisha land records portal: {' '}
           <a href="https://bhulekh.ori.nic.in/SearchYourPlot.aspx" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
