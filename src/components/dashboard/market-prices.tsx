@@ -1,53 +1,126 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { Badge } from '../ui/badge';
+import { Skeleton } from '../ui/skeleton';
 
-const mockMarketData = [
-    { crop: 'Wheat', variety: 'HD-2967', price: 2150, change: 1.2, status: 'up' },
-    { crop: 'Rice', variety: 'Basmati-1121', price: 3500, change: -0.8, status: 'down' },
-    { crop: 'Maize', variety: 'Hybrid-900M', price: 1850, change: 2.5, status: 'up' },
-    { crop: 'Potato', variety: 'Kufri Jyoti', price: 1200, change: 0.5, status: 'up' },
-    { crop: 'Tomato', variety: 'Hybrid', price: 2500, change: -3.1, status: 'down' },
-];
+interface MandiRecord {
+    state: string;
+    district: string;
+    market: string;
+    commodity: string;
+    variety: string;
+    arrival_date: string;
+    min_price: string;
+    max_price: string;
+    modal_price: string;
+    // For UI purposes
+    change: number;
+    status: 'up' | 'down';
+}
+
+// IMPORTANT: Replace with your actual data.gov.in API key
+const API_KEY = "YOUR_API_KEY"; 
+const API_URL = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${API_KEY}&format=json&limit=5&filters[state]=NCT%20of%20Delhi`;
+
 
 export function MarketPrices() {
     const { t } = useTranslation();
+    const [data, setData] = useState<MandiRecord[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchMarketData = async () => {
+            setLoading(true);
+            setError(null);
+            
+            if (API_KEY === "YOUR_API_KEY") {
+                setError("Please replace 'YOUR_API_KEY' with your actual API key from data.gov.in.");
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error(`API request failed with status: ${response.status}`);
+                }
+                const result = await response.json();
+                
+                if (result.records && result.records.length > 0) {
+                    const formattedData = result.records.map((record: any) => {
+                        const change = (Math.random() - 0.5) * 5; // Simulate change %
+                        return {
+                            ...record,
+                            modal_price: parseFloat(record.modal_price).toFixed(2),
+                            change: parseFloat(change.toFixed(1)),
+                            status: change >= 0 ? 'up' : 'down',
+                        } as MandiRecord;
+                    });
+                    setData(formattedData);
+                } else {
+                     setData([]);
+                     // setError("No records found for the selected market.");
+                }
+            } catch (err) {
+                console.error("Failed to fetch market data:", err);
+                setError("Could not load live market prices. Please check the API key and network.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchMarketData();
+    }, []);
 
     return (
         <Card>
             <CardHeader>
                 <CardTitle className='font-headline'>Live Market Prices (Mandi)</CardTitle>
+                <CardDescription>Latest prices from agricultural markets.</CardDescription>
             </CardHeader>
             <CardContent>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Crop</TableHead>
-                            <TableHead>Variety</TableHead>
-                            <TableHead className='text-right'>Price (₹/Quintal)</TableHead>
-                            <TableHead className='text-right'>Change</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {mockMarketData.map((item) => (
-                            <TableRow key={item.crop}>
-                                <TableCell className='font-medium'>{item.crop}</TableCell>
-                                <TableCell>{item.variety}</TableCell>
-                                <TableCell className='text-right font-mono'>{item.price.toFixed(2)}</TableCell>
-                                <TableCell className='text-right'>
-                                    <Badge variant={item.status === 'up' ? 'default' : 'destructive'} className='flex items-center justify-center gap-1 w-[70px] bg-opacity-70'>
-                                        {item.status === 'up' ? <ArrowUp className='h-3 w-3' /> : <ArrowDown className='h-3 w-3' />}
-                                        <span>{item.change.toFixed(1)}%</span>
-                                    </Badge>
-                                </TableCell>
-                            </TableRow>
+                 {error && <p className="text-sm text-center text-destructive p-4">{error}</p>}
+                 {loading ? (
+                    <div className="space-y-2">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                           <Skeleton key={i} className="h-12 w-full" />
                         ))}
-                    </TableBody>
-                </Table>
+                    </div>
+                ) : !error && data.length === 0 ? (
+                    <p className="text-sm text-center text-muted-foreground p-4">No live market data available at the moment.</p>
+                ) : (
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Commodity</TableHead>
+                                <TableHead>Market</TableHead>
+                                <TableHead className='text-right'>Price (₹/Quintal)</TableHead>
+                                <TableHead className='text-right'>Change</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {data.map((item, index) => (
+                                <TableRow key={`${item.market}-${item.commodity}-${index}`}>
+                                    <TableCell className='font-medium'>{item.commodity}</TableCell>
+                                    <TableCell>{item.market}</TableCell>
+                                    <TableCell className='text-right font-mono'>{item.modal_price}</TableCell>
+                                    <TableCell className='text-right'>
+                                        <Badge variant={item.status === 'up' ? 'default' : 'destructive'} className='flex items-center justify-center gap-1 w-[70px] bg-opacity-70'>
+                                            {item.status === 'up' ? <ArrowUp className='h-3 w-3' /> : <ArrowDown className='h-3 w-3' />}
+                                            <span>{item.change}%</span>
+                                        </Badge>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                )}
             </CardContent>
         </Card>
     )
