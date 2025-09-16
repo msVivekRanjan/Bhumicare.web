@@ -89,6 +89,90 @@
       "description": "The device next to a healthy crop",
       "imageUrl": "https://picsum.photos/seed/devicecrop/600/400",
       "imageHint": "technology farm"
+    },
+    {
+      "id": "feature-live-data",
+      "description": "Live Soil Health Data Feature",
+      "imageUrl": "https://picsum.photos/seed/feature1/800/600",
+      "imageHint": "data graph"
+    },
+    {
+      "id": "feature-ai-advice",
+      "description": "Voice-First AI Advice Feature",
+      "imageUrl": "https://picsum.photos/seed/feature2/800/600",
+      "imageHint": "mobile app"
+    },
+    {
+      "id": "feature-fertility-maps",
+      "description": "Dynamic Soil Fertility Maps Feature",
+      "imageUrl": "https://picsum.photos/seed/feature3/800/600",
+      "imageHint": "map satellite"
+    },
+    {
+      "id": "feature-offline-first",
+      "description": "Offline-First Design Feature",
+      "imageUrl": "https://picsum.photos/seed/feature4/800/600",
+      "imageHint": "cloud offline"
+    },
+    {
+      "id": "sdg-2",
+      "description": "SDG 2: Zero Hunger",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Sustainable_Development_Goal_02ZeroHunger.svg",
+      "imageHint": "SDG icon"
+    },
+    {
+      "id": "sdg-6",
+      "description": "SDG 6: Clean Water and Sanitation",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/de/Sustainable_Development_Goal_06CleanWaterSanitation.svg",
+      "imageHint": "SDG icon"
+    },
+    {
+      "id": "sdg-12",
+      "description": "SDG 12: Responsible Consumption and Production",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/65/Sustainable_Development_Goal_12ResponsibleConsumption.svg",
+      "imageHint": "SDG icon"
+    },
+    {
+      "id": "sdg-13",
+      "description": "SDG 13: Climate Action",
+      "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Sustainable_Development_Goal_13Climate.svg",
+      "imageHint": "SDG icon"
+    },
+    {
+      "id": "ashoka-emblem",
+      "description": "Ashoka Emblem",
+      "imageUrl": "/ashoka.svg",
+      "imageHint": "emblem government"
+    },
+    {
+      "id": "social-proof-logo-1",
+      "description": "Placeholder Logo 1",
+      "imageUrl": "https://picsum.photos/seed/logo1/150/50?grayscale",
+      "imageHint": "logo"
+    },
+    {
+      "id": "social-proof-logo-2",
+      "description": "Placeholder Logo 2",
+      "imageUrl": "https://picsum.photos/seed/logo2/150/50?grayscale",
+      "imageHint": "logo"
+    },
+    {
+      "id": "social-proof-logo-3",
+      "description": "Placeholder Logo 3",
+      "imageUrl": "https://picsum.photos/seed/logo3/150/50?grayscale",
+      "imageHint": "logo"
+    },
+    {
+      "id": "social-proof-logo-4",
+      "description": "Placeholder Logo 4",
+      "imageUrl": "https://picsum.photos/seed/logo4/150/50?grayscale",
+      "imageHint": "logo"
+    },
+    {
+      "id": "social-proof-logo-5",
+      "description": "Placeholder Logo 5",
+      "imageUrl": "https://picsum.photos/seed/logo5/150/50?grayscale",
+      "imageHint": "logo"
     }
   ]
 }

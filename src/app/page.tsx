@@ -97,27 +97,27 @@ const FlipCard = ({ member }: { member: typeof teamMembers[0] }) => {
 const sdgData = [
   {
     id: 2,
+    imageId: 'sdg-2',
     title: "SDG 2: Zero Hunger",
     description: "Bhumicare helps increase crop yields by up to 30% and reduce resource waste through data-driven farming. This directly contributes to food security and sustainable agriculture, ensuring more food is grown efficiently.",
-    iconUrl: "https://upload.wikimedia.org/wikipedia/commons/b/b7/Sustainable_Development_Goal_02ZeroHunger.svg"
   },
   {
     id: 6,
+    imageId: 'sdg-6',
     title: "SDG 6: Clean Water and Sanitation",
     description: "Our AI-powered irrigation advice allows farmers to reduce water usage by up to 40%. By optimizing water application, Bhumicare helps conserve this vital resource and prevent runoff of fertilizers into water bodies.",
-    iconUrl: "https://upload.wikimedia.org/wikipedia/commons/d/de/Sustainable_Development_Goal_06CleanWaterSanitation.svg"
   },
   {
     id: 12,
+    imageId: 'sdg-12',
     title: "SDG 12: Responsible Consumption and Production",
     description: "Bhumicare promotes responsible production by enabling precision agriculture. By applying the exact amount of fertilizer and water needed, we reduce chemical waste and encourage a more sustainable consumption cycle.",
-    iconUrl: "https://upload.wikimedia.org/wikipedia/commons/6/65/Sustainable_Development_Goal_12ResponsibleConsumption.svg"
   },
   {
     id: 13,
+    imageId: 'sdg-13',
     title: "SDG 13: Climate Action",
     description: "Efficient use of nitrogen-based fertilizers, guided by our real-time data, reduces emissions of nitrous oxide, a potent greenhouse gas. This helps mitigate climate change and promotes climate-resilient agriculture.",
-    iconUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Sustainable_Development_Goal_13Climate.svg"
   },
 ];
 
@@ -141,6 +141,8 @@ export default function LandingPage() {
     const dashboardImage = getImage('dashboard-dark');
     const problemImage = getImage('problem-viz');
     const aicSoaLogo = getImage('supporter-aic-soa');
+    const ashokaImage = getImage('ashoka-emblem');
+
 
     return (
         <div className="bg-background text-foreground font-sans antialiased">
@@ -357,7 +359,7 @@ export default function LandingPage() {
                                   </div>
                             </div>
                               <div className="flex items-start gap-4">
-                                  <div className="p-3 bg-background rounded-lg border border-white/10"><Image src="/ashoka.svg" alt="Ashoka" width={24} height={24} className="filter-white"/></div>
+                                  {ashokaImage && <div className="p-3 bg-background rounded-lg border border-white/10"><Image src={ashokaImage.imageUrl} alt={ashokaImage.description} width={24} height={24} className="filter-white"/></div>}
                                   <div>
                                       <h4 className="font-semibold">National Alignment</h4>
                                       <p className="text-muted-foreground text-sm">Supports Digital Agriculture Mission, PM-KISAN, and more.</p>
@@ -368,17 +370,19 @@ export default function LandingPage() {
                                   <div>
                                       <h4 className="font-semibold">SDG Contribution <span className="text-xs font-normal text-muted-foreground">(click icons to know more)</span></h4>
                                       <div className="flex items-center gap-3 mt-2">
-                                          {sdgData.map(sdg => (
+                                          {sdgData.map(sdg => {
+                                            const sdgImage = getImage(sdg.imageId);
+                                            return sdgImage ? (
                                               <Dialog key={sdg.id}>
                                                   <DialogTrigger asChild>
                                                       <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                                                          <Image src={sdg.iconUrl} alt={`SDG ${sdg.id}`} width={32} height={32} className="cursor-pointer" />
+                                                          <Image src={sdgImage.imageUrl} alt={`SDG ${sdg.id}`} width={32} height={32} className="cursor-pointer" />
                                                       </motion.button>
                                                   </DialogTrigger>
                                                   <DialogContent className="sm:max-w-md bg-background/80 backdrop-blur-xl border-primary/20">
                                                       <DialogHeader>
                                                           <div className="flex justify-center mb-4">
-                                                            <Image src={sdg.iconUrl} alt={sdg.title} width={64} height={64} />
+                                                            <Image src={sdgImage.imageUrl} alt={sdg.title} width={64} height={64} />
                                                           </div>
                                                           <DialogTitle className="text-center font-headline text-2xl">{sdg.title}</DialogTitle>
                                                       </DialogHeader>
@@ -387,7 +391,8 @@ export default function LandingPage() {
                                                       </p>
                                                   </DialogContent>
                                               </Dialog>
-                                          ))}
+                                            ) : null;
+                                          })}
                                       </div>
                                   </div>
                             </div>

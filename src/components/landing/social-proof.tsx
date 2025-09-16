@@ -8,11 +8,11 @@ const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id);
 
 const logos = [
     { src: getImage('supporter-aic-soa')?.imageUrl!, alt: "AIC SOA Foundation" },
-    { src: "https://picsum.photos/seed/logo1/150/50?grayscale", alt: "Placeholder Logo 1" },
-    { src: "https://picsum.photos/seed/logo2/150/50?grayscale", alt: "Placeholder Logo 2" },
-    { src: "https://picsum.photos/seed/logo3/150/50?grayscale", alt: "Placeholder Logo 3" },
-    { src: "https://picsum.photos/seed/logo4/150/50?grayscale", alt: "Placeholder Logo 4" },
-    { src: "https://picsum.photos/seed/logo5/150/50?grayscale", alt: "Placeholder Logo 5" },
+    { src: getImage('social-proof-logo-1')?.imageUrl!, alt: "Placeholder Logo 1" },
+    { src: getImage('social-proof-logo-2')?.imageUrl!, alt: "Placeholder Logo 2" },
+    { src: getImage('social-proof-logo-3')?.imageUrl!, alt: "Placeholder Logo 3" },
+    { src: getImage('social-proof-logo-4')?.imageUrl!, alt: "Placeholder Logo 4" },
+    { src: getImage('social-proof-logo-5')?.imageUrl!, alt: "Placeholder Logo 5" },
 ];
 
 export function SocialProof() {

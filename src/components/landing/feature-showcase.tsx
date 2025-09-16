@@ -5,6 +5,9 @@ import { motion } from "framer-motion";
 import { Sprout, Mic, CheckCircle, Leaf } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
+
+const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id);
 
 
 const features = [
@@ -13,28 +16,28 @@ const features = [
         description: "Get continuous, real-time data on soil nutrients (NPK), pH, and moisture, replacing infrequent and slow lab tests.",
         id: "live-data",
         icon: Sprout,
-        image: "https://picsum.photos/seed/feature1/800/600"
+        image: getImage('feature-live-data')?.imageUrl!
     },
     {
         title: "Voice-First AI Advice",
         description: "Receive simple, actionable guidance in regional dialects (Hindi, Odia, English) that farmers can easily understand and act upon.",
         id: "ai-advice",
         icon: Mic,
-        image: "https://picsum.photos/seed/feature2/800/600"
+        image: getImage('feature-ai-advice')?.imageUrl!
     },
     {
         title: "Dynamic Soil Fertility Maps",
         description: "Live, aggregated maps provide a ground-level truth for farmers and policymakers, unlike static government surveys.",
         id: "fertility-maps",
         icon: Leaf,
-        image: "https://picsum.photos/seed/feature3/800/600"
+        image: getImage('feature-fertility-maps')?.imageUrl!
     },
      {
         title: "Offline-First Design",
         description: "The device and app are designed to work reliably even without a stable internet connection, caching data until it can sync.",
         id: "offline-first",
         icon: CheckCircle,
-        image: "https://picsum.photos/seed/feature4/800/600"
+        image: getImage('feature-offline-first')?.imageUrl!
     },
 ];
 
