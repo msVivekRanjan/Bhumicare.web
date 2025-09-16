@@ -24,7 +24,7 @@ interface MandiRecord {
 }
 
 const API_KEY = "579b464db66ec23bdd000001a2d46fa589834cba62c71eee3f295ea2"; 
-const API_URL = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${API_KEY}&format=json&limit=5&filters[state]=Odisha&filters[district]=Khordha&filters[market]=Bhubaneswar`;
+const API_URL = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${API_KEY}&format=json&limit=5&filters[state]=Odisha`;
 
 
 export function MarketPrices() {
@@ -74,7 +74,7 @@ export function MarketPrices() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className='font-headline'>Live Market Prices (Bhubaneswar)</CardTitle>
+                <CardTitle className='font-headline'>Live Market Prices (Odisha)</CardTitle>
                 <CardDescription>Latest prices from agricultural markets.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -86,13 +86,13 @@ export function MarketPrices() {
                         ))}
                     </div>
                 ) : !error && data.length === 0 ? (
-                    <p className="text-sm text-center text-muted-foreground p-4">No live market data available for Bhubaneswar at the moment.</p>
+                    <p className="text-sm text-center text-muted-foreground p-4">No live market data available for Odisha at the moment.</p>
                 ) : (
                     <Table>
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Commodity</TableHead>
-                                <TableHead>Variety</TableHead>
+                                <TableHead>Market</TableHead>
                                 <TableHead className='text-right'>Price (₹/Quintal)</TableHead>
                                 <TableHead className='text-right'>Change</TableHead>
                             </TableRow>
@@ -101,7 +101,7 @@ export function MarketPrices() {
                             {data.map((item, index) => (
                                 <TableRow key={`${item.market}-${item.commodity}-${index}`}>
                                     <TableCell className='font-medium'>{item.commodity}</TableCell>
-                                    <TableCell>{item.variety}</TableCell>
+                                    <TableCell>{item.market}</TableCell>
                                     <TableCell className='text-right font-mono'>{item.modal_price}</TableCell>
                                     <TableCell className='text-right'>
                                         <Badge variant={item.status === 'up' ? 'default' : 'destructive'} className='flex items-center justify-center gap-1 w-[70px] bg-opacity-70'>
