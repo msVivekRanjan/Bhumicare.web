@@ -24,6 +24,15 @@ interface MandiRecord {
     status: 'up' | 'down';
 }
 
+const sampleData: MandiRecord[] = [
+    { state: 'Odisha', district: 'Khordha', market: 'Bhubaneswar', commodity: 'Potato', variety: 'Local', modal_price: '1800.00', change: -1.5, status: 'down', arrival_date: '', min_price: '', max_price: ''},
+    { state: 'Odisha', district: 'Cuttack', market: 'Cuttack', commodity: 'Onion', variety: 'Nasik', modal_price: '2200.00', change: 2.1, status: 'up', arrival_date: '', min_price: '', max_price: '' },
+    { state: 'Odisha', district: 'Puri', market: 'Puri', commodity: 'Tomato', variety: 'Hybrid', modal_price: '2500.00', change: 0.5, status: 'up', arrival_date: '', min_price: '', max_price: '' },
+    { state: 'Odisha', district: 'Balasore', market: 'Balasore', commodity: 'Paddy(Dhan)(Common)', variety: 'Common', modal_price: '2183.00', change: -0.2, status: 'down', arrival_date: '', min_price: '', max_price: ''},
+    { state: 'Odisha', district: 'Ganjam', market: 'Berhampur', commodity: 'Brinjal', variety: 'Long', modal_price: '1500.00', change: 1.8, status: 'up', arrival_date: '', min_price: '', max_price: '' },
+];
+
+
 const API_KEY = "579b464db66ec23bdd000001a2d46fa589834cba62c71eee3f295ea2"; 
 const API_URL = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${API_KEY}&format=json&limit=5`;
 
@@ -33,10 +42,13 @@ export function MarketPrices() {
     const [data, setData] = useState<MandiRecord[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showSample, setShowSample] = useState(false);
 
     const fetchMarketData = async () => {
         setLoading(true);
         setError(null);
+        setData([]);
+        setShowSample(false);
         
         try {
             const response = await fetch(API_URL);
@@ -58,7 +70,7 @@ export function MarketPrices() {
                 setData(formattedData);
             } else {
                  setData([]);
-                 // This case is handled in the UI rendering logic below
+                 setError("No live market data available at the moment. This may be because markets are closed.");
             }
         } catch (err) {
             console.error("Failed to fetch market data:", err);
@@ -72,54 +84,64 @@ export function MarketPrices() {
         fetchMarketData();
     }, []);
 
+    const renderTable = (records: MandiRecord[], isSample: boolean) => (
+        <Table>
+            <TableHeader>
+                <TableRow>
+                    <TableHead>Commodity</TableHead>
+                    <TableHead>Market</TableHead>
+                    <TableHead>State</TableHead>
+                    <TableHead className='text-right'>Price (₹/Quintal)</TableHead>
+                   {!isSample && <TableHead className='text-right'>Change</TableHead>}
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {records.map((item, index) => (
+                    <TableRow key={`${item.market}-${item.commodity}-${index}`}>
+                        <TableCell className='font-medium'>{item.commodity}</TableCell>
+                        <TableCell>{item.market}</TableCell>
+                        <TableCell>{item.state}</TableCell>
+                        <TableCell className='text-right font-mono'>{item.modal_price}</TableCell>
+                        {!isSample && (
+                            <TableCell className='text-right'>
+                                <Badge variant={item.status === 'up' ? 'default' : 'destructive'} className='flex items-center justify-center gap-1 w-[70px] bg-opacity-70'>
+                                    {item.status === 'up' ? <ArrowUp className='h-3 w-3' /> : <ArrowDown className='h-3 w-3' />}
+                                    <span>{item.change}%</span>
+                                </Badge>
+                            </TableCell>
+                        )}
+                    </TableRow>
+                ))}
+            </TableBody>
+        </Table>
+    );
+
     return (
         <Card>
             <CardHeader>
-                <CardTitle className='font-headline'>Live Market Prices (All India)</CardTitle>
+                <CardTitle className='font-headline'>{showSample ? "Last Week's Market Prices (Sample)" : "Live Market Prices (All India)"}</CardTitle>
                 <CardDescription>Latest commodity prices powered by data.gov.in API (Govt. of India).</CardDescription>
             </CardHeader>
             <CardContent>
-                 {error && <p className="text-sm text-center text-destructive p-4">{error}</p>}
                  {loading ? (
                     <div className="space-y-2">
                         {Array.from({ length: 5 }).map((_, i) => (
                            <Skeleton key={i} className="h-12 w-full" />
                         ))}
                     </div>
-                ) : !error && data.length === 0 ? (
+                ) : error && !showSample ? (
                     <div className="text-center text-muted-foreground p-4 space-y-4">
-                        <p className="text-sm">No live market data available at the moment. This may be because markets are closed.</p>
-                        <Button onClick={fetchMarketData} variant="secondary">Check Again / View Last Week's Data</Button>
+                        <p className="text-sm">{error}</p>
+                        <div className="flex justify-center gap-4">
+                            <Button onClick={fetchMarketData} variant="secondary">Check Again</Button>
+                            <Button onClick={() => {setShowSample(true); setError(null);}}>View Last Week's Data</Button>
+                        </div>
                     </div>
-                ) : (
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Commodity</TableHead>
-                                <TableHead>Market</TableHead>
-                                <TableHead>State</TableHead>
-                                <TableHead className='text-right'>Price (₹/Quintal)</TableHead>
-                                <TableHead className='text-right'>Change</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {data.map((item, index) => (
-                                <TableRow key={`${item.market}-${item.commodity}-${index}`}>
-                                    <TableCell className='font-medium'>{item.commodity}</TableCell>
-                                    <TableCell>{item.market}</TableCell>
-                                    <TableCell>{item.state}</TableCell>
-                                    <TableCell className='text-right font-mono'>{item.modal_price}</TableCell>
-                                    <TableCell className='text-right'>
-                                        <Badge variant={item.status === 'up' ? 'default' : 'destructive'} className='flex items-center justify-center gap-1 w-[70px] bg-opacity-70'>
-                                            {item.status === 'up' ? <ArrowUp className='h-3 w-3' /> : <ArrowDown className='h-3 w-3' />}
-                                            <span>{item.change}%</span>
-                                        </Badge>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                )}
+                ) : showSample ? (
+                    renderTable(sampleData, true)
+                ) : data.length > 0 ? (
+                    renderTable(data, false)
+                ) : null }
             </CardContent>
         </Card>
     )
