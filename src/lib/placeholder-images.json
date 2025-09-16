@@ -3,7 +3,7 @@
     {
       "id": "dashboard-dark",
       "description": "Bhumicare Dashboard Preview",
-      "imageUrl": "/Assets/Dashboard/web_collage.png",
+      "imageUrl": "/Assets/Dashboard/team-green-genesis.png",
       "imageHint": "dashboard dark"
     },
     {
@@ -57,7 +57,7 @@
     {
       "id": "problem-viz",
       "description": "Data visualization of farming problem",
-      "imageUrl": "https://picsum.photos/seed/problem-viz/800/600",
+      "imageUrl": "/Assets/Dashboard/problem-viz.png",
       "imageHint": "data chart"
     },
     {
