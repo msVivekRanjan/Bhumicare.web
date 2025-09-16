@@ -19,6 +19,7 @@ const FALLBACK_CENTER = { lat: 20.245763, lng: 85.802415 };
 
 export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
   const [center, setCenter] = useState(FALLBACK_CENTER);
+  const [zoom, setZoom] = useState(5);
   const [isMarking, setIsMarking] = useState(false);
   const [vertices, setVertices] = useState<google.maps.LatLngLiteral[]>([]);
   const [polygon, setPolygon] = useState<google.maps.Polygon | null>(null);
@@ -58,17 +59,18 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
             lng: position.coords.longitude,
           };
           setCenter(userLoc);
+          setZoom(15);
           if (map) {
             map.panTo(userLoc);
-            map.setZoom(15);
           }
            toast({ title: "Location found!", description: "Map centered on your current location." });
         },
         () => {
             toast({ title: "Could not get location.", description: "Defaulting to a central location.", variant: "destructive" });
+            setCenter(FALLBACK_CENTER);
+            setZoom(5);
             if(map) {
               map.panTo(FALLBACK_CENTER);
-              map.setZoom(5);
             }
         }
       );
@@ -169,7 +171,7 @@ export function RegistrationMap({ onPolygonChange }: RegistrationMapProps) {
     >
       <Map
         center={center}
-        zoom={5}
+        zoom={zoom}
         gestureHandling={'cooperative'}
         disableDefaultUI={false}
         mapId="bhumicare_reg_map"
