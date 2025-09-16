@@ -17,12 +17,27 @@ export default function SettingsPage() {
 
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [plotId, setPlotId] = useState('');
+    const [farmCoordinates, setFarmCoordinates] = useState('');
 
     useEffect(() => {
         const storedName = localStorage.getItem('bhumicare_user_name');
         const storedEmail = localStorage.getItem('bhumicare_user_email');
+        const storedPlotId = localStorage.getItem('bhumicare_plot_id');
+        const storedCoords = localStorage.getItem('bhumicare_field_coordinates');
+        
         if (storedName) setName(storedName);
         if (storedEmail) setEmail(storedEmail);
+        if (storedPlotId) setPlotId(storedPlotId);
+        if (storedCoords) {
+             try {
+                const coords = JSON.parse(storedCoords);
+                const formattedCoords = coords.map((c: {lat: number, lng: number}) => `(${c.lat.toFixed(4)}, ${c.lng.toFixed(4)})`).join(', ');
+                setFarmCoordinates(formattedCoords);
+            } catch {
+                setFarmCoordinates('Invalid coordinate data');
+            }
+        }
     }, []);
 
     const handleSaveChanges = (section: string) => {
@@ -95,6 +110,23 @@ export default function SettingsPage() {
                         <Input id="farm-size" type="number" defaultValue="10" />
                     </div>
                     <Button onClick={() => handleSaveChanges('farm details')}>Save Farm Details</Button>
+                </CardContent>
+            </Card>
+            
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline">Farm Geolocation</CardTitle>
+                    <CardDescription>Your registered farm identification and location data.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                     <div className="space-y-2">
+                        <Label htmlFor="plot-id">Plot Unique ID</Label>
+                        <Input id="plot-id" value={plotId} readOnly disabled />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="farm-coordinates">Farm Coordinates (Lat, Lng)</Label>
+                        <Input id="farm-coordinates" value={farmCoordinates} readOnly disabled />
+                    </div>
                 </CardContent>
             </Card>
 

@@ -2,8 +2,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from '@/hooks/use-translation';
-import Image from 'next/image';
 import { Cloud, CloudRain, Sun, Cloudy } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const forecast = [
   { day: 'Mon', temp: 34, icon: <Sun className="h-6 w-6 text-yellow-500" /> },
@@ -15,6 +15,22 @@ const forecast = [
 
 export function WeatherWidget() {
   const { t } = useTranslation();
+  const [location, setLocation] = useState('New Delhi');
+
+  useEffect(() => {
+    const storedLocation = localStorage.getItem('bhumicare_user_location');
+    if (storedLocation) {
+      try {
+        const parsedLocation = JSON.parse(storedLocation);
+        if(parsedLocation.lat && parsedLocation.lng) {
+            setLocation('Your Farm Location');
+        }
+      } catch (error) {
+        console.error("Failed to parse user location for weather widget.", error);
+      }
+    }
+  }, []);
+
   return (
     <Card>
       <CardHeader>
@@ -24,7 +40,7 @@ export function WeatherWidget() {
         <div className="flex flex-col items-center text-center">
             <Sun className="w-16 h-16 text-yellow-400 mb-2" />
           <div className="text-5xl font-bold font-headline">33°C</div>
-          <div className="text-muted-foreground">Sunny, New Delhi</div>
+          <div className="text-muted-foreground">{location === 'New Delhi' ? 'Sunny, New Delhi' : location}</div>
         </div>
         <div className="mt-6 flex justify-around">
           {forecast.map((item) => (

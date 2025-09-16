@@ -21,6 +21,7 @@ export function RegisterForm() {
 
   const nameInputRef = useRef<HTMLInputElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
+  const plotIdInputRef = useRef<HTMLInputElement>(null);
 
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -28,13 +29,11 @@ export function RegisterForm() {
       
       const name = nameInputRef.current?.value;
       const email = emailInputRef.current?.value;
+      const plotId = plotIdInputRef.current?.value;
 
-      if(name) {
-        localStorage.setItem('bhumicare_user_name', name);
-      }
-      if(email) {
-        localStorage.setItem('bhumicare_user_email', email);
-      }
+      if(name) localStorage.setItem('bhumicare_user_name', name);
+      if(email) localStorage.setItem('bhumicare_user_email', email);
+      if(plotId) localStorage.setItem('bhumicare_plot_id', plotId);
       
       // For demonstration, we save to local storage.
       // In a real app, this would be sent to the server.
@@ -55,6 +54,7 @@ export function RegisterForm() {
       } else {
         // If no field is defined, we can clear old data or use a default
          localStorage.removeItem('bhumicare_field_coordinates');
+         localStorage.removeItem('bhumicare_user_location');
       }
       
       toast({
@@ -83,7 +83,7 @@ export function RegisterForm() {
 
       <div className="grid gap-2">
         <Label htmlFor="plot-id">Plot Unique Id</Label>
-        <Input id="plot-id" type="text" className="bg-transparent" />
+        <Input ref={plotIdInputRef} id="plot-id" type="text" className="bg-transparent" />
         <p className="text-xs text-muted-foreground">
           Find your plot ID on the Govt. of Odisha land records portal: {' '}
           <a href="https://bhulekh.ori.nic.in/SearchYourPlot.aspx" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
