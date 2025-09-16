@@ -25,7 +25,7 @@ interface MandiRecord {
 }
 
 const API_KEY = "579b464db66ec23bdd000001a2d46fa589834cba62c71eee3f295ea2"; 
-const API_URL = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${API_KEY}&format=json&limit=5&filters[state]=Odisha`;
+const API_URL = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=${API_KEY}&format=json&limit=5`;
 
 
 export function MarketPrices() {
@@ -75,7 +75,7 @@ export function MarketPrices() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle className='font-headline'>Live Market Prices (Odisha)</CardTitle>
+                <CardTitle className='font-headline'>Live Market Prices (All India)</CardTitle>
                 <CardDescription>Latest commodity prices powered by data.gov.in API (Govt. of India).</CardDescription>
             </CardHeader>
             <CardContent>
@@ -88,7 +88,7 @@ export function MarketPrices() {
                     </div>
                 ) : !error && data.length === 0 ? (
                     <div className="text-center text-muted-foreground p-4 space-y-4">
-                        <p className="text-sm">No live market data available for Odisha at the moment. This may be because markets are closed.</p>
+                        <p className="text-sm">No live market data available at the moment. This may be because markets are closed.</p>
                         <Button onClick={fetchMarketData} variant="secondary">Check Again / View Last Week's Data</Button>
                     </div>
                 ) : (
@@ -97,6 +97,7 @@ export function MarketPrices() {
                             <TableRow>
                                 <TableHead>Commodity</TableHead>
                                 <TableHead>Market</TableHead>
+                                <TableHead>State</TableHead>
                                 <TableHead className='text-right'>Price (₹/Quintal)</TableHead>
                                 <TableHead className='text-right'>Change</TableHead>
                             </TableRow>
@@ -106,6 +107,7 @@ export function MarketPrices() {
                                 <TableRow key={`${item.market}-${item.commodity}-${index}`}>
                                     <TableCell className='font-medium'>{item.commodity}</TableCell>
                                     <TableCell>{item.market}</TableCell>
+                                    <TableCell>{item.state}</TableCell>
                                     <TableCell className='text-right font-mono'>{item.modal_price}</TableCell>
                                     <TableCell className='text-right'>
                                         <Badge variant={item.status === 'up' ? 'default' : 'destructive'} className='flex items-center justify-center gap-1 w-[70px] bg-opacity-70'>
