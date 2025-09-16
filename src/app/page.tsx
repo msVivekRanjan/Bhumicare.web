@@ -14,6 +14,14 @@ import { EndorsementCarousel } from '@/components/landing/endorsement-carousel';
 import { useState } from 'react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ProductCarousel } from '@/components/landing/product-carousel';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id);
 
@@ -71,7 +79,7 @@ const FlipCard = ({ member }: { member: typeof teamMembers[0] }) => {
                     />
                     <h4 className="text-lg font-semibold">{member.name}</h4>
                     <p className="text-sm text-primary/80">{member.role}</p>
-                    <p className="text-xs text-muted-foreground mt-4 italic">Click to know more</p>
+                    <p className="text-xs text-muted-foreground mt-4 italic">Hover to know more</p>
                 </div>
                 
                 {/* Back of card */}
@@ -85,6 +93,33 @@ const FlipCard = ({ member }: { member: typeof teamMembers[0] }) => {
         </div>
     );
 };
+
+const sdgData = [
+  {
+    id: 2,
+    title: "SDG 2: Zero Hunger",
+    description: "Bhumicare helps increase crop yields by up to 30% and reduce resource waste through data-driven farming. This directly contributes to food security and sustainable agriculture, ensuring more food is grown efficiently.",
+    iconUrl: "https://upload.wikimedia.org/wikipedia/commons/b/b7/Sustainable_Development_Goal_02ZeroHunger.svg"
+  },
+  {
+    id: 6,
+    title: "SDG 6: Clean Water and Sanitation",
+    description: "Our AI-powered irrigation advice allows farmers to reduce water usage by up to 40%. By optimizing water application, Bhumicare helps conserve this vital resource and prevent runoff of fertilizers into water bodies.",
+    iconUrl: "https://upload.wikimedia.org/wikipedia/commons/d/de/Sustainable_Development_Goal_06CleanWaterSanitation.svg"
+  },
+  {
+    id: 12,
+    title: "SDG 12: Responsible Consumption and Production",
+    description: "Bhumicare promotes responsible production by enabling precision agriculture. By applying the exact amount of fertilizer and water needed, we reduce chemical waste and encourage a more sustainable consumption cycle.",
+    iconUrl: "https://upload.wikimedia.org/wikipedia/commons/6/65/Sustainable_Development_Goal_12ResponsibleConsumption.svg"
+  },
+  {
+    id: 13,
+    title: "SDG 13: Climate Action",
+    description: "Efficient use of nitrogen-based fertilizers, guided by our real-time data, reduces emissions of nitrous oxide, a potent greenhouse gas. This helps mitigate climate change and promotes climate-resilient agriculture.",
+    iconUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Sustainable_Development_Goal_13Climate.svg"
+  },
+];
 
 
 export default function LandingPage() {
@@ -122,7 +157,7 @@ export default function LandingPage() {
                         className="absolute inset-0 z-0"
                         style={{ background: spotlightStyle }}
                     />
-                    <div className="absolute inset-0 bg-background/80 -z-10" />
+                    <div className="absolute inset-0 bg-background/80 z-0" />
 
                     <motion.div 
                         className="relative z-10 space-y-8 max-w-4xl"
@@ -331,12 +366,28 @@ export default function LandingPage() {
                               <div className="flex items-start gap-4">
                                   <div className="p-3 bg-background rounded-lg border border-white/10"><Check className="h-6 w-6 text-primary" /></div>
                                   <div>
-                                      <h4 className="font-semibold">SDG Contribution</h4>
+                                      <h4 className="font-semibold">SDG Contribution <span className="text-xs font-normal text-muted-foreground">(click icons to know more)</span></h4>
                                       <div className="flex items-center gap-3 mt-2">
-                                          <Image src="https://upload.wikimedia.org/wikipedia/commons/b/b7/Sustainable_Development_Goal_02ZeroHunger.svg" alt="SDG 2" width={32} height={32} />
-                                          <Image src="https://upload.wikimedia.org/wikipedia/commons/d/de/Sustainable_Development_Goal_06CleanWaterSanitation.svg" alt="SDG 6" width={32} height={32} />
-                                          <Image src="https://upload.wikimedia.org/wikipedia/commons/6/65/Sustainable_Development_Goal_12ResponsibleConsumption.svg" alt="SDG 12" width={32} height={32} />
-                                          <Image src="https://upload.wikimedia.org/wikipedia/commons/7/7b/Sustainable_Development_Goal_13Climate.svg" alt="SDG 13" width={32} height={32} />
+                                          {sdgData.map(sdg => (
+                                              <Dialog key={sdg.id}>
+                                                  <DialogTrigger asChild>
+                                                      <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                                          <Image src={sdg.iconUrl} alt={`SDG ${sdg.id}`} width={32} height={32} className="cursor-pointer" />
+                                                      </motion.button>
+                                                  </DialogTrigger>
+                                                  <DialogContent className="sm:max-w-md bg-background/80 backdrop-blur-xl border-primary/20">
+                                                      <DialogHeader>
+                                                          <div className="flex justify-center mb-4">
+                                                            <Image src={sdg.iconUrl} alt={sdg.title} width={64} height={64} />
+                                                          </div>
+                                                          <DialogTitle className="text-center font-headline text-2xl">{sdg.title}</DialogTitle>
+                                                      </DialogHeader>
+                                                      <p className="text-muted-foreground text-center px-4 pb-4">
+                                                         {sdg.description}
+                                                      </p>
+                                                  </DialogContent>
+                                              </Dialog>
+                                          ))}
                                       </div>
                                   </div>
                             </div>
@@ -406,7 +457,7 @@ export default function LandingPage() {
                               transition={{ duration: 0.8, ease: 'easeOut' }}
                               className="relative p-12 bg-background-secondary border border-white/10 rounded-2xl overflow-hidden"
                           >
-                              <div className="absolute inset-0 bg-aurora-cta -z-10" />
+                              <div className="absolute inset-0 bg-aurora-cta z-[-1]" />
                               <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">Ready to Transform Your Farm?</h2>
                               <p className="text-lg text-muted-foreground max-w-2xl mx-auto mt-4 mb-8">
                                   Join the future of farming today. Get real-time soil data, AI-powered advice, and increase your profitability.

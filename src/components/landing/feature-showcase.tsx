@@ -96,7 +96,7 @@ export const FeatureShowcase = () => {
                         ))}
                     </div>
 
-                    <div className="space-y-16">
+                    <div className="hidden lg:flex flex-col space-y-8">
                         {features.map((feature, index) => (
                              <div 
                                 key={feature.id} 
