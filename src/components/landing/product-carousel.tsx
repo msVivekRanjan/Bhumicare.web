@@ -5,7 +5,7 @@ import useEmblaCarousel, { EmblaOptionsType } from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { DotButton, PrevButton, NextButton } from './carousel-buttons';
 import { cn } from '@/lib/utils';
 
@@ -104,13 +104,16 @@ export const ProductCarousel = () => {
             <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
                 <DialogContent className="max-w-4xl p-2 bg-background/80 backdrop-blur-xl border-white/20">
                     {lightboxImage && (
-                        <Image
-                            src={lightboxImage.imageUrl}
-                            alt={lightboxImage.description}
-                            width={1200}
-                            height={800}
-                            className="w-full h-auto object-contain rounded-lg"
-                        />
+                        <>
+                           <DialogTitle className="sr-only">{lightboxImage.description}</DialogTitle>
+                           <Image
+                                src={lightboxImage.imageUrl}
+                                alt={lightboxImage.description}
+                                width={1200}
+                                height={800}
+                                className="w-full h-auto object-contain rounded-lg"
+                            />
+                        </>
                     )}
                 </DialogContent>
             </Dialog>
