@@ -28,19 +28,16 @@ export function RecommendationCard() {
   const fetchRecommendation = async () => {
     setLoading(true);
     setError(null);
+    setRecommendation(null);
     try {
       const result = await getSmartRecommendation(mockSensorData);
       setRecommendation(result);
     } catch (err) {
-      setError('Failed to fetch recommendation.');
+      setError('Failed to fetch recommendation. You may have exceeded your API quota.');
       console.error(err);
     }
     setLoading(false);
   };
-  
-  useEffect(() => {
-    fetchRecommendation();
-  }, []);
 
   return (
     <Card>
@@ -56,9 +53,13 @@ export function RecommendationCard() {
           </div>
         ) : error ? (
           <p className="text-sm text-destructive">{error}</p>
-        ) : (
+        ) : recommendation ? (
           <p className="text-sm text-muted-foreground leading-relaxed">
-            {recommendation?.recommendation}
+            {recommendation.recommendation}
+          </p>
+        ) : (
+           <p className="text-sm text-muted-foreground leading-relaxed">
+            Click the button below to generate an AI-powered recommendation based on your latest farm data.
           </p>
         )}
         <Button onClick={fetchRecommendation} disabled={loading} className="w-full" variant="secondary">
