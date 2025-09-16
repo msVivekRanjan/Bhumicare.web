@@ -332,10 +332,10 @@ export default function LandingPage() {
                                   <div>
                                       <h4 className="font-semibold">SDG Contribution</h4>
                                       <div className="flex items-center gap-3 mt-2">
-                                          <Image src="https://commons.wikimedia.org/wiki/File:Sustainable_Development_Goals.svg#/media/File:Sustainable_Development_Goal_02ZeroHunger.svg" alt="SDG 2" width={32} height={32} />
-                                          <Image src="https://commons.wikimedia.org/wiki/File:Sustainable_Development_Goals.svg#/media/File:Sustainable_Development_Goal_06CleanWaterSanitation.svg" alt="SDG 6" width={32} height={32} />
-                                          <Image src="https://commons.wikimedia.org/wiki/File:Sustainable_Development_Goals.svg#/media/File:Sustainable_Development_Goal_12ResponsibleConsumption.svg" alt="SDG 12" width={32} height={32} />
-                                          <Image src="https://commons.wikimedia.org/wiki/File:Sustainable_Development_Goals.svg#/media/File:Sustainable_Development_Goal_13Climate.svg" alt="SDG 13" width={32} height={32} />
+                                          <Image src="https://upload.wikimedia.org/wikipedia/commons/b/b7/Sustainable_Development_Goal_02ZeroHunger.svg" alt="SDG 2" width={32} height={32} />
+                                          <Image src="https://upload.wikimedia.org/wikipedia/commons/d/de/Sustainable_Development_Goal_06CleanWaterSanitation.svg" alt="SDG 6" width={32} height={32} />
+                                          <Image src="https://upload.wikimedia.org/wikipedia/commons/6/65/Sustainable_Development_Goal_12ResponsibleConsumption.svg" alt="SDG 12" width={32} height={32} />
+                                          <Image src="https://upload.wikimedia.org/wikipedia/commons/7/7b/Sustainable_Development_Goal_13Climate.svg" alt="SDG 13" width={32} height={32} />
                                       </div>
                                   </div>
                             </div>
