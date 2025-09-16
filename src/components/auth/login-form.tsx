@@ -25,7 +25,7 @@ export function LoginForm() {
           type="email"
           placeholder="m@example.com"
           required
-          defaultValue="farmer@bhumicare.com"
+          defaultValue="vivek@bhumicare.com"
           className="bg-transparent"
         />
       </div>

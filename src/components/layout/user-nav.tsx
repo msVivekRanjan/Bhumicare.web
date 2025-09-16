@@ -18,8 +18,8 @@ import { useEffect, useState } from 'react';
 
 export function UserNav() {
   const { t } = useTranslation();
-  const [name, setName] = useState('Farmer');
-  const [email, setEmail] = useState('farmer@bhumicare.com');
+  const [name, setName] = useState('Vivek Ranjan');
+  const [email, setEmail] = useState('vivek@bhumicare.com');
 
   useEffect(() => {
     const storedName = localStorage.getItem('bhumicare_user_name');

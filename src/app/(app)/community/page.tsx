@@ -48,7 +48,7 @@ export default function CommunityForumPage() {
     const handleAddPost = (content: string) => {
         const newPost = {
             id: `${Date.now()}`,
-            author: 'Farmer', // Assuming the current user
+            author: 'Vivek', // Assuming the current user
             avatar: 'https://picsum.photos/seed/user1/40/40',
             timestamp: 'Just now',
             content,
