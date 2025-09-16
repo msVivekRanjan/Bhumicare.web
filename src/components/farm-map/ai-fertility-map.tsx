@@ -505,7 +505,7 @@ export function AIFertilityMap() {
     }
     
     return (
-        <ErrorBoundary fallback={<p className='p-4 text-center text-muted-foreground'>The map could not load. Please check your Google Maps API key.</p>}>
+        <ErrorBoundary fallback={<p className='p-4 text-center text-destructive'>The map could not load. Please check your Google Maps API key in `src/lib/constants.ts`.</p>}>
             <APIProvider apiKey={GOOGLE_MAPS_API_KEY} libraries={['geometry']}>
                 <div ref={mapContainerRef} className="w-full h-full relative bg-muted">
                     <Map

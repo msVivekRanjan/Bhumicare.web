@@ -84,7 +84,7 @@ export function RegisterForm() {
       <div className="grid gap-2">
         <Label>{t('define_field_boundary')}</Label>
         <div className="h-96 w-full rounded-lg overflow-hidden border">
-          <ErrorBoundary fallback={<p>Something went wrong with the map.</p>}>
+          <ErrorBoundary fallback={<p className='p-4 text-center text-destructive'>Map could not load. Please check your Google Maps API Key in `src/lib/constants.ts`.</p>}>
             <APIProvider apiKey={GOOGLE_MAPS_API_KEY} libraries={['drawing', 'geometry']}>
                   <RegistrationMap onPolygonChange={setFieldCoordinates} />
             </APIProvider>
