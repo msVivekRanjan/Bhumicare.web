@@ -82,6 +82,17 @@ export function RegisterForm() {
       </div>
 
       <div className="grid gap-2">
+        <Label htmlFor="plot-id">Plot Unique Id</Label>
+        <Input id="plot-id" type="text" className="bg-background/50" />
+        <p className="text-xs text-muted-foreground">
+          Find your plot ID on the Govt. of Odisha land records portal: {' '}
+          <a href="https://bhulekh.ori.nic.in/SearchYourPlot.aspx" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
+            Bhulekh Odisha
+          </a>
+        </p>
+      </div>
+
+      <div className="grid gap-2">
         <Label>{t('define_field_boundary')}</Label>
         <div className="h-96 w-full rounded-lg overflow-hidden border">
           <ErrorBoundary fallback={<p className='p-4 text-center text-destructive'>The map could not load. The Google Maps API key in `src/lib/constants.ts` is likely invalid or missing. Please replace it with your own key.</p>}>
