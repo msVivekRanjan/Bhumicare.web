@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { getSmartRecommendation } from '@/ai/flows/smart-recommendations';
 import { useTranslation } from '@/hooks/use-translation';
 import { Skeleton } from '../ui/skeleton';
+import ErrorBoundary from '../error-boundary';
 
 const INDIA_CENTER = { lat: 20.5937, lng: 78.9629 };
 const GRID_RESOLUTION = 7; // Use a 7x7 grid
@@ -504,29 +505,31 @@ export function AIFertilityMap() {
     }
     
     return (
-        <APIProvider apiKey={GOOGLE_MAPS_API_KEY} libraries={['geometry']}>
-            <div ref={mapContainerRef} className="w-full h-full relative bg-muted">
-                <Map
-                    defaultCenter={INDIA_CENTER}
-                    defaultZoom={5}
-                    gestureHandling={'cooperative'}
-                    mapId={'bhumicare_ai_fertility_map'}
-                    mapTypeId="satellite"
-                    disableDefaultUI={false}
-                    zoomControl={true}
-                    mapTypeControl={true}
-                    streetViewControl={true}
-                    fullscreenControl={false}
-                >
-                    <BivariateMap />
-                </Map>
-                 <div className="absolute top-4 right-4 z-10">
-                    <Button type="button" size="icon" variant="secondary" onClick={handleFullscreen} title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}>
-                        {isFullscreen ? <Shrink className="h-5 w-5" /> : <Expand className="h-5 w-5" />}
-                    </Button>
+        <ErrorBoundary fallback={<p className='p-4 text-center text-muted-foreground'>The map could not load. Please check your Google Maps API key.</p>}>
+            <APIProvider apiKey={GOOGLE_MAPS_API_KEY} libraries={['geometry']}>
+                <div ref={mapContainerRef} className="w-full h-full relative bg-muted">
+                    <Map
+                        defaultCenter={INDIA_CENTER}
+                        defaultZoom={5}
+                        gestureHandling={'cooperative'}
+                        mapId={'bhumicare_ai_fertility_map'}
+                        mapTypeId="satellite"
+                        disableDefaultUI={false}
+                        zoomControl={true}
+                        mapTypeControl={true}
+                        streetViewControl={true}
+                        fullscreenControl={false}
+                    >
+                        <BivariateMap />
+                    </Map>
+                     <div className="absolute top-4 right-4 z-10">
+                        <Button type="button" size="icon" variant="secondary" onClick={handleFullscreen} title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}>
+                            {isFullscreen ? <Shrink className="h-5 w-5" /> : <Expand className="h-5 w-5" />}
+                        </Button>
+                    </div>
                 </div>
-            </div>
-        </APIProvider>
+            </APIProvider>
+        </ErrorBoundary>
     );
 }
 
