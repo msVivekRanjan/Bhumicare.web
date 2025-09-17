@@ -22,15 +22,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useTranslation } from '@/hooks/use-translation';
 
 const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id);
-
-const teamMembers = [
-    { name: 'Raj Sahasransu Biswal', avatarUrl: getImage('team-raj')?.imageUrl!, role: 'Project Lead', bio: 'Raj is the visionary behind Bhumicare, leading the AI development and full-stack architecture to turn complex data into actionable insights for farmers.', linkedin: '#' },
-    { name: 'Vivek Ranjan Sahoo', avatarUrl: getImage('team-vivek')?.imageUrl!, role: 'UI/UX & Frontend', bio: 'Vivek crafts the user experience, ensuring the Bhumicare dashboard is intuitive, accessible, and presents complex information in a simple, beautiful interface.', linkedin: '#' },
-    { name: 'Ayush Ranjan Pradhan', avatarUrl: getImage('team-ayush')?.imageUrl!, role: 'Hardware & IoT', bio: 'Ayush engineers the heart of our solution—the IoT device. His expertise in hardware ensures our sensors are reliable, accurate, and built to last in the field.', linkedin: '#' },
-    { name: 'Subasis Mishra', avatarUrl: getImage('team-subasis')?.imageUrl!, role: 'App Developer', bio: 'Subasis drives the product strategy and market outreach, connecting our technology with the farmers and organizations who need it most.', linkedin: '#' },
-];
 
 const Section = ({ children, className, id, ...props }: { children: React.ReactNode, className?: string, id?: string }) => (
     <motion.section
@@ -53,7 +47,8 @@ const SectionDivider = () => (
 )
 
 
-const FlipCard = ({ member }: { member: typeof teamMembers[0] }) => {
+const FlipCard = ({ member }: { member: ReturnType<typeof useTeamMembers>[0] }) => {
+    const { t } = useTranslation();
     const [isFlipped, setIsFlipped] = useState(false);
 
     return (
@@ -79,7 +74,7 @@ const FlipCard = ({ member }: { member: typeof teamMembers[0] }) => {
                     />
                     <h4 className="text-lg font-semibold">{member.name}</h4>
                     <p className="text-sm text-primary/80">{member.role}</p>
-                    <p className="text-xs text-muted-foreground mt-4 italic">Hover to know more</p>
+                    <p className="text-xs text-muted-foreground mt-4 italic">{t('hover_to_know_more')}</p>
                 </div>
                 
                 {/* Back of card */}
@@ -94,35 +89,51 @@ const FlipCard = ({ member }: { member: typeof teamMembers[0] }) => {
     );
 };
 
-const sdgData = [
-  {
-    id: 2,
-    imageId: 'sdg-2',
-    title: "SDG 2: Zero Hunger",
-    description: "Bhumicare helps increase crop yields by up to 30% and reduce resource waste through data-driven farming. This directly contributes to food security and sustainable agriculture, ensuring more food is grown efficiently.",
-  },
-  {
-    id: 6,
-    imageId: 'sdg-6',
-    title: "SDG 6: Clean Water and Sanitation",
-    description: "Our AI-powered irrigation advice allows farmers to reduce water usage by up to 40%. By optimizing water application, Bhumicare helps conserve this vital resource and prevent runoff of fertilizers into water bodies.",
-  },
-  {
-    id: 12,
-    imageId: 'sdg-12',
-    title: "SDG 12: Responsible Consumption and Production",
-    description: "Bhumicare promotes responsible production by enabling precision agriculture. By applying the exact amount of fertilizer and water needed, we reduce chemical waste and encourage a more sustainable consumption cycle.",
-  },
-  {
-    id: 13,
-    imageId: 'sdg-13',
-    title: "SDG 13: Climate Action",
-    description: "Efficient use of nitrogen-based fertilizers, guided by our real-time data, reduces emissions of nitrous oxide, a potent greenhouse gas. This helps mitigate climate change and promotes climate-resilient agriculture.",
-  },
-];
+const useTeamMembers = () => {
+    const { t } = useTranslation();
+    return [
+        { name: t('team_member_1_name'), avatarUrl: getImage('team-raj')?.imageUrl!, role: t('team_member_1_role'), bio: t('team_member_1_bio'), linkedin: '#' },
+        { name: t('team_member_2_name'), avatarUrl: getImage('team-vivek')?.imageUrl!, role: t('team_member_2_role'), bio: t('team_member_2_bio'), linkedin: '#' },
+        { name: t('team_member_3_name'), avatarUrl: getImage('team-ayush')?.imageUrl!, role: t('team_member_3_role'), bio: t('team_member_3_bio'), linkedin: '#' },
+        { name: t('team_member_4_name'), avatarUrl: getImage('team-subasis')?.imageUrl!, role: t('team_member_4_role'), bio: t('team_member_4_bio'), linkedin: '#' },
+    ];
+};
+
+const useSdgData = () => {
+    const { t } = useTranslation();
+    return [
+        {
+            id: 2,
+            imageId: 'sdg-2',
+            title: t('sdg_2_title'),
+            description: t('sdg_2_desc'),
+        },
+        {
+            id: 6,
+            imageId: 'sdg-6',
+            title: t('sdg_6_title'),
+            description: t('sdg_6_desc'),
+        },
+        {
+            id: 12,
+            imageId: 'sdg-12',
+            title: t('sdg_12_title'),
+            description: t('sdg_12_desc'),
+        },
+        {
+            id: 13,
+            imageId: 'sdg-13',
+            title: t('sdg_13_title'),
+            description: t('sdg_13_desc'),
+        },
+    ];
+}
 
 
 export default function LandingPage() {
+    const { t } = useTranslation();
+    const teamMembers = useTeamMembers();
+    const sdgData = useSdgData();
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
 
@@ -173,23 +184,23 @@ export default function LandingPage() {
                             className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter"
                             variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } }}}
                         >
-                            From Guesswork to Guidance
+                            {t('hero_title')}
                         </motion.h1>
                         <motion.p 
                             className="text-lg md:text-xl text-foreground/80 max-w-3xl mx-auto"
                             variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } }}}
                         >
-                            Bhumicare replaces outdated reports with simple, actionable advice, helping farmers increase yields, save resources, and secure their future.
+                            {t('hero_subtitle')}
                         </motion.p>
                         <motion.div 
                             className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
                             variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } }}}
                         >
                             <Button size="lg" asChild className="w-full sm:w-auto">
-                                <Link href="/register">Get Started Free</Link>
+                                <Link href="/register">{t('get_started_free')}</Link>
                             </Button>
                             <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
-                                <Link href="#how-it-works">How It Works</Link>
+                                <Link href="#how-it-works">{t('how_it_works')}</Link>
                             </Button>
                         </motion.div>
                     </motion.div>
@@ -204,22 +215,22 @@ export default function LandingPage() {
                   <Section id="problem">
                       <div className="grid lg:grid-cols-2 gap-12 items-center">
                           <div className="space-y-4">
-                              <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">The Challenge Facing Indian Agriculture</h2>
+                              <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">{t('problem_title')}</h2>
                               <p className="text-lg text-muted-foreground">
-                                  Today, both farmers and the government face the same big problem: wrong or missing soil data. This leads to wasted resources and uncertainty. Farmers guess on water and fertilizer because soil tests are rare and slow. Official surveys are costly, infrequent, and quickly become obsolete.
+                                  {t('problem_desc')}
                               </p>
                               <ul className="space-y-3 pt-4">
                                   <li className="flex items-center gap-3">
                                       <Check className="h-5 w-5 text-primary" />
-                                      <span className="text-muted-foreground">Inefficient resource use (water, fertilizer)</span>
+                                      <span className="text-muted-foreground">{t('problem_point_1')}</span>
                                   </li>
                                   <li className="flex items-center gap-3">
                                       <Check className="h-5 w-5 text-primary" />
-                                      <span className="text-muted-foreground">Outdated data for policy-making</span>
+                                      <span className="text-muted-foreground">{t('problem_point_2')}</span>
                                   </li>
                                   <li className="flex items-center gap-3">
                                       <Check className="h-5 w-5 text-primary" />
-                                      <span className="text-muted-foreground">Uncertainty in crop and yield planning</span>
+                                      <span className="text-muted-foreground">{t('problem_point_3')}</span>
                                   </li>
                               </ul>
                           </div>
@@ -249,9 +260,9 @@ export default function LandingPage() {
                   {/* Dashboard Preview Section */}
                   <Section id="dashboard-preview">
                       <div className="text-center max-w-4xl mx-auto space-y-6">
-                          <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">Your Central Hub for Soil Intelligence</h2>
+                          <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">{t('dashboard_preview_title')}</h2>
                           <p className="text-lg text-muted-foreground">
-                              Our intuitive dashboard makes complex soil data simple to understand and act upon. Get real-time metrics, AI-powered recommendations, and historical trends at a glance.
+                              {t('dashboard_preview_desc')}
                           </p>
                       </div>
                       <motion.div 
@@ -296,17 +307,17 @@ export default function LandingPage() {
                   {/* How It Works Section */}
                   <Section id="how-it-works">
                       <div className="text-center max-w-4xl mx-auto space-y-4 mb-16">
-                          <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">Simple Technology, Powerful Results</h2>
-                          <p className="text-lg text-muted-foreground">A seamless 4-step process from soil to solution.</p>
+                          <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">{t('how_it_works_title')}</h2>
+                          <p className="text-lg text-muted-foreground">{t('how_it_works_subtitle')}</p>
                       </div>
                       <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                           <div className="absolute top-1/2 left-0 w-full h-px bg-border -translate-y-1/2 hidden lg:block" />
                           {
                               [
-                                  { icon: Cpu, title: '1. Sense', description: 'Our IoT device continuously measures NPK, pH, moisture, and temperature in the soil.' },
-                                  { icon: Cloud, title: '2. Sync', description: 'Data is sent to the cloud via Wi-Fi, LoRa, or 5G, with offline caching for reliability.' },
-                                  { icon: BrainCircuit, title: '3. Analyze', description: 'Our AI advisor combines soil, crop, and weather data to generate insights.' },
-                                  { icon: MicVocal, title: '4. Advise', description: 'Receive simple, voice-first advice in your own language directly on the app.' },
+                                  { icon: Cpu, title: `1. ${t('how_it_works_step_1_title')}`, description: t('how_it_works_step_1_desc') },
+                                  { icon: Cloud, title: `2. ${t('how_it_works_step_2_title')}`, description: t('how_it_works_step_2_desc') },
+                                  { icon: BrainCircuit, title: `3. ${t('how_it_works_step_3_title')}`, description: t('how_it_works_step_3_desc') },
+                                  { icon: MicVocal, title: `4. ${t('how_it_works_step_4_title')}`, description: t('how_it_works_step_4_desc') },
                               ].map((step, index) => (
                                   <motion.div 
                                       key={index}
@@ -331,21 +342,21 @@ export default function LandingPage() {
                   <Section id="impact">
                       <div className="grid lg:grid-cols-2 gap-16 items-center">
                           <div className="space-y-6">
-                              <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">Grow More. Spend Less. Protect the Future.</h2>
-                              <p className="text-lg text-muted-foreground">Bhumicare delivers tangible, data-driven results that empower farmers and strengthen the agricultural ecosystem.</p>
+                              <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">{t('impact_title')}</h2>
+                              <p className="text-lg text-muted-foreground">{t('impact_desc')}</p>
                               {/* Core Metrics */}
                               <div className="flex flex-col sm:flex-row gap-8 pt-4">
                                   <div className="text-left">
                                       <AnimatedNumber value={30} className="text-5xl font-bold text-primary" prefix="+" />
-                                      <p className="text-muted-foreground mt-1">Crop Yield Increase</p>
+                                      <p className="text-muted-foreground mt-1">{t('impact_metric_1')}</p>
                                   </div>
                                   <div className="text-left">
                                       <AnimatedNumber value={30} className="text-5xl font-bold text-primary" prefix="-" />
-                                      <p className="text-muted-foreground mt-1">Fertilizer Costs</p>
+                                      <p className="text-muted-foreground mt-1">{t('impact_metric_2')}</p>
                                   </div>
                                   <div className="text-left">
                                       <AnimatedNumber value={40} className="text-5xl font-bold text-primary" prefix="-" />
-                                      <p className="text-muted-foreground mt-1">Water Usage</p>
+                                      <p className="text-muted-foreground mt-1">{t('impact_metric_3')}</p>
                                   </div>
                               </div>
                           </div>
@@ -354,21 +365,21 @@ export default function LandingPage() {
                             <div className="flex items-start gap-4">
                                   <div className="p-3 bg-background rounded-lg border border-white/10"><Cpu className="h-6 w-6 text-secondary" /></div>
                                   <div>
-                                      <h4 className="font-semibold">Validated Technology</h4>
-                                      <p className="text-muted-foreground text-sm">Technology Readiness Level: TRL 4, field-tested and ready for deployment.</p>
+                                      <h4 className="font-semibold">{t('impact_validated_tech_title')}</h4>
+                                      <p className="text-muted-foreground text-sm">{t('impact_validated_tech_desc')}</p>
                                   </div>
                             </div>
                               <div className="flex items-start gap-4">
                                   {ashokaImage && <div className="p-3 bg-background rounded-lg border border-white/10"><Image src={ashokaImage.imageUrl} alt={ashokaImage.description} width={24} height={24} className="filter-white"/></div>}
                                   <div>
-                                      <h4 className="font-semibold">National Alignment</h4>
-                                      <p className="text-muted-foreground text-sm">Supports Digital Agriculture Mission, PM-KISAN, and more.</p>
+                                      <h4 className="font-semibold">{t('impact_alignment_title')}</h4>
+                                      <p className="text-muted-foreground text-sm">{t('impact_alignment_desc')}</p>
                                   </div>
                             </div>
                               <div className="flex items-start gap-4">
                                   <div className="p-3 bg-background rounded-lg border border-white/10"><Check className="h-6 w-6 text-primary" /></div>
                                   <div>
-                                      <h4 className="font-semibold">SDG Contribution <span className="text-xs font-normal text-muted-foreground">(click icons to know more)</span></h4>
+                                      <h4 className="font-semibold">{t('impact_sdg_title')} <span className="text-xs font-normal text-muted-foreground">{t('click_icons_to_know_more')}</span></h4>
                                       <div className="flex items-center gap-3 mt-2">
                                           {sdgData.map(sdg => {
                                             const sdgImage = getImage(sdg.imageId);
@@ -404,13 +415,13 @@ export default function LandingPage() {
                    {/* Product Testing Gallery */}
                     <Section id="product-gallery">
                         <div className="text-center max-w-4xl mx-auto space-y-4 mb-16">
-                            <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">Hardware in Action</h2>
-                            <p className="text-lg text-muted-foreground">From prototype to field, see the evolution of our IoT device.</p>
+                            <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">{t('product_gallery_title')}</h2>
+                            <p className="text-lg text-muted-foreground">{t('product_gallery_subtitle')}</p>
                         </div>
                         <ProductCarousel />
                         <div className="text-center mt-8 max-w-2xl mx-auto">
                             <p className="text-sm text-muted-foreground">
-                                Our proprietary hardware is currently at Technology Readiness Level 5 (TRL 5), undergoing rigorous testing in simulated and real-world environments to ensure accuracy and durability.
+                                {t('product_gallery_footer')}
                             </p>
                         </div>
                     </Section>
@@ -419,7 +430,7 @@ export default function LandingPage() {
                   {/* Testimonials Section */}
                   <Section id="testimonials">
                       <div className="text-center max-w-4xl mx-auto space-y-4 mb-16">
-                          <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">What Experts & Farmers Are Saying</h2>
+                          <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">{t('testimonials_title')}</h2>
                       </div>
                       <EndorsementCarousel />
                   </Section>
@@ -428,8 +439,8 @@ export default function LandingPage() {
                   {/* Team & Supporters Section */}
                   <Section id="team">
                       <div className="text-center max-w-4xl mx-auto space-y-6 mb-16">
-                          <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">Our Team & Supporters</h2>
-                          <p className="text-lg text-muted-foreground">We are a passionate team of engineers and innovators dedicated to revolutionizing agriculture.</p>
+                          <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">{t('team_title')}</h2>
+                          <p className="text-lg text-muted-foreground">{t('team_subtitle')}</p>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
                           {teamMembers.map((member, i) => (
@@ -445,7 +456,7 @@ export default function LandingPage() {
                           ))}
                       </div>
                       <div className="text-center mt-24">
-                          <p className="text-lg text-muted-foreground">Proudly Supported and Incubated by</p>
+                          <p className="text-lg text-muted-foreground">{t('team_supported_by')}</p>
                           <div className="mt-6 flex justify-center items-center">
                             {aicSoaLogo && <Image src={aicSoaLogo.imageUrl} alt={aicSoaLogo.description} data-ai-hint={aicSoaLogo.imageHint} width={200} height={80} className="filter-grayscale contrast-0 brightness-200" />}
                           </div>
@@ -463,12 +474,12 @@ export default function LandingPage() {
                               className="relative p-12 bg-background-secondary border border-white/10 rounded-2xl overflow-hidden"
                           >
                               <div className="absolute inset-0 bg-aurora-cta z-[-1]" />
-                              <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">Ready to Transform Your Farm?</h2>
+                              <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">{t('cta_title')}</h2>
                               <p className="text-lg text-muted-foreground max-w-2xl mx-auto mt-4 mb-8">
-                                  Join the future of farming today. Get real-time soil data, AI-powered advice, and increase your profitability.
+                                  {t('cta_subtitle')}
                               </p>
                               <Button size="lg" asChild>
-                                  <Link href="/register">Get Started For Free</Link>
+                                  <Link href="/register">{t('get_started_for_free')}</Link>
                               </Button>
                           </motion.div>
                       </div>

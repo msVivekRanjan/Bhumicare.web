@@ -9,8 +9,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { ThemeToggle } from '../layout/theme-toggle';
 import { LanguageSwitcher } from '../layout/language-switcher';
+import { useTranslation } from '@/hooks/use-translation';
 
 export function LandingHeader() {
+    const { t } = useTranslation();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -31,9 +33,9 @@ export function LandingHeader() {
     }, [isMenuOpen]);
 
     const navLinks = [
-        { href: '#solution', label: 'Solution' },
-        { href: '#impact', label: 'Impact' },
-        { href: '#team', label: 'Team' },
+        { href: '#solution', label: t('solution') },
+        { href: '#impact', label: t('impact') },
+        { href: '#team', label: t('team') },
     ];
     
     const handleScroll = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -96,10 +98,10 @@ export function LandingHeader() {
                         <LanguageSwitcher />
                         <ThemeToggle />
                         <Button variant="ghost" asChild>
-                            <Link href="/login">Login</Link>
+                            <Link href="/login">{t('login')}</Link>
                         </Button>
                         <Button asChild>
-                            <Link href="/register">Get Started</Link>
+                            <Link href="/register">{t('get_started')}</Link>
                         </Button>
                     </div>
 
@@ -159,10 +161,10 @@ export function LandingHeader() {
                                         <ThemeToggle />
                                     </div>
                                     <Button variant="outline" size="lg" asChild>
-                                        <Link href="/login" onClick={() => setIsMenuOpen(false)}>Login</Link>
+                                        <Link href="/login" onClick={() => setIsMenuOpen(false)}>{t('login')}</Link>
                                     </Button>
                                     <Button size="lg" asChild>
-                                        <Link href="/register" onClick={() => setIsMenuOpen(false)}>Get Started</Link>
+                                        <Link href="/register" onClick={() => setIsMenuOpen(false)}>{t('get_started')}</Link>
                                     </Button>
                                 </motion.div>
                             </nav>

@@ -6,42 +6,48 @@ import { Sprout, Mic, CheckCircle, Leaf } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { useTranslation } from "@/hooks/use-translation";
 
 const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id);
 
 
-const features = [
-    {
-        title: "Live Soil Health Data",
-        description: "Get continuous, real-time data on soil nutrients (NPK), pH, and moisture, replacing infrequent and slow lab tests.",
-        id: "live-data",
-        icon: Sprout,
-        image: getImage('feature-live-data')?.imageUrl!
-    },
-    {
-        title: "Voice-First AI Advice",
-        description: "Receive simple, actionable guidance in regional dialects (Hindi, Odia, English) that farmers can easily understand and act upon.",
-        id: "ai-advice",
-        icon: Mic,
-        image: getImage('feature-ai-advice')?.imageUrl!
-    },
-    {
-        title: "Dynamic Soil Fertility Maps",
-        description: "Live, aggregated maps provide a ground-level truth for farmers and policymakers, unlike static government surveys.",
-        id: "fertility-maps",
-        icon: Leaf,
-        image: getImage('feature-fertility-maps')?.imageUrl!
-    },
-     {
-        title: "Offline-First Design",
-        description: "The device and app are designed to work reliably even without a stable internet connection, caching data until it can sync.",
-        id: "offline-first",
-        icon: CheckCircle,
-        image: getImage('feature-offline-first')?.imageUrl!
-    },
-];
+const useFeatures = () => {
+    const { t } = useTranslation();
+    return [
+        {
+            title: t('feature_1_title'),
+            description: t('feature_1_desc'),
+            id: "live-data",
+            icon: Sprout,
+            image: getImage('feature-live-data')?.imageUrl!
+        },
+        {
+            title: t('feature_2_title'),
+            description: t('feature_2_desc'),
+            id: "ai-advice",
+            icon: Mic,
+            image: getImage('feature-ai-advice')?.imageUrl!
+        },
+        {
+            title: t('feature_3_title'),
+            description: t('feature_3_desc'),
+            id: "fertility-maps",
+            icon: Leaf,
+            image: getImage('feature-fertility-maps')?.imageUrl!
+        },
+        {
+            title: t('feature_4_title'),
+            description: t('feature_4_desc'),
+            id: "offline-first",
+            icon: CheckCircle,
+            image: getImage('feature-offline-first')?.imageUrl!
+        },
+    ];
+};
 
 export const FeatureShowcase = () => {
+    const { t } = useTranslation();
+    const features = useFeatures();
     const [activeFeature, setActiveFeature] = useState(features[0].id);
     const featureRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -73,8 +79,8 @@ export const FeatureShowcase = () => {
         <section id="solution" className="relative py-24 sm:py-32 px-6">
             <div className="container mx-auto max-w-7xl">
                 <div className="text-center max-w-4xl mx-auto space-y-4 mb-16">
-                    <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">This is Where Bhumicare Makes the Difference</h2>
-                    <p className="text-lg text-muted-foreground">Our integrated system of hardware and AI provides a complete, modern solution to an age-old problem.</p>
+                    <h2 className="text-3xl md:text-4xl font-semibold tracking-tighter">{t('solution_title')}</h2>
+                    <p className="text-lg text-muted-foreground">{t('solution_subtitle')}</p>
                 </div>
                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
                      <div className="lg:sticky top-24 space-y-8">

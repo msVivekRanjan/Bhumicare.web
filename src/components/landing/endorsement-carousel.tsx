@@ -11,32 +11,37 @@ import {
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { PlaceHolderImages } from '@/lib/placeholder-images'
+import { useTranslation } from '@/hooks/use-translation'
 
 const getImage = (id: string) => PlaceHolderImages.find(img => img.id === id);
 
 
-const endorsements = [
-  {
-    quote: "Bhumicare's ground-level data is the missing piece in precision agriculture. It has the potential to revolutionize how we manage soil health at scale.",
-    author: "Dr. Anjali Verma",
-    title: "Agricultural Scientist, IARI",
-    avatar: getImage('endorsement-scientist')?.imageUrl!
-  },
-  {
-    quote: "A brilliant application of IoT and AI to solve a real-world problem for millions. This is the future of sustainable farming.",
-    author: "Rohan Mehta",
-    title: "Startup Mentor, AGNIi",
-     avatar: getImage('endorsement-mentor')?.imageUrl!
-  },
-  {
-    quote: "The simplicity of receiving advice in my own dialect makes all the difference. It's like having an expert in my pocket.",
-    author: "Suresh Patel",
-    title: "Farmer, Odisha",
-     avatar: getImage('endorsement-farmer')?.imageUrl!
-  }
-]
+const useEndorsements = () => {
+    const { t } = useTranslation();
+    return [
+        {
+            quote: t('testimonial_1_quote'),
+            author: t('testimonial_1_author'),
+            title: t('testimonial_1_title'),
+            avatar: getImage('endorsement-scientist')?.imageUrl!
+        },
+        {
+            quote: t('testimonial_2_quote'),
+            author: t('testimonial_2_author'),
+            title: t('testimonial_2_title'),
+            avatar: getImage('endorsement-mentor')?.imageUrl!
+        },
+        {
+            quote: t('testimonial_3_quote'),
+            author: t('testimonial_3_author'),
+            title: t('testimonial_3_title'),
+            avatar: getImage('endorsement-farmer')?.imageUrl!
+        }
+    ];
+}
 
 export const EndorsementCarousel = () => {
+  const endorsements = useEndorsements();
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 5000, stopOnInteraction: true, stopOnMouseEnter: true })])
   const [prevBtnEnabled, setPrevBtnEnabled] = useState(false)
   const [nextBtnEnabled, setNextBtnEnabled] = useState(false)
