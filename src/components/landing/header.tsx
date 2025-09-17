@@ -7,6 +7,8 @@ import { BhumicareLogo } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
+import { ThemeToggle } from '../layout/theme-toggle';
+import { LanguageSwitcher } from '../layout/language-switcher';
 
 export function LandingHeader() {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -90,7 +92,9 @@ export function LandingHeader() {
                         ))}
                     </nav>
                     
-                    <div className="hidden lg:flex items-center gap-4">
+                    <div className="hidden lg:flex items-center gap-2">
+                        <LanguageSwitcher />
+                        <ThemeToggle />
                         <Button variant="ghost" asChild>
                             <Link href="/login">Login</Link>
                         </Button>
@@ -150,6 +154,10 @@ export function LandingHeader() {
                                     animate={{opacity: 1, y: 0}}
                                     transition={{delay: 0.6, ease: 'easeOut'}}
                                 >
+                                    <div className="flex justify-center gap-4">
+                                        <LanguageSwitcher />
+                                        <ThemeToggle />
+                                    </div>
                                     <Button variant="outline" size="lg" asChild>
                                         <Link href="/login" onClick={() => setIsMenuOpen(false)}>Login</Link>
                                     </Button>
