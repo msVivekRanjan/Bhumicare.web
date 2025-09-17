@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from '@/hooks/use-translation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Skeleton } from '../ui/skeleton';
 import { Button } from '../ui/button';
@@ -44,7 +44,7 @@ export function MarketPrices() {
     const [error, setError] = useState<string | null>(null);
     const [showSample, setShowSample] = useState(false);
 
-    const fetchMarketData = async () => {
+    const fetchMarketData = useCallback(async () => {
         setLoading(true);
         setError(null);
         setData([]);
@@ -70,19 +70,21 @@ export function MarketPrices() {
                 setData(formattedData);
             } else {
                  setData([]);
-                 setError("No live market data available at the moment. This may be because markets are closed.");
+                 setError("No live market data available at the moment. This may be because markets are closed. Showing last week's data instead.");
+                 setShowSample(true);
             }
         } catch (err) {
             console.error("Failed to fetch market data:", err);
-            setError("Could not load live market prices. Please check your network and the API status.");
+            setError("Could not load live market prices. Showing last week's data instead.");
+            setShowSample(true);
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchMarketData();
-    }, []);
+    }, [fetchMarketData]);
 
     const renderTable = (records: MandiRecord[], isSample: boolean) => (
         <Table>
@@ -118,9 +120,15 @@ export function MarketPrices() {
 
     return (
         <Card>
-            <CardHeader>
-                <CardTitle className='font-headline'>{showSample ? "Last Week's Market Prices (Sample)" : "Live Market Prices (All India)"}</CardTitle>
-                <CardDescription>Latest commodity prices powered by data.gov.in API (Govt. of India).</CardDescription>
+            <CardHeader className="flex flex-row items-start justify-between">
+                <div>
+                    <CardTitle className='font-headline'>{showSample ? "Last Week's Market Prices (Sample)" : "Live Market Prices (All India)"}</CardTitle>
+                    <CardDescription>Latest commodity prices powered by data.gov.in API.</CardDescription>
+                </div>
+                 <Button onClick={fetchMarketData} variant="outline" size="sm" className="whitespace-nowrap" disabled={loading}>
+                    <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                    Refresh
+                </Button>
             </CardHeader>
             <CardContent>
                  {loading ? (
@@ -129,19 +137,12 @@ export function MarketPrices() {
                            <Skeleton key={i} className="h-12 w-full" />
                         ))}
                     </div>
-                ) : error && !showSample ? (
-                    <div className="text-center text-muted-foreground p-4 space-y-4">
-                        <p className="text-sm">{error}</p>
-                        <div className="flex justify-center gap-4">
-                            <Button onClick={fetchMarketData} variant="secondary">Check Again</Button>
-                            <Button onClick={() => {setShowSample(true); setError(null);}}>View Last Week's Data</Button>
-                        </div>
-                    </div>
-                ) : showSample ? (
-                    renderTable(sampleData, true)
-                ) : data.length > 0 ? (
-                    renderTable(data, false)
-                ) : null }
+                ) : (
+                    <>
+                     {error && <p className="text-sm text-muted-foreground mb-4">{error}</p>}
+                     {showSample ? renderTable(sampleData, true) : renderTable(data, false)}
+                    </>
+                )}
             </CardContent>
         </Card>
     )

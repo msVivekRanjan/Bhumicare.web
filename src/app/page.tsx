@@ -156,7 +156,7 @@ export default function LandingPage() {
                     onMouseMove={handleMouseMove}
                 >
                      <motion.div 
-                        className="absolute inset-0 z-0"
+                        className="absolute inset-0 z-0 pointer-events-none"
                         style={{ background: spotlightStyle }}
                     />
                     <div className="absolute inset-0 bg-background/80 z-0" />
