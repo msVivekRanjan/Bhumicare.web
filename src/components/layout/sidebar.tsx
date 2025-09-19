@@ -32,7 +32,6 @@ export default function AppSidebar() {
     { href: '/reports', label: t('reports'), icon: FileText },
     { href: '/community', label: t('community_forum'), icon: MessageSquare },
     { href: '/alerts', label: t('alerts'), icon: Bell },
-    { href: '/settings', label: t('settings'), icon: Settings },
     { href: '/support', label: t('help_support'), icon: LifeBuoy },
   ];
 

@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { APIProvider, Map, useMap, InfoWindow, AdvancedMarker } from '@vis.gl/react-google-maps';
 import { GOOGLE_MAPS_API_KEY } from '@/lib/constants';
-import { MapLegend } from './map-legend';
+import { MapLegend, getBivariateColor } from './map-legend';
 import { Button } from '../ui/button';
 import { Loader2, LocateFixed, Undo, Expand, Shrink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -23,65 +23,29 @@ type CellData = {
     phosphorus: number;
     potassium: number;
     soilMoisture: number;
-    fertilityIndex: number;
 };
 
 // --- Helper functions for client-side simulation ---
-const calculateFertilityIndex = (data: { nitrogen: number, phosphorus: number, potassium: number, soilMoisture: number }): number => {
-    const { nitrogen, phosphorus, potassium, soilMoisture } = data;
-
-    // Normalize each parameter to a 0-1 scale where 1 is optimal
-    const normN = 1 - Math.abs(150 - nitrogen) / 150; // Optimal at 150
-    const normP = 1 - Math.abs(50 - phosphorus) / 50;   // Optimal at 50
-    const normK = 1 - Math.abs(100 - potassium) / 100; // Optimal at 100
-    const normMoisture = 1 - Math.abs(50 - soilMoisture) / 50; // Optimal at 50
-
-    // Clamp values between 0 and 1
-    const clampedValues = [normN, normP, normK, normMoisture].map(v => Math.max(0, Math.min(1, v)));
-    
-    // Weighted average
-    const fertility = (clampedValues[0] * 0.4) + (clampedValues[1] * 0.2) + (clampedValues[2] * 0.2) + (clampedValues[3] * 0.2);
-    
-    return Math.max(0, Math.min(1, fertility));
-};
-
 const simulateSensorDataForGrid = (
     baseData: { nitrogen: number, phosphorus: number, potassium: number, soilMoisture: number },
     gridCells: {id: string, center: google.maps.LatLngLiteral}[]
-): CellData[] => {
+): Omit<CellData, 'polygon'>[] => {
     return gridCells.map(cell => {
         // Create slight, logical variations based on coordinates
         const latFactor = (cell.center.lat % 0.01) * 100;
         const lngFactor = (cell.center.lng % 0.01) * 100;
 
         const simulatedData = {
-            nitrogen: baseData.nitrogen + (latFactor - 5) * 2, // +/- 10
-            phosphorus: baseData.phosphorus + (lngFactor - 5), // +/- 5
-            potassium: baseData.potassium + (latFactor - lngFactor), // +/- 10
-            soilMoisture: baseData.soilMoisture - (latFactor - 5), // +/- 5
+            nitrogen: baseData.nitrogen + (latFactor - 5) * 8, // Wider range for more color variation
+            phosphorus: baseData.phosphorus + (lngFactor - 5),
+            potassium: baseData.potassium + (latFactor - lngFactor),
+            soilMoisture: baseData.soilMoisture - (lngFactor - 5) * 3, // Wider range for more color variation
         };
-
-        const fertilityIndex = calculateFertilityIndex(simulatedData);
         
-        const cellPoly = cell.id.split('_').map(Number);
-        const i = cellPoly[1];
-        const j = cellPoly[2];
-
-        // This part is a placeholder as the actual polygons are created later.
-        // We just need to pass the data through.
-        const dummyPolygon = [
-             { lat: 0, lng: 0 },
-             { lat: 0, lng: 0 },
-             { lat: 0, lng: 0 },
-             { lat: 0, lng: 0 },
-        ];
-
         return {
             id: cell.id,
             center: cell.center,
-            polygon: dummyPolygon, // Will be replaced later
             ...simulatedData,
-            fertilityIndex,
         };
     });
 };
@@ -188,7 +152,7 @@ const BivariateMap = () => {
         setIsRecommendationLoading(true);
         setInfoWindowRecommendation(null);
         try {
-            const recommendation = await getSmartRecommendation({
+            const result = await getSmartRecommendation({
                 soilMoisture: cellData.soilMoisture,
                 lightLevel: 98, // Using a typical value
                 gasLevel: 29,   // Using a typical value
@@ -198,7 +162,9 @@ const BivariateMap = () => {
                 phosphorus: cellData.phosphorus,
                 potassium: cellData.potassium,
             });
-            setInfoWindowRecommendation(recommendation.recommendation);
+            // Combine multiple recommendations for a concise message
+            const combinedRecommendation = `${result.irrigation} ${result.fertilization}`;
+            setInfoWindowRecommendation(combinedRecommendation);
         } catch (error) {
             console.error("Failed to get recommendation for cell:", error);
             setInfoWindowRecommendation("Could not load recommendation.");
@@ -355,7 +321,6 @@ const BivariateMap = () => {
             setIsLoadingMap(false);
         };
 
-        // Added a timeout to simulate a quick loading process and prevent UI blocking on heavy fields
         setTimeout(generateMap, 100);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -369,9 +334,7 @@ const BivariateMap = () => {
         const newGridPolygons: google.maps.Polygon[] = [];
 
         mapData.forEach(region => {
-            const fertilityIndex = region.fertilityIndex;
-            const hue = (fertilityIndex * 120).toString(10);
-            const color = `hsl(${hue}, 100%, 50%)`;
+            const color = getBivariateColor(region.nitrogen, region.soilMoisture);
 
             const polygon = new google.maps.Polygon({
                 paths: region.polygon,
@@ -379,7 +342,7 @@ const BivariateMap = () => {
                 strokeOpacity: 0.2,
                 strokeWeight: 1,
                 fillColor: color,
-                fillOpacity: 0.6,
+                fillOpacity: 0.7,
                 map: map,
                 zIndex: 3,
             });
@@ -416,14 +379,15 @@ const BivariateMap = () => {
                     onCloseClick={() => setHoverData(null)}
                     options={{ pixelOffset: new window.google.maps.Size(0, -30) }}
                 >
-                    <div className="p-1 text-black font-body w-64">
-                        <h4 className="font-bold text-base mb-2 font-headline">GPS Sensor: {hoverData.id}</h4>
+                    <div className="p-1 text-black font-sans w-64">
+                        <h4 className="font-bold text-base mb-2 font-headline">Cell: {hoverData.id}</h4>
                         <p className="text-xs font-mono">Lat: {hoverData.center.lat.toFixed(4)}, Lng: {hoverData.center.lng.toFixed(4)}</p>
                         <hr className="my-2"/>
-                        <p className="text-xs"><b>Fertility Index:</b> {(hoverData.fertilityIndex * 100).toFixed(0)}%</p>
+                        <p className="text-xs"><b>N:</b> {hoverData.nitrogen.toFixed(0)} mg/kg</p>
                         <p className="text-xs"><b>Moisture:</b> {hoverData.soilMoisture.toFixed(1)}%</p>
-                        <p className="text-xs"><b>N:</b> {hoverData.nitrogen.toFixed(0)} | <b>P:</b> {hoverData.phosphorus.toFixed(0)} | <b>K:</b> {hoverData.potassium.toFixed(0)}</p>
-                        <div className="mt-2 text-xs italic">
+                        <hr className="my-2"/>
+                        <p className="text-xs font-semibold">AI Recommendation:</p>
+                        <div className="mt-1 text-xs italic">
                            {isRecommendationLoading ? (
                             <div className="space-y-1">
                                 <Skeleton className="h-3 w-full" />
@@ -537,8 +501,3 @@ export function AIFertilityMap() {
         </ErrorBoundary>
     );
 }
-
-export const getColorFromIndex = (fertilityIndex: number) => {
-    const hue = (fertilityIndex * 120).toString(10);
-    return `hsl(${hue}, 100%, 45%)`;
-};
