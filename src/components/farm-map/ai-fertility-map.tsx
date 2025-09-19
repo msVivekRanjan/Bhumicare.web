@@ -30,16 +30,23 @@ const simulateSensorDataForGrid = (
     baseData: { nitrogen: number, phosphorus: number, potassium: number, soilMoisture: number },
     gridCells: {id: string, center: google.maps.LatLngLiteral}[]
 ): Omit<CellData, 'polygon'>[] => {
-    return gridCells.map(cell => {
-        // Create slight, logical variations based on coordinates
-        const latFactor = (cell.center.lat % 0.01) * 100;
-        const lngFactor = (cell.center.lng % 0.01) * 100;
+    return gridCells.map((cell, index) => {
+        // Create variations that span the full range of thresholds
+        // This will ensure all 9 colors of the bivariate map are shown
+        const row = Math.floor(index / GRID_RESOLUTION);
+        const col = index % GRID_RESOLUTION;
+
+        // Map indices to values that cross the thresholds (low, medium, high)
+        const nitrogenVariation = (col / (GRID_RESOLUTION -1)) * 200; // 0 to 200
+        const moistureVariation = (row / (GRID_RESOLUTION-1)) * 60; // 0 to 60
 
         const simulatedData = {
-            nitrogen: baseData.nitrogen + (latFactor - 5) * 8, // Wider range for more color variation
-            phosphorus: baseData.phosphorus + (lngFactor - 5),
-            potassium: baseData.potassium + (latFactor - lngFactor),
-            soilMoisture: baseData.soilMoisture - (lngFactor - 5) * 3, // Wider range for more color variation
+            // Start low and go high to ensure color variation
+            nitrogen: 50 + nitrogenVariation, // Spans from 50 (low) to 250 (high)
+            soilMoisture: 10 + moistureVariation, // Spans from 10 (low) to 70 (high)
+            // Keep other values relatively stable for this simulation
+            phosphorus: baseData.phosphorus + (Math.random() - 0.5) * 10,
+            potassium: baseData.potassium + (Math.random() - 0.5) * 20,
         };
         
         return {
