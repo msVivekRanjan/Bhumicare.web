@@ -63,31 +63,31 @@
     {
       "id": "product-testing-1",
       "description": "Product testing in a lab environment",
-      "imageUrl": "https://picsum.photos/seed/labtest/600/400",
+      "imageUrl": "/Assets/Testing/test1.jpeg",
       "imageHint": "lab technology"
     },
     {
       "id": "product-testing-2",
       "description": "Close-up of the IoT device's sensor array",
-      "imageUrl": "https://picsum.photos/seed/sensormacro/600/400",
+      "imageUrl": "/Assets/Testing/test2.jpeg",
       "imageHint": "circuit board"
     },
     {
       "id": "product-testing-3",
       "description": "Device being tested in an outdoor field setting",
-      "imageUrl": "https://picsum.photos/seed/fieldtest/600/400",
+      "imageUrl": "/Assets/Testing/test3.jpeg",
       "imageHint": "farm technology"
     },
     {
       "id": "product-testing-4",
       "description": "Engineer working on the device prototype",
-      "imageUrl": "https://picsum.photos/seed/engineer/600/400",
+      "imageUrl": "/Assets/Testing/test4.jpeg",
       "imageHint": "engineer working"
     },
     {
       "id": "product-testing-5",
       "description": "The device next to a healthy crop",
-      "imageUrl": "https://picsum.photos/seed/devicecrop/600/400",
+      "imageUrl": "/Assets/Testing/test5.jpeg",
       "imageHint": "technology farm"
     },
     {
