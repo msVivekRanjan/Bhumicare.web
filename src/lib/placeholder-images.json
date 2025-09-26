@@ -93,25 +93,25 @@
     {
       "id": "feature-live-data",
       "description": "Live Soil Health Data Feature",
-      "imageUrl": "https://picsum.photos/seed/feature1/800/600",
+      "imageUrl": "/Assets/Features/feat_1.png",
       "imageHint": "data graph"
     },
     {
       "id": "feature-ai-advice",
       "description": "Voice-First AI Advice Feature",
-      "imageUrl": "https://picsum.photos/seed/feature2/800/600",
+      "imageUrl": "/Assets/Features/feat_2.jpg",
       "imageHint": "mobile app"
     },
     {
       "id": "feature-fertility-maps",
       "description": "Dynamic Soil Fertility Maps Feature",
-      "imageUrl": "https://picsum.photos/seed/feature3/800/600",
+      "imageUrl": "/Assets/Features/feat_3.jpg",
       "imageHint": "map satellite"
     },
     {
       "id": "feature-offline-first",
       "description": "Offline-First Design Feature",
-      "imageUrl": "https://picsum.photos/seed/feature4/800/600",
+      "imageUrl": "/Assets/Features/feat_4.png",
       "imageHint": "cloud offline"
     },
     {
